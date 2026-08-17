@@ -1,9 +1,8 @@
-export const CLAUDIAN_STORAGE_PATH = '.claudian';
+export const DEAN_STORAGE_PATH = '.dean';
 
-export const LEGACY_CLAUDIAN_SETTINGS_PATH = '.claude/claudian-settings.json';
-export const CLAUDIAN_SETTINGS_PATH = `${CLAUDIAN_STORAGE_PATH}/claudian-settings.json`;
+export const DEAN_SETTINGS_PATH = `${DEAN_STORAGE_PATH}/dean-settings.json`;
 
 export const LEGACY_SESSIONS_PATH = '.claude/sessions';
-export const SESSIONS_PATH = `${CLAUDIAN_STORAGE_PATH}/sessions`;
+export const SESSIONS_PATH = `${DEAN_STORAGE_PATH}/sessions`;
 export const INPUT_LEDGER_SUFFIX = '.inputs.json';
 export const DELETION_MARKER_SUFFIX = '.deleted.json';

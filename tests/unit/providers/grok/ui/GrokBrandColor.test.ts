@@ -12,19 +12,19 @@ describe('Grok brand color', () => {
   );
 
   it('uses white in dark mode and black in light mode', () => {
-    expect(variablesCss).toContain('--claudian-brand-grok: #ffffff;');
-    expect(variablesCss).toContain('--claudian-brand-grok-rgb: 255, 255, 255;');
+    expect(variablesCss).toContain('--dean-brand-grok: #ffffff;');
+    expect(variablesCss).toContain('--dean-brand-grok-rgb: 255, 255, 255;');
     expect(variablesCss).toMatch(
-      /body\.theme-light \.claudian-container \{[\s\S]*?--claudian-brand-grok: #000000;[\s\S]*?--claudian-brand-grok-rgb: 0, 0, 0;[\s\S]*?\}/,
+      /body\.theme-light \.dean-container \{[\s\S]*?--dean-brand-grok: #000000;[\s\S]*?--dean-brand-grok-rgb: 0, 0, 0;[\s\S]*?\}/,
     );
   });
 
   it('routes active and streaming Grok surfaces through its brand token', () => {
     expect(variablesCss).toMatch(
-      /\.claudian-container\[data-provider="grok"\] \{[\s\S]*?--claudian-brand: var\(--claudian-brand-grok\);[\s\S]*?--claudian-brand-rgb: var\(--claudian-brand-grok-rgb\);[\s\S]*?\}/,
+      /\.dean-container\[data-provider="grok"\] \{[\s\S]*?--dean-brand: var\(--dean-brand-grok\);[\s\S]*?--dean-brand-rgb: var\(--dean-brand-grok-rgb\);[\s\S]*?\}/,
     );
     expect(tabsCss).toMatch(
-      /\.claudian-tab-badge-streaming\[data-provider="grok"\] \{[\s\S]*?border-color: var\(--claudian-brand-grok, #ffffff\);[\s\S]*?\}/,
+      /\.dean-tab-badge-streaming\[data-provider="grok"\] \{[\s\S]*?border-color: var\(--dean-brand-grok, #ffffff\);[\s\S]*?\}/,
     );
   });
 });

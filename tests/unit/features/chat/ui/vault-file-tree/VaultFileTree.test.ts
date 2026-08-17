@@ -189,10 +189,10 @@ describe('VaultFileTree', () => {
     expect(model.options.unsafeCSS).not.toContain('truncate-marker');
     expect(root.isRoot).toHaveBeenCalledTimes(1);
     expect(model.render).toHaveBeenCalledWith({
-      containerWrapper: hostEl.querySelector('.claudian-vault-file-tree-pane'),
+      containerWrapper: hostEl.querySelector('.dean-vault-file-tree-pane'),
     });
-    expect(hostEl.querySelector('.claudian-vault-file-tree-loading')).toBeNull();
-    expect(hostEl.querySelector('.claudian-vault-file-tree-title')?.textContent)
+    expect(hostEl.querySelector('.dean-vault-file-tree-loading')).toBeNull();
+    expect(hostEl.querySelector('.dean-vault-file-tree-title')?.textContent)
       .toBe('Knowledge Vault');
   });
 
@@ -227,7 +227,7 @@ describe('VaultFileTree', () => {
   it('opens an activated file in an existing navigable Obsidian leaf', async () => {
     const { getLeaf, hostEl, openFile, tree } = createHarness();
     await tree.mount();
-    const treePane = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-pane');
+    const treePane = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-pane');
     if (!treePane) throw new Error('Tree pane was not rendered');
     const folderRow = createTreeRow(treePane, 'Projects/', 'folder');
     const fileRow = createTreeRow(treePane, 'Projects/Plan.md', 'file');
@@ -246,7 +246,7 @@ describe('VaultFileTree', () => {
   it('reopens repeated file activations and ignores modifier selection clicks', async () => {
     const { hostEl, openFile, tree } = createHarness();
     await tree.mount();
-    const treePane = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-pane');
+    const treePane = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-pane');
     if (!treePane) throw new Error('Tree pane was not rendered');
     const fileRow = createTreeRow(treePane, 'Projects/Plan.md', 'file');
 
@@ -278,7 +278,7 @@ describe('VaultFileTree', () => {
     const { hostEl, openFile, tree } = createHarness(ownerDocument);
     ownerDocument.body.append(hostEl);
     await tree.mount();
-    const treePane = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-pane');
+    const treePane = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-pane');
     if (!treePane) throw new Error('Tree pane was not rendered');
     const fileRow = createTreeRow(treePane, 'Projects/Plan.md', 'file');
 
@@ -301,7 +301,7 @@ describe('VaultFileTree', () => {
       finishFirstOpen = resolve;
     }));
     await tree.mount();
-    const treePane = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-pane');
+    const treePane = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-pane');
     if (!treePane) throw new Error('Tree pane was not rendered');
     const firstRow = createTreeRow(treePane, 'Projects/Plan.md', 'file');
     const laterRow = createTreeRow(treePane, 'Projects/Later.md', 'file');
@@ -353,26 +353,26 @@ describe('VaultFileTree', () => {
     const { files, handlers, hostEl, tree } = createHarness();
     await tree.mount();
     const model = FakePierreTree.instances[0];
-    const header = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-header');
+    const header = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-header');
     const defaultHeader = hostEl.querySelector<HTMLElement>(
-      '.claudian-vault-file-tree-default-header',
+      '.dean-vault-file-tree-default-header',
     );
     const searchButton = hostEl.querySelector<HTMLButtonElement>('[aria-label="Search files"]');
-    const searchField = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-search');
-    const searchInput = hostEl.querySelector<HTMLInputElement>('.claudian-vault-file-tree-search-input');
+    const searchField = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-search');
+    const searchInput = hostEl.querySelector<HTMLInputElement>('.dean-vault-file-tree-search-input');
     const focusSearchInput = jest.spyOn(searchInput as HTMLInputElement, 'focus');
 
     expect(searchField?.parentElement).toBe(header);
     expect(hostEl.children).toHaveLength(2);
-    expect(defaultHeader?.classList.contains('claudian-hidden')).toBe(false);
+    expect(defaultHeader?.classList.contains('dean-hidden')).toBe(false);
     expect(searchButton?.getAttribute('aria-expanded')).toBe('false');
-    expect(searchField?.classList.contains('claudian-hidden')).toBe(true);
+    expect(searchField?.classList.contains('dean-hidden')).toBe(true);
     searchButton?.click();
-    expect(defaultHeader?.classList.contains('claudian-hidden')).toBe(true);
+    expect(defaultHeader?.classList.contains('dean-hidden')).toBe(true);
     expect(searchButton?.getAttribute('aria-expanded')).toBe('true');
-    expect(searchField?.classList.contains('claudian-hidden')).toBe(false);
+    expect(searchField?.classList.contains('dean-hidden')).toBe(false);
     expect(searchField?.lastElementChild?.classList.contains(
-      'claudian-vault-file-tree-search-icon',
+      'dean-vault-file-tree-search-icon',
     )).toBe(true);
     expect(focusSearchInput).toHaveBeenCalledTimes(1);
 
@@ -389,9 +389,9 @@ describe('VaultFileTree', () => {
         paths: ['Projects/Plan.md'],
       }));
       expect(model.setSearch).not.toHaveBeenCalled();
-      const panes = hostEl.querySelectorAll<HTMLElement>('.claudian-vault-file-tree-pane');
-      expect(panes[0].classList.contains('claudian-hidden')).toBe(true);
-      expect(panes[1].classList.contains('claudian-hidden')).toBe(false);
+      const panes = hostEl.querySelectorAll<HTMLElement>('.dean-vault-file-tree-pane');
+      expect(panes[0].classList.contains('dean-hidden')).toBe(true);
+      expect(panes[1].classList.contains('dean-hidden')).toBe(false);
 
       const created = createFile('Projects/Plan update.md');
       files.push(created);
@@ -411,8 +411,8 @@ describe('VaultFileTree', () => {
       searchInput.value = '';
       searchInput.dispatchEvent(new Event('input'));
       expect(refreshedSearchModel.cleanUp).toHaveBeenCalledTimes(1);
-      expect(panes[0].classList.contains('claudian-hidden')).toBe(false);
-      expect(panes[1].classList.contains('claudian-hidden')).toBe(true);
+      expect(panes[0].classList.contains('dean-hidden')).toBe(false);
+      expect(panes[1].classList.contains('dean-hidden')).toBe(true);
       jest.advanceTimersByTime(100);
       expect(model.batch).toHaveBeenCalledTimes(1);
 
@@ -436,7 +436,7 @@ describe('VaultFileTree', () => {
     await tree.mount();
     const searchButton = hostEl.querySelector<HTMLButtonElement>('[aria-label="Search files"]');
     const searchInput = hostEl.querySelector<HTMLInputElement>(
-      '.claudian-vault-file-tree-search-input',
+      '.dean-vault-file-tree-search-input',
     );
 
     jest.useFakeTimers();
@@ -448,7 +448,7 @@ describe('VaultFileTree', () => {
       jest.advanceTimersByTime(300);
 
       expect(FakePierreTree.instances[1].options.paths).toHaveLength(500);
-      expect(hostEl.querySelector('.claudian-vault-file-tree-search-limit')?.textContent)
+      expect(hostEl.querySelector('.dean-vault-file-tree-search-limit')?.textContent)
         .toBe('Showing the first 500 matches');
       expect(FakePierreTree.instances[0].setSearch).not.toHaveBeenCalled();
     } finally {
@@ -462,9 +462,9 @@ describe('VaultFileTree', () => {
     document.body.append(hostEl);
     await tree.mount();
     const searchButton = hostEl.querySelector<HTMLButtonElement>('[aria-label="Search files"]');
-    const searchField = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-search');
+    const searchField = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-search');
     const searchInput = hostEl.querySelector<HTMLInputElement>(
-      '.claudian-vault-file-tree-search-input',
+      '.dean-vault-file-tree-search-input',
     );
 
     jest.useFakeTimers();
@@ -476,11 +476,11 @@ describe('VaultFileTree', () => {
       searchInput.dispatchEvent(new Event('input'));
       jest.advanceTimersByTime(300);
       const resultButton = document.createElement('button');
-      hostEl.querySelector('.claudian-vault-file-tree-pane:not(.claudian-hidden)')
+      hostEl.querySelector('.dean-vault-file-tree-pane:not(.dean-hidden)')
         ?.append(resultButton);
       resultButton.focus();
 
-      expect(searchField?.classList.contains('claudian-hidden')).toBe(false);
+      expect(searchField?.classList.contains('dean-hidden')).toBe(false);
       expect(FakePierreTree.instances[1].cleanUp).not.toHaveBeenCalled();
     } finally {
       jest.useRealTimers();
@@ -494,9 +494,9 @@ describe('VaultFileTree', () => {
     document.body.append(hostEl);
     await tree.mount();
     const searchButton = hostEl.querySelector<HTMLButtonElement>('[aria-label="Search files"]');
-    const searchField = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-search');
+    const searchField = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-search');
     const searchInput = hostEl.querySelector<HTMLInputElement>(
-      '.claudian-vault-file-tree-search-input',
+      '.dean-vault-file-tree-search-input',
     );
 
     jest.useFakeTimers();
@@ -508,7 +508,7 @@ describe('VaultFileTree', () => {
       searchInput.dispatchEvent(new Event('input'));
       jest.advanceTimersByTime(300);
       const searchPane = hostEl.querySelector<HTMLElement>(
-        '.claudian-vault-file-tree-pane:not(.claudian-hidden)',
+        '.dean-vault-file-tree-pane:not(.dean-hidden)',
       );
       if (!searchPane) throw new Error('Search results were not rendered');
       const fileRow = createTreeRow(searchPane, 'Projects/Plan.md', 'file');
@@ -520,11 +520,11 @@ describe('VaultFileTree', () => {
         metaKey: true,
       }));
       jest.runAllTicks();
-      expect(searchField?.classList.contains('claudian-hidden')).toBe(false);
+      expect(searchField?.classList.contains('dean-hidden')).toBe(false);
 
       folderRow.click();
       jest.runAllTicks();
-      expect(searchField?.classList.contains('claudian-hidden')).toBe(false);
+      expect(searchField?.classList.contains('dean-hidden')).toBe(false);
       expect(FakePierreTree.instances[1].cleanUp).not.toHaveBeenCalled();
     } finally {
       jest.useRealTimers();
@@ -537,11 +537,11 @@ describe('VaultFileTree', () => {
     const { hostEl, tree } = createHarness();
     await tree.mount();
     const defaultHeader = hostEl.querySelector<HTMLElement>(
-      '.claudian-vault-file-tree-default-header',
+      '.dean-vault-file-tree-default-header',
     );
     const searchButton = hostEl.querySelector<HTMLButtonElement>('[aria-label="Search files"]');
-    const searchField = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-search');
-    const searchInput = hostEl.querySelector<HTMLInputElement>('.claudian-vault-file-tree-search-input');
+    const searchField = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-search');
+    const searchInput = hostEl.querySelector<HTMLInputElement>('.dean-vault-file-tree-search-input');
     const blurSearchInput = jest.spyOn(searchInput as HTMLInputElement, 'blur');
     const focusSearchButton = jest.spyOn(searchButton as HTMLButtonElement, 'focus');
 
@@ -553,8 +553,8 @@ describe('VaultFileTree', () => {
 
     expect(searchInput.value).toBe('');
     expect(FakePierreTree.instances).toHaveLength(1);
-    expect(searchField?.classList.contains('claudian-hidden')).toBe(true);
-    expect(defaultHeader?.classList.contains('claudian-hidden')).toBe(false);
+    expect(searchField?.classList.contains('dean-hidden')).toBe(true);
+    expect(defaultHeader?.classList.contains('dean-hidden')).toBe(false);
     expect(searchButton?.getAttribute('aria-expanded')).toBe('false');
     expect(blurSearchInput).toHaveBeenCalledTimes(1);
     expect(focusSearchButton).not.toHaveBeenCalled();
@@ -564,8 +564,8 @@ describe('VaultFileTree', () => {
     const { hostEl, tree } = createHarness();
     await tree.mount();
     const searchButton = hostEl.querySelector<HTMLButtonElement>('[aria-label="Search files"]');
-    const searchField = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-search');
-    const searchInput = hostEl.querySelector<HTMLInputElement>('.claudian-vault-file-tree-search-input');
+    const searchField = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-search');
+    const searchInput = hostEl.querySelector<HTMLInputElement>('.dean-vault-file-tree-search-input');
     const blurSearchInput = jest.spyOn(searchInput as HTMLInputElement, 'blur');
 
     searchButton?.click();
@@ -577,7 +577,7 @@ describe('VaultFileTree', () => {
     expect(tree.handleEscape(event)).toBe(true);
     expect(searchInput.value).toBe('');
     expect(FakePierreTree.instances).toHaveLength(1);
-    expect(searchField?.classList.contains('claudian-hidden')).toBe(true);
+    expect(searchField?.classList.contains('dean-hidden')).toBe(true);
     expect(blurSearchInput).toHaveBeenCalledTimes(1);
     expect(tree.handleEscape(event)).toBe(false);
   });
@@ -586,8 +586,8 @@ describe('VaultFileTree', () => {
     const { hostEl, tree } = createHarness();
     await tree.mount();
     const searchButton = hostEl.querySelector<HTMLButtonElement>('[aria-label="Search files"]');
-    const searchField = hostEl.querySelector<HTMLElement>('.claudian-vault-file-tree-search');
-    const searchInput = hostEl.querySelector<HTMLInputElement>('.claudian-vault-file-tree-search-input');
+    const searchField = hostEl.querySelector<HTMLElement>('.dean-vault-file-tree-search');
+    const searchInput = hostEl.querySelector<HTMLInputElement>('.dean-vault-file-tree-search-input');
     const blurSearchInput = jest.spyOn(searchInput as HTMLInputElement, 'blur');
 
     searchButton?.click();
@@ -600,7 +600,7 @@ describe('VaultFileTree', () => {
 
     expect(searchInput.value).toBe('');
     expect(FakePierreTree.instances).toHaveLength(1);
-    expect(searchField?.classList.contains('claudian-hidden')).toBe(true);
+    expect(searchField?.classList.contains('dean-hidden')).toBe(true);
     expect(blurSearchInput).toHaveBeenCalledTimes(1);
   });
 

@@ -28,18 +28,18 @@
 | `ChatState` | Transient per-tab message projection, stream state, queued input, render state, and conversation-operation flags |
 | `TabStatePersistenceCoordinator` | Debouncing, snapshotting, ordering, retry retention, and flushing of tab-layout writes |
 | `TabBar` | Expanded-title presentation state for the current view |
-| `ClaudianView` | View assembly, rendered DOM placement, presentation coordination, layout-mode navigation, and assembly of the persisted current-tab snapshot |
+| `DeanView` | View assembly, rendered DOM placement, presentation coordination, layout-mode navigation, and assembly of the persisted current-tab snapshot |
 
 `TabSession` stores lifecycle values, while lifecycle operations in `TabLifecycle` and `TabManager` perform the transitions. Controllers, renderers, and UI components must request those operations instead of assigning lifecycle state themselves.
 
-`TabStatePersistenceCoordinator` owns write sequencing, not semantic tab state. It receives the active tab identity assembled by `ClaudianView`; it must not infer, add, or remove runtime tabs.
+`TabStatePersistenceCoordinator` owns write sequencing, not semantic tab state. It receives the active tab identity assembled by `DeanView`; it must not infer, add, or remove runtime tabs.
 
 ## State Model
 
 Keep these layers independent:
 
 1. **Durable conversation state**
-   - Claudian's in-memory conversation projection, metadata, input ledger, and provider resume snapshot are coordinated by the application conversation repository.
+   - Dean's in-memory conversation projection, metadata, input ledger, and provider resume snapshot are coordinated by the application conversation repository.
    - Provider-native transcripts remain provider-owned replay sources and are read-only.
 2. **Persisted tab shell**
    - `AppTabManagerState` currently stores only the active tab ID and its conversation binding. Legacy multi-tab snapshots are restored as the current tab only.
@@ -105,6 +105,6 @@ Tab activation and conversation hydration do not themselves authorize creation o
 
 ## Gotchas
 
-- `ClaudianView.onClose()` must abort active tabs and dispose execution coordinators.
+- `DeanView.onClose()` must abort active tabs and dispose execution coordinators.
 - Bang-bash mode bypasses provider execution and runs a local shell command directly. It is available only when the enabled provider exposes it in `ProviderChatUIConfig`.
 - Forking is provider-owned under the hood. Use execution and provider history contracts instead of reconstructing provider session IDs in feature code.

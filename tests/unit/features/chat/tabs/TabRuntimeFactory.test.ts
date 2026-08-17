@@ -418,7 +418,7 @@ describe('Tab provider execution ownership', () => {
     tab.dom.messagesEl.scrollTo = jest.fn();
 
     const bottomButton = tab.dom.messagesWrapperEl.querySelector(
-      '.claudian-nav-btn-bottom',
+      '.dean-nav-btn-bottom',
     );
     bottomButton?.click();
 
@@ -436,25 +436,25 @@ describe('Tab provider execution ownership', () => {
 
     expect(tab.state.autoScrollEnabled).toBe(true);
 
-    const sidebar = tab.dom.messagesWrapperEl.querySelector('.claudian-nav-sidebar');
+    const sidebar = tab.dom.messagesWrapperEl.querySelector('.dean-nav-sidebar');
     for (const buttonIndex of [0, 1, 3]) {
       bottomButton?.click();
       sidebar?.children[buttonIndex]?.click();
       expect(tab.state.autoScrollEnabled).toBe(false);
     }
 
-    const userMessage = tab.dom.messagesEl.createDiv({ cls: 'claudian-message-user' });
+    const userMessage = tab.dom.messagesEl.createDiv({ cls: 'dean-message-user' });
     userMessage.setAttribute('data-toc-title', 'Prompt');
     const queryMessages = tab.dom.messagesEl.querySelectorAll.bind(tab.dom.messagesEl);
     tab.dom.messagesEl.querySelectorAll = jest.fn((selector: string) => (
-      selector === '.claudian-message-user, [data-role="user"]'
+      selector === '.dean-message-user, [data-role="user"]'
         ? [userMessage]
         : queryMessages(selector)
     ));
     const messageControl = userMessage.createEl('button');
     bottomButton?.click();
     sidebar?.children[2]?.click();
-    tab.dom.messagesWrapperEl.querySelector('.claudian-nav-toc-item')?.click();
+    tab.dom.messagesWrapperEl.querySelector('.dean-nav-toc-item')?.click();
     expect(tab.state.autoScrollEnabled).toBe(false);
 
     bottomButton?.click();
@@ -573,7 +573,7 @@ describe('Tab provider execution ownership', () => {
     tab.state.autoScrollEnabled = false;
     tab.dom.messagesEl.scrollTo = jest.fn();
 
-    tab.dom.messagesWrapperEl.querySelector('.claudian-nav-btn-bottom')?.click();
+    tab.dom.messagesWrapperEl.querySelector('.dean-nav-btn-bottom')?.click();
 
     expect(tab.state.autoScrollEnabled).toBe(false);
   });
@@ -592,7 +592,7 @@ describe('Tab provider execution ownership', () => {
       tab.state.autoScrollEnabled = false;
 
       tab.dom.messagesEl.dispatchEvent('scroll');
-      tab.dom.messagesWrapperEl.querySelector('.claudian-nav-btn-top')?.click();
+      tab.dom.messagesWrapperEl.querySelector('.dean-nav-btn-top')?.click();
       jest.advanceTimersByTime(150);
 
       expect(tab.state.autoScrollEnabled).toBe(false);
@@ -935,7 +935,7 @@ describe('Tab provider execution ownership', () => {
     const tab = await createTestTab({ plugin, containerEl: createMockEl() as any });
     const modelOptions = Array.from(
       tab.dom.inputWrapper.querySelectorAll(
-        '.claudian-model-option',
+        '.dean-model-option',
       ) as NodeListOf<HTMLElement>,
     );
     const alternate = modelOptions.find(option =>
@@ -981,7 +981,7 @@ describe('Tab provider execution ownership', () => {
       });
       const modelOptions = Array.from(
         tab.dom.inputWrapper.querySelectorAll(
-          '.claudian-model-option',
+          '.dean-model-option',
         ) as NodeListOf<HTMLElement>,
       );
       const codex = modelOptions.find(option =>
@@ -1042,7 +1042,7 @@ describe('Tab provider execution ownership', () => {
       });
       const modelOptions = Array.from(
         tab.dom.inputWrapper.querySelectorAll(
-          '.claudian-model-option',
+          '.dean-model-option',
         ) as NodeListOf<HTMLElement>,
       );
       const codex = modelOptions.find(option =>
@@ -1088,7 +1088,7 @@ describe('Tab provider execution ownership', () => {
     const tab = await createTestTab({ plugin, containerEl: createMockEl() as any });
     const modelOptions = Array.from(
       tab.dom.inputWrapper.querySelectorAll(
-        '.claudian-model-option',
+        '.dean-model-option',
       ) as NodeListOf<HTMLElement>,
     );
     const alternate = modelOptions.find(option =>
@@ -1144,7 +1144,7 @@ describe('Tab provider execution ownership', () => {
       });
       const modelOptions = Array.from(
         tab.dom.inputWrapper.querySelectorAll(
-          '.claudian-model-option',
+          '.dean-model-option',
         ) as NodeListOf<HTMLElement>,
       );
       const first = modelOptions.find(option =>
@@ -1192,7 +1192,7 @@ describe('Tab provider execution ownership', () => {
     });
     const modelOptions = Array.from(
       tab.dom.inputWrapper.querySelectorAll(
-        '.claudian-model-option',
+        '.dean-model-option',
       ) as NodeListOf<HTMLElement>,
     );
     const alternate = modelOptions.find(option =>
@@ -1236,7 +1236,7 @@ describe('Tab provider execution ownership', () => {
     });
     const modelOptions = Array.from(
       tab.dom.inputWrapper.querySelectorAll(
-        '.claudian-model-option',
+        '.dean-model-option',
       ) as NodeListOf<HTMLElement>,
     );
     const alternate = modelOptions.find(option =>
@@ -1269,7 +1269,7 @@ describe('Tab provider execution ownership', () => {
     });
     const modelOptions = Array.from(
       tab.dom.inputWrapper.querySelectorAll(
-        '.claudian-model-option',
+        '.dean-model-option',
       ) as NodeListOf<HTMLElement>,
     );
     const alternate = modelOptions.find(option =>
@@ -1445,7 +1445,7 @@ describe('Tab provider execution ownership', () => {
     selectionController.updateIndicator();
 
     const removeButton = tab.dom.contextRowEl.querySelector(
-      '.claudian-context-chip-remove',
+      '.dean-context-chip-remove',
     ) as any;
     removeButton.dispatchEvent('click');
 

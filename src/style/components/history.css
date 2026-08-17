@@ -1,10 +1,10 @@
-.claudian-history-container {
+.dean-history-container {
   position: static;
 }
 
-.claudian-session-sidebar {
+.dean-session-sidebar {
   display: none;
-  flex: 0 0 var(--claudian-session-sidebar-width, 240px);
+  flex: 0 0 var(--dean-session-sidebar-width, 240px);
   flex-direction: column;
   min-width: 0;
   min-height: 0;
@@ -12,7 +12,7 @@
   background: var(--background-primary);
 }
 
-.claudian-session-resizer {
+.dean-session-resizer {
   position: relative;
   display: none;
   flex: 0 0 5px;
@@ -20,7 +20,7 @@
   touch-action: none;
 }
 
-.claudian-session-resizer::after {
+.dean-session-resizer::after {
   position: absolute;
   inset-block: 0;
   inset-inline-start: 2px;
@@ -30,31 +30,31 @@
   transition: background 0.15s ease;
 }
 
-.claudian-session-resizer:hover::after,
-.claudian-session-resizer:focus-visible::after,
-.claudian-resizing-session-sidebar .claudian-session-resizer::after {
+.dean-session-resizer:hover::after,
+.dean-session-resizer:focus-visible::after,
+.dean-resizing-session-sidebar .dean-session-resizer::after {
   background: var(--interactive-accent);
 }
 
-.claudian-resizing-session-sidebar,
-.claudian-resizing-session-sidebar * {
+.dean-resizing-session-sidebar,
+.dean-resizing-session-sidebar * {
   cursor: col-resize;
   user-select: none;
 }
 
-.claudian-wide-session-layout .claudian-session-sidebar {
+.dean-wide-session-layout .dean-session-sidebar {
   display: flex;
 }
 
-.claudian-wide-session-layout .claudian-session-resizer {
+.dean-wide-session-layout .dean-session-resizer {
   display: block;
 }
 
-.claudian-wide-session-layout .claudian-view-input-nav-row {
+.dean-wide-session-layout .dean-view-input-nav-row {
   display: none;
 }
 
-.claudian-sidebar-surface-switcher {
+.dean-sidebar-surface-switcher {
   display: flex;
   flex: 0 0 28px;
   align-items: center;
@@ -65,7 +65,7 @@
   background: transparent;
 }
 
-.claudian-session-sidebar .claudian-sidebar-surface-button {
+.dean-session-sidebar .dean-sidebar-surface-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,13 +81,13 @@
   box-shadow: none;
 }
 
-.claudian-session-sidebar .claudian-sidebar-surface-button:hover,
-.claudian-session-sidebar .claudian-sidebar-surface-button:active {
+.dean-session-sidebar .dean-sidebar-surface-button:hover,
+.dean-session-sidebar .dean-sidebar-surface-button:active {
   background: transparent;
   box-shadow: none;
 }
 
-.claudian-session-sidebar .claudian-sidebar-surface-button::before {
+.dean-session-sidebar .dean-sidebar-surface-button::before {
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -97,29 +97,29 @@
   transition: opacity 0.12s ease;
 }
 
-.claudian-session-sidebar .claudian-sidebar-surface-button:hover::before {
+.dean-session-sidebar .dean-sidebar-surface-button:hover::before {
   opacity: 0.45;
 }
 
-.claudian-session-sidebar .claudian-sidebar-surface-button.is-active::before {
+.dean-session-sidebar .dean-sidebar-surface-button.is-active::before {
   opacity: 0.72;
 }
 
-.claudian-session-sidebar .claudian-sidebar-surface-button:focus-visible {
+.dean-session-sidebar .dean-sidebar-surface-button:focus-visible {
   background: transparent;
   box-shadow: none;
   outline: none;
 }
 
-.claudian-session-sidebar .claudian-sidebar-surface-button:focus-visible::before {
+.dean-session-sidebar .dean-sidebar-surface-button:focus-visible::before {
   opacity: 0.72;
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
 }
 
-.claudian-session-new-control,
-.claudian-session-search-control,
-.claudian-session-archive-control {
+.dean-session-new-control,
+.dean-session-search-control,
+.dean-session-archive-control {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -134,17 +134,17 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.claudian-session-new-control:hover,
-.claudian-session-new-control:focus-visible,
-.claudian-session-search-control:hover,
-.claudian-session-search-control:focus-visible,
-.claudian-session-archive-control:hover,
-.claudian-session-archive-control:focus-visible {
+.dean-session-new-control:hover,
+.dean-session-new-control:focus-visible,
+.dean-session-search-control:hover,
+.dean-session-search-control:focus-visible,
+.dean-session-archive-control:hover,
+.dean-session-archive-control:focus-visible {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudian-session-search-field {
+.dean-session-search-field {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -156,11 +156,11 @@
   color: var(--text-muted);
 }
 
-.claudian-session-archive-control {
+.dean-session-archive-control {
   margin-bottom: 12px;
 }
 
-.claudian-session-search-input {
+.dean-session-search-input {
   flex: 1 1 auto;
   min-width: 0;
   padding: 0;
@@ -172,33 +172,33 @@
   box-shadow: none;
 }
 
-.claudian-session-search-input:hover,
-.claudian-session-search-input:focus {
+.dean-session-search-input:hover,
+.dean-session-search-input:focus {
   border: 0;
   background: transparent;
   box-shadow: none;
   outline: none;
 }
 
-.claudian-session-search-input::-webkit-search-cancel-button {
+.dean-session-search-input::-webkit-search-cancel-button {
   display: none;
 }
 
-.claudian-session-new-icon,
-.claudian-session-nav-icon {
+.dean-session-new-icon,
+.dean-session-nav-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 16px;
 }
 
-.claudian-session-new-icon svg,
-.claudian-session-nav-icon svg {
+.dean-session-new-icon svg,
+.dean-session-nav-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudian-session-sidebar .claudian-history-header {
+.dean-session-sidebar .dean-history-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -207,24 +207,24 @@
   border-bottom: none;
 }
 
-.claudian-session-sidebar .claudian-history-section--sessions:not(:first-child) {
+.dean-session-sidebar .dean-history-section--sessions:not(:first-child) {
   margin-top: 4px;
 }
 
-.claudian-session-sidebar .claudian-session-section-header {
+.dean-session-sidebar .dean-session-section-header {
   flex-shrink: 0;
   min-height: 40px;
   background: var(--background-primary);
 }
 
-.claudian-session-header-actions {
+.dean-session-header-actions {
   display: flex;
   align-items: center;
   gap: 4px;
   margin-inline-start: auto;
 }
 
-.claudian-session-header-btn {
+.dean-session-header-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -233,7 +233,7 @@
   cursor: pointer;
 }
 
-.claudian-session-header-icon {
+.dean-session-header-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -243,22 +243,22 @@
   transition: color 0.15s ease;
 }
 
-.claudian-session-header-btn:hover .claudian-session-header-icon,
-.claudian-session-header-btn:focus-visible .claudian-session-header-icon {
+.dean-session-header-btn:hover .dean-session-header-icon,
+.dean-session-header-btn:focus-visible .dean-session-header-icon {
   color: var(--text-normal);
 }
 
-.claudian-session-header-icon svg {
+.dean-session-header-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudian-session-header-icon[data-icon-state] svg {
+.dean-session-header-icon[data-icon-state] svg {
   width: 14px;
   height: 14px;
 }
 
-.claudian-session-sidebar .claudian-history-list {
+.dean-session-sidebar .dean-history-list {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -267,7 +267,7 @@
   overflow: hidden;
 }
 
-.claudian-session-sidebar .claudian-history-section--pinned {
+.dean-session-sidebar .dean-history-section--pinned {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
@@ -275,29 +275,29 @@
   min-height: 0;
 }
 
-.claudian-session-sidebar .claudian-history-section--pinned
-  .claudian-history-section-items {
+.dean-session-sidebar .dean-history-section--pinned
+  .dean-history-section-items {
   min-height: 0;
   overflow-y: auto;
   overflow-anchor: none;
 }
 
-.claudian-session-sidebar .claudian-history-section--sessions,
-.claudian-session-sidebar .claudian-history-section--archived {
+.dean-session-sidebar .dean-history-section--sessions,
+.dean-session-sidebar .dean-history-section--archived {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
 }
 
-.claudian-session-sidebar .claudian-session-list-items {
+.dean-session-sidebar .dean-session-list-items {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overflow-anchor: none;
 }
 
-.claudian-session-group-header {
+.dean-session-group-header {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -310,24 +310,24 @@
   border-radius: 6px;
 }
 
-.claudian-session-group-header:hover,
-.claudian-session-group-header:focus-visible {
+.dean-session-group-header:hover,
+.dean-session-group-header:focus-visible {
   background: var(--background-modifier-hover);
 }
 
-.claudian-session-group-icon {
+.dean-session-group-icon {
   display: flex;
   flex: 0 0 14px;
   align-items: center;
   justify-content: center;
 }
 
-.claudian-session-group-icon svg {
+.dean-session-group-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.claudian-session-group-label {
+.dean-session-group-label {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
@@ -335,19 +335,19 @@
   white-space: nowrap;
 }
 
-.claudian-session-group-header--attention .claudian-session-group-label {
+.dean-session-group-header--attention .dean-session-group-label {
   color: var(--text-normal);
   animation: attention-title-pulse 1.6s ease-in-out infinite;
 }
 
-.claudian-session-group-status {
+.dean-session-group-status {
   flex-shrink: 0;
   font-size: 10px;
   font-weight: 400;
 }
 
-.claudian-session-group-running-indicator,
-.claudian-session-running-indicator {
+.dean-session-group-running-indicator,
+.dean-session-running-indicator {
   display: none;
   flex: 0 0 14px;
   align-items: center;
@@ -355,20 +355,20 @@
   color: var(--interactive-accent);
 }
 
-.claudian-session-group-running-indicator--visible,
-.claudian-session-running-indicator {
+.dean-session-group-running-indicator--visible,
+.dean-session-running-indicator {
   display: flex;
 }
 
-.claudian-session-group-running-indicator svg,
-.claudian-session-running-indicator svg {
+.dean-session-group-running-indicator svg,
+.dean-session-running-indicator svg {
   width: 14px;
   height: 14px;
   animation: spin 1s linear infinite;
   stroke-width: 2.5;
 }
 
-.claudian-session-group-new-action {
+.dean-session-group-new-action {
   display: none;
   flex: 0 0 18px;
   width: 18px;
@@ -382,90 +382,90 @@
   box-shadow: none;
 }
 
-.claudian-session-group-header:hover .claudian-session-group-new-action,
-.claudian-session-group-header:focus-within .claudian-session-group-new-action {
+.dean-session-group-header:hover .dean-session-group-new-action,
+.dean-session-group-header:focus-within .dean-session-group-new-action {
   display: flex;
 }
 
-.claudian-session-group-new-action:hover,
-.claudian-session-group-new-action:focus-visible {
+.dean-session-group-new-action:hover,
+.dean-session-group-new-action:focus-visible {
   border: 0;
   background: transparent;
   color: var(--text-normal);
   box-shadow: none;
 }
 
-.claudian-session-group-new-action svg {
+.dean-session-group-new-action svg {
   width: 14px;
   height: 14px;
   color: var(--text-muted);
   transition: color 0.15s ease;
 }
 
-.claudian-session-group-new-action:hover svg,
-.claudian-session-group-new-action:focus-visible svg {
+.dean-session-group-new-action:hover svg,
+.dean-session-group-new-action:focus-visible svg {
   color: var(--text-normal);
 }
 
-.claudian-session-group-body--collapsed {
+.dean-session-group-body--collapsed {
   display: none;
 }
 
-.claudian-session-group-header--missing .claudian-session-group-icon,
-.claudian-session-group-header--missing .claudian-session-group-label,
-.claudian-session-group-header--missing .claudian-session-group-status {
+.dean-session-group-header--missing .dean-session-group-icon,
+.dean-session-group-header--missing .dean-session-group-label,
+.dean-session-group-header--missing .dean-session-group-status {
   color: var(--text-error);
 }
 
-.claudian-session-sidebar .claudian-history-item {
+.dean-session-sidebar .dean-history-item {
   position: relative;
   border-bottom: none;
   border-radius: 6px;
 }
 
-.claudian-session-sidebar .claudian-history-item-icon {
+.dean-session-sidebar .dean-history-item-icon {
   display: none;
 }
 
-.claudian-session-sidebar .claudian-history-item-title {
+.dean-session-sidebar .dean-history-item-title {
   color: var(--text-muted);
 }
 
-.claudian-session-sidebar .claudian-history-item.active,
-.claudian-session-sidebar .claudian-history-item.open {
+.dean-session-sidebar .dean-history-item.active,
+.dean-session-sidebar .dean-history-item.open {
   padding-inline-start: 12px;
   background: transparent;
   border-inline-start: none;
 }
 
-.claudian-session-sidebar .claudian-session-group-body .claudian-history-item {
+.dean-session-sidebar .dean-session-group-body .dean-history-item {
   padding-inline-start: 32px;
 }
 
-.claudian-session-sidebar .claudian-history-item.active:hover,
-.claudian-session-sidebar .claudian-history-item.open:hover {
+.dean-session-sidebar .dean-history-item.active:hover,
+.dean-session-sidebar .dean-history-item.open:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudian-session-sidebar .claudian-history-item.active .claudian-history-item-title {
+.dean-session-sidebar .dean-history-item.active .dean-history-item-title {
   color: var(--text-normal);
 }
 
-.claudian-session-sidebar
-  .claudian-history-item.claudian-history-item--attention
-  .claudian-history-item-title {
+.dean-session-sidebar
+  .dean-history-item.dean-history-item--attention
+  .dean-history-item-title {
   color: var(--text-normal);
   animation: attention-title-pulse 1.6s ease-in-out infinite;
 }
 
-.claudian-session-sidebar .claudian-history-item-actions {
+.dean-session-sidebar .dean-history-item-actions {
   display: none;
   flex-shrink: 0;
   gap: 6px;
   margin-inline-start: 0;
 }
 
-.claudian-session-metadata-popover {
+.dean-session-metadata-popover {
   position: fixed;
   z-index: 1000;
   box-sizing: border-box;
@@ -478,11 +478,11 @@
   box-shadow: var(--shadow-s);
 }
 
-body.theme-dark .claudian-session-metadata-popover {
+body.theme-dark .dean-session-metadata-popover {
   background-color: #1e1e1e;
 }
 
-.claudian-session-metadata-row {
+.dean-session-metadata-row {
   display: grid;
   grid-template-columns: 16px max-content minmax(0, 1fr);
   align-items: center;
@@ -492,63 +492,63 @@ body.theme-dark .claudian-session-metadata-popover {
   font-size: var(--font-ui-small);
 }
 
-.claudian-session-metadata-row--provider {
+.dean-session-metadata-row--provider {
   grid-template-columns: 16px minmax(0, 1fr);
 }
 
-.claudian-session-metadata-row--unlabeled {
+.dean-session-metadata-row--unlabeled {
   grid-template-columns: 16px minmax(0, 1fr);
 }
 
-.claudian-session-metadata-row--provider-no-icon {
+.dean-session-metadata-row--provider-no-icon {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.claudian-session-metadata-provider-icon {
+.dean-session-metadata-provider-icon {
   color: var(--text-muted);
 }
 
-.claudian-session-metadata-icon {
+.dean-session-metadata-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
 }
 
-.claudian-session-metadata-icon svg {
+.dean-session-metadata-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.claudian-session-metadata-label {
+.dean-session-metadata-label {
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-.claudian-session-metadata-value {
+.dean-session-metadata-value {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.claudian-session-metadata-value--note {
+.dean-session-metadata-value--note {
   overflow-x: auto;
   overflow-y: hidden;
   text-overflow: clip;
   scrollbar-width: none;
 }
 
-.claudian-session-metadata-value--note::-webkit-scrollbar {
+.dean-session-metadata-value--note::-webkit-scrollbar {
   display: none;
 }
 
-.claudian-session-sidebar .claudian-history-item:hover .claudian-history-item-actions,
-.claudian-session-sidebar .claudian-history-item:focus-within .claudian-history-item-actions {
+.dean-session-sidebar .dean-history-item:hover .dean-history-item-actions,
+.dean-session-sidebar .dean-history-item:focus-within .dean-history-item-actions {
   display: flex;
 }
 
-.claudian-session-sidebar .claudian-history-item-actions .claudian-action-btn {
+.dean-session-sidebar .dean-history-item-actions .dean-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -562,29 +562,29 @@ body.theme-dark .claudian-session-metadata-popover {
   color: var(--text-muted);
 }
 
-.claudian-session-sidebar .claudian-history-item-actions .claudian-action-btn:hover,
-.claudian-session-sidebar .claudian-history-item-actions .claudian-action-btn:focus-visible {
+.dean-session-sidebar .dean-history-item-actions .dean-action-btn:hover,
+.dean-session-sidebar .dean-history-item-actions .dean-action-btn:focus-visible {
   background: transparent;
   box-shadow: none;
   color: var(--text-normal);
 }
 
-.claudian-session-sidebar .claudian-history-item-actions .claudian-delete-btn:hover,
-.claudian-session-sidebar .claudian-history-item-actions .claudian-delete-btn:focus-visible {
+.dean-session-sidebar .dean-history-item-actions .dean-delete-btn:hover,
+.dean-session-sidebar .dean-history-item-actions .dean-delete-btn:focus-visible {
   color: var(--color-red);
 }
 
-.claudian-session-sidebar .claudian-archive-btn:disabled {
+.dean-session-sidebar .dean-archive-btn:disabled {
   color: var(--text-faint);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.claudian-history-item--noninteractive .claudian-history-item-content {
+.dean-history-item--noninteractive .dean-history-item-content {
   cursor: default;
 }
 
-.claudian-history-archive-control {
+.dean-history-archive-control {
   position: sticky;
   top: 0;
   z-index: 1;
@@ -601,14 +601,14 @@ body.theme-dark .claudian-session-metadata-popover {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.claudian-history-archive-control:hover,
-.claudian-history-archive-control:focus-visible {
+.dean-history-archive-control:hover,
+.dean-history-archive-control:focus-visible {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
 /* History dropup menu (opens upward since it's at bottom of view) */
-.claudian-history-menu {
+.dean-history-menu {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -626,11 +626,11 @@ body.theme-dark .claudian-session-metadata-popover {
   inset-inline-end: 0;
 }
 
-.claudian-history-menu.visible {
+.dean-history-menu.visible {
   display: block;
 }
 
-.claudian-history-header {
+.dean-history-header {
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -640,20 +640,20 @@ body.theme-dark .claudian-session-metadata-popover {
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.claudian-history-list {
+.dean-history-list {
   max-height: 350px;
   overflow-y: auto;
   overflow-anchor: none;
 }
 
-.claudian-history-empty {
+.dean-history-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
   font-size: 13px;
 }
 
-.claudian-history-item {
+.dean-history-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -662,86 +662,86 @@ body.theme-dark .claudian-session-metadata-popover {
   transition: background 0.15s ease;
 }
 
-.claudian-history-item-icon {
+.dean-history-item-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.claudian-history-item-icon svg {
+.dean-history-item-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudian-history-item:last-child {
+.dean-history-item:last-child {
   border-bottom: none;
 }
 
-.claudian-history-item:hover {
+.dean-history-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudian-history-item.active {
+.dean-history-item.active {
   background: var(--background-modifier-hover);
   border-inline-start: 2px solid var(--interactive-accent);
   padding-inline-start: 10px;
 }
 
-.claudian-history-item.active:hover {
+.dean-history-item.active:hover {
   background: var(--background-modifier-active-hover, var(--background-modifier-hover));
 }
 
-.claudian-history-item.active .claudian-history-item-icon {
+.dean-history-item.active .dean-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.claudian-history-item.active .claudian-history-item-content {
+.dean-history-item.active .dean-history-item-content {
   cursor: default;
 }
 
-.claudian-history-item.active .claudian-history-item-date {
+.dean-history-item.active .dean-history-item-date {
   color: var(--text-faint);
 }
 
-.claudian-history-item.open {
+.dean-history-item.open {
   background: var(--background-modifier-hover);
   border-inline-start: 2px solid var(--interactive-accent);
   padding-inline-start: 10px;
 }
 
-.claudian-history-item.open:hover {
+.dean-history-item.open:hover {
   background: var(--background-modifier-active-hover, var(--background-modifier-hover));
 }
 
-.claudian-history-item.open .claudian-history-item-icon {
+.dean-history-item.open .dean-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.claudian-history-item.open .claudian-history-item-date {
+.dean-history-item.open .dean-history-item-date {
   color: var(--text-muted);
 }
 
-.claudian-history-item.running .claudian-history-item-icon {
+.dean-history-item.running .dean-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.claudian-history-item.running .claudian-history-item-icon svg {
+.dean-history-item.running .dean-history-item-icon svg {
   animation: spin 1s linear infinite;
 }
 
-.claudian-history-item.running .claudian-history-item-date {
+.dean-history-item.running .dean-history-item-date {
   color: var(--interactive-accent);
   font-weight: 500;
 }
 
-.claudian-history-item-content {
+.dean-history-item-content {
   flex: 1;
   min-width: 0;
   cursor: pointer;
 }
 
-.claudian-history-item-title {
+.dean-history-item-title {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-normal);
@@ -750,13 +750,13 @@ body.theme-dark .claudian-session-metadata-popover {
   text-overflow: ellipsis;
 }
 
-.claudian-history-item-date {
+.dean-history-item-date {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 2px;
 }
 
-.claudian-history-item-actions {
+.dean-history-item-actions {
   display: flex;
   gap: 4px;
   margin-inline-start: 8px;
@@ -764,15 +764,15 @@ body.theme-dark .claudian-session-metadata-popover {
   transition: opacity 0.15s ease;
 }
 
-.claudian-history-item:hover .claudian-history-item-actions {
+.dean-history-item:hover .dean-history-item-actions {
   opacity: 1;
 }
 
-.claudian-history-item:focus-within .claudian-history-item-actions {
+.dean-history-item:focus-within .dean-history-item-actions {
   opacity: 1;
 }
 
-.claudian-action-btn {
+.dean-action-btn {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -782,25 +782,25 @@ body.theme-dark .claudian-session-metadata-popover {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.claudian-action-btn:hover {
+.dean-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudian-action-btn svg {
+.dean-action-btn svg {
   width: 14px;
   height: 14px;
 }
 
-.claudian-delete-btn:hover {
+.dean-delete-btn:hover {
   color: var(--color-red);
 }
 
-.claudian-open-new-tab-btn:hover {
+.dean-open-new-tab-btn:hover {
   color: var(--interactive-accent);
 }
 
-.claudian-history-menu .claudian-history-item-actions .claudian-action-btn {
+.dean-history-menu .dean-history-item-actions .dean-action-btn {
   background: transparent;
   border: none;
   box-shadow: none;
@@ -808,15 +808,15 @@ body.theme-dark .claudian-session-metadata-popover {
   transition: color 0.15s ease;
 }
 
-.claudian-history-menu .claudian-history-item-actions .claudian-action-btn:hover,
-.claudian-history-menu .claudian-history-item-actions .claudian-action-btn:focus-visible {
+.dean-history-menu .dean-history-item-actions .dean-action-btn:hover,
+.dean-history-menu .dean-history-item-actions .dean-action-btn:focus-visible {
   background: transparent;
   border: none;
   box-shadow: none;
   color: var(--text-normal);
 }
 
-.claudian-rename-input {
+.dean-rename-input {
   width: 100%;
   padding: 2px 4px;
   font-size: 13px;
@@ -827,13 +827,13 @@ body.theme-dark .claudian-session-metadata-popover {
   color: var(--text-normal);
 }
 
-.claudian-rename-input:focus {
+.dean-rename-input:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--interactive-accent-hover);
 }
 
 /* Loading indicator for title generation */
-.claudian-action-loading {
+.dean-action-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -842,7 +842,7 @@ body.theme-dark .claudian-session-metadata-popover {
   cursor: default;
 }
 
-.claudian-history-load-more {
+.dean-history-load-more {
   width: calc(100% - 16px);
   margin: 8px;
   padding: 8px 12px;
@@ -853,7 +853,7 @@ body.theme-dark .claudian-session-metadata-popover {
   cursor: pointer;
 }
 
-.claudian-history-load-more:hover {
+.dean-history-load-more:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }

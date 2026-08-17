@@ -2,7 +2,7 @@
 
 ## Project
 
-Claudian is an Obsidian plugin that embeds provider-backed coding agents in a sidebar and inline-edit flow. Claude is the default provider. Codex, Grok, OpenCode, and Pi are optional providers that plug into the same conversation model through `Conversation.providerId` and opaque provider-owned `providerState`.
+Dean is an Obsidian plugin that embeds provider-backed coding agents in a sidebar and inline-edit flow. Claude is the default provider. Codex, Grok, OpenCode, and Pi are optional providers that plug into the same conversation model through `Conversation.providerId` and opaque provider-owned `providerState`.
 
 Do not assume provider parity. Check each provider's `capabilities.ts`, `registration.ts`, and UI config before wiring shared behavior.
 
@@ -112,7 +112,7 @@ Provider-specific session fields belong behind typed helpers in the owning provi
 
 - For new behavior or bug fixes, work one observable slice at a time: add or update the failing test in the mirrored `tests/` path, make it pass, then refactor.
 - Test through the closest stable owner or public interface; do not expose or test private methods only for convenience.
-- Mock environment and provider boundaries. Prefer real Claudian code, fixtures, or lightweight fakes for Claudian-owned collaborators.
+- Mock environment and provider boundaries. Prefer real Dean code, fixtures, or lightweight fakes for Dean-owned collaborators.
 - For shared provider contracts, test provider-neutral behavior first, then cover each provider adapter's distinct behavior separately.
 - If a change cannot be tested directly, document why and cover the closest stable contract instead.
 
@@ -124,9 +124,9 @@ Provider-specific session fields belong behind typed helpers in the owning provi
 - Model, permission, plan-mode, command, MCP, skill, and subagent behavior is provider-specific unless the core contract explicitly makes it shared.
 - Treat persisted provider configuration as untrusted runtime input. Provider settings readers and storage normalization must decode every field; invalid permission, tool, and sandbox modes must fail closed.
 - When provider behavior is uncertain, inspect real runtime output first. Put throwaway scripts, traces, and handoff notes in `.context/`.
-- Treat provider-native history and transcripts as read-only. Never mutate or delete provider session data when a Claudian conversation changes.
+- Treat provider-native history and transcripts as read-only. Never mutate or delete provider session data when a Dean conversation changes.
 - Only explicitly enabled models belong in the chat selector: no synthetic provider entries, no hidden session models, and no provider-default fallback when none are enabled.
-- Runtime-discovered commands are read-only in Claudian; providers own their editing and deletion.
+- Runtime-discovered commands are read-only in Dean; providers own their editing and deletion.
 - Auxiliary query runners own their own process and session, independent from the chat runtime.
 
 ## Review Checks

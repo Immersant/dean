@@ -173,9 +173,9 @@ describe('ConversationController', () => {
         await controller.createNew();
 
         const welcomeEl = deps.getWelcomeEl()!;
-        expect(welcomeEl.querySelector('.claudian-welcome-brand')?.textContent)
-          .toBe('Claudian');
-        expect(welcomeEl.querySelector('.claudian-welcome-greeting')).not.toBeNull();
+        expect(welcomeEl.querySelector('.dean-welcome-brand')?.textContent)
+          .toBe('Dean');
+        expect(welcomeEl.querySelector('.dean-welcome-greeting')).not.toBeNull();
       });
 
       it('should clear todos for new conversation', async () => {
@@ -349,8 +349,8 @@ describe('ConversationController', () => {
 
       controller.initializeWelcome();
       const initialCallCount = createDivSpy.mock.calls.length;
-      expect(welcomeEl.querySelector('.claudian-welcome-brand')).not.toBeNull();
-      expect(welcomeEl.querySelector('.claudian-welcome-greeting')).not.toBeNull();
+      expect(welcomeEl.querySelector('.dean-welcome-brand')).not.toBeNull();
+      expect(welcomeEl.querySelector('.dean-welcome-greeting')).not.toBeNull();
 
       controller.initializeWelcome();
       expect(createDivSpy).toHaveBeenCalledTimes(initialCallCount);
@@ -687,7 +687,7 @@ describe('ConversationController', () => {
 
         expect(dropdown.children.length).toBe(2);
         const list = dropdown.children[1];
-        expect(list.hasClass('claudian-history-list')).toBe(true);
+        expect(list.hasClass('dean-history-list')).toBe(true);
         expect(list.children.length).toBe(2);
       });
 
@@ -697,7 +697,7 @@ describe('ConversationController', () => {
         controller.updateHistoryDropdown();
 
         const list = dropdown.children[1];
-        expect(list.children[0].hasClass('claudian-history-empty')).toBe(true);
+        expect(list.children[0].hasClass('dean-history-empty')).toBe(true);
       });
 
       it('should sort conversations by lastActivityAt descending', () => {
@@ -710,7 +710,7 @@ describe('ConversationController', () => {
         controller.updateHistoryDropdown();
 
         const list = dropdown.children[1];
-        const firstTitle = list.children[0].querySelector('.claudian-history-item-title');
+        const firstTitle = list.children[0].querySelector('.dean-history-item-title');
         expect(firstTitle?.textContent).toBe('New');
       });
 
@@ -735,7 +735,7 @@ describe('ConversationController', () => {
           onSelectConversation: jest.fn(),
         });
 
-        const titles = container.querySelectorAll('.claudian-history-item-title');
+        const titles = container.querySelectorAll('.dean-history-item-title');
         expect(titles.map((title: { textContent: string }) => title.textContent)).toEqual([
           'Response newer',
           'Metadata newer',
@@ -767,7 +767,7 @@ describe('ConversationController', () => {
 
         const list = dropdown.children[1];
         const item = list.children[0];
-        const loadingEl = item.querySelector('.claudian-action-loading');
+        const loadingEl = item.querySelector('.dean-action-loading');
         expect(loadingEl).toBeTruthy();
       });
 
@@ -780,7 +780,7 @@ describe('ConversationController', () => {
 
         const list = dropdown.children[1];
         const item = list.children[0];
-        const actions = item.querySelector('.claudian-history-item-actions');
+        const actions = item.querySelector('.dean-history-item-actions');
         expect(actions).toBeTruthy();
         // regenerate button + rename button + delete button = 3 children
         expect(actions!.children.length).toBe(3);
@@ -797,7 +797,7 @@ describe('ConversationController', () => {
 
         const list = dropdown.children[1];
         const item = list.children[0];
-        const content = item.querySelector('.claudian-history-item-content');
+        const content = item.querySelector('.dean-history-item-content');
         const listeners = content?._eventListeners?.get('click');
         expect(listeners).toBeUndefined();
       });
@@ -815,7 +815,7 @@ describe('ConversationController', () => {
         const list = dropdown.children[1];
         // conv-2 is the non-current one (sorted second by lastActivityAt)
         const otherItem = list.children[1];
-        const content = otherItem.querySelector('.claudian-history-item-content');
+        const content = otherItem.querySelector('.dean-history-item-content');
         const listeners = content?._eventListeners?.get('click');
         expect(listeners).toBeDefined();
         expect(listeners!.length).toBe(1);
@@ -832,7 +832,7 @@ describe('ConversationController', () => {
 
         const list = dropdown.children[1];
         const item = list.children[0];
-        const deleteBtn = item.querySelector('.claudian-delete-btn');
+        const deleteBtn = item.querySelector('.dean-delete-btn');
         expect(deleteBtn).toBeTruthy();
 
         const clickHandlers = deleteBtn!._eventListeners?.get('click');
@@ -881,16 +881,16 @@ describe('ConversationController', () => {
           sort: 'last-updated',
         });
 
-        const pinnedSection = container.querySelector('.claudian-history-section--pinned')!;
-        const sessionsSection = container.querySelector('.claudian-history-section--sessions')!;
-        expect(pinnedSection.querySelector('.claudian-history-section-label')?.textContent)
+        const pinnedSection = container.querySelector('.dean-history-section--pinned')!;
+        const sessionsSection = container.querySelector('.dean-history-section--sessions')!;
+        expect(pinnedSection.querySelector('.dean-history-section-label')?.textContent)
           .toBe('Pinned');
-        expect(sessionsSection.querySelector('.claudian-history-section-label')?.textContent)
+        expect(sessionsSection.querySelector('.dean-history-section-label')?.textContent)
           .toBe('Sessions');
-        expect(pinnedSection.querySelectorAll('.claudian-history-item-title')
+        expect(pinnedSection.querySelectorAll('.dean-history-item-title')
           .map((el: { textContent: string }) => el.textContent))
           .toEqual(['Pinned new', 'Pinned old']);
-        expect(sessionsSection.querySelectorAll('.claudian-history-item-title')
+        expect(sessionsSection.querySelectorAll('.dean-history-item-title')
           .map((el: { textContent: string }) => el.textContent))
           .toEqual(['Normal']);
       });
@@ -942,25 +942,25 @@ describe('ConversationController', () => {
           ]),
         });
 
-        const pinnedSection = container.querySelector('.claudian-history-section--pinned')!;
-        const pinnedHeaders = pinnedSection.querySelectorAll('.claudian-session-group-header');
+        const pinnedSection = container.querySelector('.dean-history-section--pinned')!;
+        const pinnedHeaders = pinnedSection.querySelectorAll('.dean-session-group-header');
         expect(pinnedHeaders.map((header: any) => header.getAttribute('data-note-path'))).toEqual([
           'Projects/Plan.md',
           'Projects/Empty.md',
         ]);
-        expect(pinnedSection.querySelectorAll('.claudian-session-group-body')[0]
-          .querySelectorAll('.claudian-history-item-title')
+        expect(pinnedSection.querySelectorAll('.dean-session-group-body')[0]
+          .querySelectorAll('.dean-history-item-title')
           .map((item: any) => item.textContent))
           .toEqual(['Note regular', 'Note pinned session']);
-        expect(pinnedSection.querySelectorAll('.claudian-history-item-title')
+        expect(pinnedSection.querySelectorAll('.dean-history-item-title')
           .map((item: any) => item.textContent))
           .toEqual(['Note regular', 'Note pinned session', 'Standalone pinned']);
 
-        const sessionsSection = container.querySelector('.claudian-history-section--sessions')!;
-        expect(sessionsSection.querySelectorAll('.claudian-history-item-title')
+        const sessionsSection = container.querySelector('.dean-history-section--sessions')!;
+        expect(sessionsSection.querySelectorAll('.dean-history-item-title')
           .map((item: any) => item.textContent))
           .toEqual(['Regular']);
-        expect(container.querySelectorAll('.claudian-history-item').filter((item: any) => (
+        expect(container.querySelectorAll('.dean-history-item').filter((item: any) => (
           item.getAttribute('data-conversation-id') === 'note-pinned-session'
         ))).toHaveLength(1);
       });
@@ -994,7 +994,7 @@ describe('ConversationController', () => {
           onSetLinkedNotePinned,
         });
 
-        const groupHeaders = container.querySelectorAll('.claudian-session-group-header');
+        const groupHeaders = container.querySelectorAll('.dean-session-group-header');
         const pinnedHeader = groupHeaders.find((header: any) => (
           header.getAttribute('data-note-path') === 'Projects/Plan.md'
         ))!;
@@ -1071,7 +1071,7 @@ describe('ConversationController', () => {
           onSetConversationsArchived,
         });
 
-        const groupHeaders = container.querySelectorAll('.claudian-session-group-header');
+        const groupHeaders = container.querySelectorAll('.dean-session-group-header');
         const planHeader = groupHeaders.find((header: any) => (
           header.getAttribute('data-note-path') === 'Projects/Plan.md'
         ))!;
@@ -1113,7 +1113,7 @@ describe('ConversationController', () => {
           onSetLinkedNotePinned: jest.fn().mockResolvedValue(undefined),
           onSetConversationsArchived,
         });
-        const busyHeader = busyContainer.querySelector('.claudian-session-group-header')!;
+        const busyHeader = busyContainer.querySelector('.dean-session-group-header')!;
         busyHeader.dispatchEvent({
           type: 'contextmenu',
           preventDefault: jest.fn(),
@@ -1154,7 +1154,7 @@ describe('ConversationController', () => {
           getModelLabel: () => 'GPT-5.1 Codex',
         });
 
-        const item = container.querySelector('.claudian-history-item')!;
+        const item = container.querySelector('.dean-history-item')!;
         item.getBoundingClientRect = jest.fn().mockReturnValue({
           top: 120,
           left: 20,
@@ -1171,21 +1171,21 @@ describe('ConversationController', () => {
           configurable: true,
           value: body,
         });
-        const content = item.querySelector('.claudian-history-item-content')!;
+        const content = item.querySelector('.dean-history-item-content')!;
         expect(item.getAttribute('tabindex')).toBeNull();
         expect(item.getAttribute('role')).toBeNull();
         expect(content.getAttribute('tabindex')).toBe('0');
         expect(content.getAttribute('role')).toBe('button');
-        expect(item.querySelector('.claudian-history-item-date')).toBeNull();
+        expect(item.querySelector('.dean-history-item-date')).toBeNull();
 
         item.dispatchEvent({ type: 'mouseenter' });
 
-        const popover = body.querySelector('.claudian-session-metadata-popover')!;
+        const popover = body.querySelector('.dean-session-metadata-popover')!;
         expect(popover.getAttribute('role')).toBe('tooltip');
-        expect(popover.querySelectorAll('.claudian-session-metadata-label')
+        expect(popover.querySelectorAll('.dean-session-metadata-label')
           .map((label: { textContent: string }) => label.textContent))
           .toEqual(['Created', 'Last active']);
-        expect(popover.querySelectorAll('.claudian-session-metadata-value')
+        expect(popover.querySelectorAll('.dean-session-metadata-value')
           .map((value: { textContent: string }) => value.textContent))
           .toEqual([
             'Architecture',
@@ -1193,11 +1193,11 @@ describe('ConversationController', () => {
             'Aug 3, 2026',
             'Aug 5, 2026, 14:28',
           ]);
-        expect(popover.querySelector('.claudian-session-metadata-provider-icon'))
+        expect(popover.querySelector('.dean-session-metadata-provider-icon'))
           .not.toBeNull();
         expect(popover.style.top).toBe('120px');
         const noteValue = popover.querySelector(
-          '.claudian-session-metadata-value--note',
+          '.dean-session-metadata-value--note',
         )!;
         expect(noteValue.getAttribute('title')).toBe('Projects/Architecture.md');
 
@@ -1206,10 +1206,10 @@ describe('ConversationController', () => {
           key: 'Escape',
           stopPropagation: jest.fn(),
         });
-        expect(popover.hasClass('claudian-hidden')).toBe(true);
+        expect(popover.hasClass('dean-hidden')).toBe(true);
 
         content.dispatchEvent({ type: 'focusin' });
-        expect(body.querySelectorAll('.claudian-session-metadata-popover'))
+        expect(body.querySelectorAll('.dean-session-metadata-popover'))
           .toHaveLength(2);
       });
 
@@ -1229,8 +1229,8 @@ describe('ConversationController', () => {
           showMetadataPopover: true,
         });
 
-        const item = container.querySelector('.claudian-history-item')!;
-        const content = item.querySelector('.claudian-history-item-content')!;
+        const item = container.querySelector('.dean-history-item')!;
+        const content = item.querySelector('.dean-history-item-content')!;
         const preventDefault = jest.fn();
         const stopPropagation = jest.fn();
         expect(item.getAttribute('role')).toBeNull();
@@ -1271,7 +1271,7 @@ describe('ConversationController', () => {
           getModelLabel: () => 'GPT-5.1 Codex',
         });
 
-        const item = container.querySelector('.claudian-history-item')!;
+        const item = container.querySelector('.dean-history-item')!;
         const body = createMockEl();
         Object.defineProperty(item.ownerDocument, 'body', {
           configurable: true,
@@ -1280,9 +1280,9 @@ describe('ConversationController', () => {
 
         item.dispatchEvent({ type: 'mouseenter' });
 
-        const popover = body.querySelector('.claudian-session-metadata-popover')!;
-        expect(popover.querySelectorAll('.claudian-session-metadata-row')).toHaveLength(3);
-        expect(popover.querySelectorAll('.claudian-session-metadata-value')
+        const popover = body.querySelector('.dean-session-metadata-popover')!;
+        expect(popover.querySelectorAll('.dean-session-metadata-row')).toHaveLength(3);
+        expect(popover.querySelectorAll('.dean-session-metadata-value')
           .map((value: { textContent: string }) => value.textContent))
           .toEqual(['GPT-5.1 Codex', 'Aug 3, 2026', 'Aug 5, 2026, 14:28']);
       });
@@ -1298,8 +1298,8 @@ describe('ConversationController', () => {
           showPinnedSection: true,
         });
 
-        expect(container.querySelector('.claudian-history-section--pinned')).toBeNull();
-        expect(container.querySelector('.claudian-history-section--sessions')).not.toBeNull();
+        expect(container.querySelector('.dean-history-section--pinned')).toBeNull();
+        expect(container.querySelector('.dean-history-section--sessions')).not.toBeNull();
       });
 
       it('marks attention rows for title animation without session action buttons', () => {
@@ -1335,20 +1335,20 @@ describe('ConversationController', () => {
           showPinnedSection: true,
         });
 
-        expect(container.querySelector('.claudian-history-section--attention')).toBeNull();
-        expect(container.querySelectorAll('.claudian-history-item')).toHaveLength(4);
-        const attentionItems = container.querySelectorAll('.claudian-history-item--attention');
+        expect(container.querySelector('.dean-history-section--attention')).toBeNull();
+        expect(container.querySelectorAll('.dean-history-item')).toHaveLength(4);
+        const attentionItems = container.querySelectorAll('.dean-history-item--attention');
         expect(attentionItems).toHaveLength(3);
-        expect(container.querySelector('.claudian-session-attention-indicator')).toBeNull();
+        expect(container.querySelector('.dean-session-attention-indicator')).toBeNull();
         for (const item of attentionItems) {
-          expect(item.querySelector('.claudian-pin-btn')).toBeNull();
-          expect(item.querySelector('.claudian-archive-btn')).toBeNull();
+          expect(item.querySelector('.dean-pin-btn')).toBeNull();
+          expect(item.querySelector('.dean-archive-btn')).toBeNull();
         }
-        const normalItem = container.querySelectorAll('.claudian-history-item').find(
+        const normalItem = container.querySelectorAll('.dean-history-item').find(
           (item: HTMLElement) => item.getAttribute('data-conversation-id') === 'normal',
         )!;
-        expect(normalItem.querySelector('.claudian-pin-btn')).not.toBeNull();
-        expect(normalItem.querySelector('.claudian-archive-btn')).not.toBeNull();
+        expect(normalItem.querySelector('.dean-pin-btn')).not.toBeNull();
+        expect(normalItem.querySelector('.dean-archive-btn')).not.toBeNull();
       });
 
       it('does not mark archived rows for attention presentation', () => {
@@ -1369,7 +1369,7 @@ describe('ConversationController', () => {
           showAttentionState: false,
         });
 
-        expect(container.querySelector('.claudian-history-item--attention')).toBeNull();
+        expect(container.querySelector('.dean-history-item--attention')).toBeNull();
       });
 
       it('renders active session management actions without archived sessions', () => {
@@ -1388,13 +1388,13 @@ describe('ConversationController', () => {
           onSetConversationArchived: jest.fn().mockResolvedValue(undefined),
         });
 
-        expect(container.querySelectorAll('.claudian-history-item-title')
+        expect(container.querySelectorAll('.dean-history-item-title')
           .map((el: { textContent: string }) => el.textContent))
           .toEqual(['Active']);
-        expect(container.querySelector('.claudian-pin-btn')).not.toBeNull();
-        expect(container.querySelector('.claudian-archive-btn')).not.toBeNull();
-        expect(container.querySelector('.claudian-delete-btn')).toBeNull();
-        expect(container.querySelectorAll('.claudian-action-btn').some(
+        expect(container.querySelector('.dean-pin-btn')).not.toBeNull();
+        expect(container.querySelector('.dean-archive-btn')).not.toBeNull();
+        expect(container.querySelector('.dean-delete-btn')).toBeNull();
+        expect(container.querySelectorAll('.dean-action-btn').some(
           (button: { getAttribute(name: string): string | null | undefined }) => (
             button.getAttribute('aria-label') === 'Rename'
           ),
@@ -1439,7 +1439,7 @@ describe('ConversationController', () => {
           searchQuery: 'ROADMAP',
         });
 
-        expect(container.querySelectorAll('.claudian-history-item-title')
+        expect(container.querySelectorAll('.dean-history-item-title')
           .map((el: { textContent: string }) => el.textContent))
           .toEqual(['Roadmap review', 'Planning notes']);
       });
@@ -1457,7 +1457,7 @@ describe('ConversationController', () => {
           searchQuery: 'missing',
         });
 
-        expect(container.querySelector('.claudian-history-empty')?.textContent)
+        expect(container.querySelector('.dean-history-empty')?.textContent)
           .toBe('No matching sessions');
       });
 
@@ -1476,15 +1476,15 @@ describe('ConversationController', () => {
           onSetConversationArchived: jest.fn().mockResolvedValue(undefined),
         });
 
-        expect(container.querySelector('.claudian-history-section-label')?.textContent)
+        expect(container.querySelector('.dean-history-section-label')?.textContent)
           .toBe('Archived');
-        expect(container.querySelectorAll('.claudian-history-item-title')
+        expect(container.querySelectorAll('.dean-history-item-title')
           .map((el: { textContent: string }) => el.textContent))
           .toEqual(['Archived']);
-        expect(container.querySelector('.claudian-restore-btn')).not.toBeNull();
-        expect(container.querySelector('.claudian-delete-btn')).not.toBeNull();
-        expect(container.querySelector('.claudian-pin-btn')).toBeNull();
-        expect(container.querySelector('.claudian-archive-btn')).toBeNull();
+        expect(container.querySelector('.dean-restore-btn')).not.toBeNull();
+        expect(container.querySelector('.dean-delete-btn')).not.toBeNull();
+        expect(container.querySelector('.dean-pin-btn')).toBeNull();
+        expect(container.querySelector('.dean-archive-btn')).toBeNull();
       });
 
       it('disables archive actions for running sessions', () => {
@@ -1503,7 +1503,7 @@ describe('ConversationController', () => {
           onSetConversationArchived: jest.fn().mockResolvedValue(undefined),
         });
 
-        const archiveButton = container.querySelector('.claudian-archive-btn')!;
+        const archiveButton = container.querySelector('.dean-archive-btn')!;
         expect(archiveButton.getAttribute('disabled')).not.toBeNull();
         expect(archiveButton.getAttribute('aria-label'))
           .toBe('Cannot archive a running session');
@@ -1541,7 +1541,7 @@ describe('ConversationController', () => {
           onSetConversationArchived: jest.fn().mockResolvedValue(undefined),
         });
 
-        expect(container.querySelectorAll('.claudian-session-group-label')
+        expect(container.querySelectorAll('.dean-session-group-label')
           .map((el: { textContent: string }) => el.textContent))
           .toEqual(['B', 'A']);
       });
@@ -1584,20 +1584,20 @@ describe('ConversationController', () => {
         });
 
         const labels = container
-          .querySelectorAll('.claudian-session-group-label')
+          .querySelectorAll('.dean-session-group-label')
           .map((label: { textContent: string }) => label.textContent);
         expect(labels).toEqual(['Plan', 'Plan', 'Unlinked']);
         expect(labels).not.toContain('Untitled 2');
-        const groupHeaders = container.querySelectorAll('.claudian-session-group-header');
+        const groupHeaders = container.querySelectorAll('.dean-session-group-header');
         expect(groupHeaders[0].getAttribute('title')).toBe('Projects/A/Plan.md');
         expect(groupHeaders[1].getAttribute('title')).toBe('Projects/B/Plan.md');
-        const groupIcons = container.querySelectorAll('.claudian-session-group-icon');
+        const groupIcons = container.querySelectorAll('.dean-session-group-icon');
         expect(groupIcons).toHaveLength(3);
         expect(setIcon).toHaveBeenCalledWith(groupIcons[0], 'file-text');
         expect(setIcon).toHaveBeenCalledWith(groupIcons[1], 'file-text');
         expect(setIcon).toHaveBeenCalledWith(groupIcons[2], 'inbox');
         const linkedNoteActions = container.querySelectorAll(
-          '.claudian-session-group-new-action',
+          '.dean-session-group-new-action',
         );
         expect(linkedNoteActions).toHaveLength(2);
         expect(linkedNoteActions[0].tagName).toBe('SPAN');
@@ -1620,18 +1620,18 @@ describe('ConversationController', () => {
         ]);
         expect(groupHeaders[0].getAttribute('role')).toBe('button');
         expect(groupHeaders[0].getAttribute('aria-expanded')).toBe('true');
-        const groupBodies = container.querySelectorAll('.claudian-session-group-body');
+        const groupBodies = container.querySelectorAll('.dean-session-group-body');
         expect(groupBodies).toHaveLength(3);
 
         groupHeaders[0].click();
 
         expect(groupHeaders[0].getAttribute('aria-expanded')).toBe('false');
-        expect(groupBodies[0].hasClass('claudian-session-group-body--collapsed')).toBe(true);
+        expect(groupBodies[0].hasClass('dean-session-group-body--collapsed')).toBe(true);
         expect(onGroupCollapseChange).toHaveBeenCalledWith(
           'note:Projects/A/Plan.md',
           true,
         );
-        expect(container.querySelectorAll('.claudian-history-item')).toHaveLength(3);
+        expect(container.querySelectorAll('.dean-history-item')).toHaveLength(3);
       });
 
       it('delegates rerendering after deletion when the surface owner provides a callback', async () => {
@@ -1647,7 +1647,7 @@ describe('ConversationController', () => {
           onRerender,
         });
 
-        const deleteBtn = container.querySelector('.claudian-delete-btn');
+        const deleteBtn = container.querySelector('.dean-delete-btn');
         const clickHandlers = deleteBtn?._eventListeners?.get('click');
         expect(clickHandlers).toBeDefined();
 
@@ -1675,14 +1675,14 @@ describe('ConversationController', () => {
         });
 
         let list = container.children[1];
-        expect(list.querySelectorAll('.claudian-history-item')).toHaveLength(25);
-        const loadMore = list.querySelector('.claudian-history-load-more');
+        expect(list.querySelectorAll('.dean-history-item')).toHaveLength(25);
+        const loadMore = list.querySelector('.dean-history-load-more');
         expect(loadMore).not.toBeNull();
 
         loadMore!.click();
         list = container.children[1];
-        expect(list.querySelectorAll('.claudian-history-item')).toHaveLength(50);
-        expect(list.querySelector('.claudian-history-load-more')).not.toBeNull();
+        expect(list.querySelectorAll('.dean-history-item')).toHaveLength(50);
+        expect(list.querySelector('.dean-history-load-more')).not.toBeNull();
       });
 
       it('keeps pagination bounded across pinned and regular dual-mode sessions', () => {
@@ -1711,19 +1711,19 @@ describe('ConversationController', () => {
         };
         controller.renderHistoryDropdown(container, options);
 
-        let list = container.querySelector('.claudian-history-list')!;
-        expect(list.querySelectorAll('.claudian-history-item')).toHaveLength(25);
-        expect(list.querySelector('.claudian-history-load-more')).not.toBeNull();
+        let list = container.querySelector('.dean-history-list')!;
+        expect(list.querySelectorAll('.dean-history-item')).toHaveLength(25);
+        expect(list.querySelector('.dean-history-load-more')).not.toBeNull();
 
-        list.querySelector('.claudian-history-load-more')!.click();
+        list.querySelector('.dean-history-load-more')!.click();
         expect(onRerender).toHaveBeenCalledTimes(1);
         expect(list.dataset.visibleCount).toBe('50');
-        expect(list.querySelectorAll('.claudian-history-item')).toHaveLength(25);
+        expect(list.querySelectorAll('.dean-history-item')).toHaveLength(25);
 
         controller.renderHistoryDropdown(container, options);
-        list = container.querySelector('.claudian-history-list')!;
-        expect(list.querySelectorAll('.claudian-history-item')).toHaveLength(40);
-        expect(list.querySelector('.claudian-history-load-more')).toBeNull();
+        list = container.querySelector('.dean-history-list')!;
+        expect(list.querySelectorAll('.dean-history-item')).toHaveLength(40);
+        expect(list.querySelector('.dean-history-load-more')).toBeNull();
       });
 
       it('preserves grouped-list position and loaded count across an external rerender', () => {
@@ -1746,14 +1746,14 @@ describe('ConversationController', () => {
         };
 
         controller.renderHistoryDropdown(container, options);
-        container.querySelector('.claudian-history-load-more')?.click();
-        const previousList = container.querySelector('.claudian-history-list')!;
+        container.querySelector('.dean-history-load-more')?.click();
+        const previousList = container.querySelector('.dean-history-list')!;
         previousList.scrollTop = 320;
 
         controller.renderHistoryDropdown(container, options);
 
-        const rerenderedList = container.querySelector('.claudian-history-list')!;
-        expect(rerenderedList.querySelectorAll('.claudian-history-item')).toHaveLength(50);
+        const rerenderedList = container.querySelector('.dean-history-list')!;
+        expect(rerenderedList.querySelectorAll('.dean-history-item')).toHaveLength(50);
         expect(rerenderedList.scrollTop).toBe(320);
       });
 
@@ -1775,14 +1775,14 @@ describe('ConversationController', () => {
         };
 
         controller.renderHistoryDropdown(container, options);
-        container.querySelector('.claudian-history-load-more')?.click();
-        const previousList = container.querySelector('.claudian-history-list')!;
+        container.querySelector('.dean-history-load-more')?.click();
+        const previousList = container.querySelector('.dean-history-list')!;
         previousList.scrollTop = 320;
 
         controller.renderHistoryDropdown(container, options);
 
-        const rerenderedList = container.querySelector('.claudian-history-list')!;
-        expect(rerenderedList.querySelectorAll('.claudian-history-item')).toHaveLength(50);
+        const rerenderedList = container.querySelector('.dean-history-list')!;
+        expect(rerenderedList.querySelectorAll('.dean-history-item')).toHaveLength(50);
         expect(rerenderedList.scrollTop).toBe(320);
       });
 
@@ -1803,18 +1803,18 @@ describe('ConversationController', () => {
         };
 
         controller.renderHistoryDropdown(container, options);
-        container.querySelector('.claudian-history-load-more')?.click();
+        container.querySelector('.dean-history-load-more')?.click();
         controller.renderHistoryDropdown(container, options);
-        expect(container.querySelectorAll('.claudian-history-item')).toHaveLength(50);
+        expect(container.querySelectorAll('.dean-history-item')).toHaveLength(50);
 
         controller.renderHistoryDropdown(container, {
           ...options,
           searchQuery: 'missing',
         });
-        expect(container.querySelector('.claudian-history-list')?.dataset.visibleCount).toBe('50');
+        expect(container.querySelector('.dean-history-list')?.dataset.visibleCount).toBe('50');
 
         controller.renderHistoryDropdown(container, options);
-        expect(container.querySelectorAll('.claudian-history-item')).toHaveLength(50);
+        expect(container.querySelectorAll('.dean-history-item')).toHaveLength(50);
       });
 
       it('preserves dual-mode pinned and session scroll positions across a rerender', () => {
@@ -1835,19 +1835,19 @@ describe('ConversationController', () => {
         };
 
         controller.renderHistoryDropdown(container, options);
-        const pinnedItems = container.querySelector('.claudian-history-section--pinned')!
-          .querySelector('.claudian-history-section-items')!;
-        const sessionItems = container.querySelector('.claudian-session-list-items')!;
+        const pinnedItems = container.querySelector('.dean-history-section--pinned')!
+          .querySelector('.dean-history-section-items')!;
+        const sessionItems = container.querySelector('.dean-session-list-items')!;
         pinnedItems.scrollTop = 24;
         sessionItems.scrollTop = 320;
 
         controller.renderHistoryDropdown(container, options);
 
         expect(
-          container.querySelector('.claudian-history-section--pinned')!
-            .querySelector('.claudian-history-section-items')!.scrollTop,
+          container.querySelector('.dean-history-section--pinned')!
+            .querySelector('.dean-history-section-items')!.scrollTop,
         ).toBe(24);
-        expect(container.querySelector('.claudian-session-list-items')!.scrollTop).toBe(320);
+        expect(container.querySelector('.dean-session-list-items')!.scrollTop).toBe(320);
       });
 
       it('preserves list position when archiving removes the final active session', () => {
@@ -1867,12 +1867,12 @@ describe('ConversationController', () => {
         };
 
         controller.renderHistoryDropdown(container, options);
-        container.querySelector('.claudian-history-list')!.scrollTop = 120;
+        container.querySelector('.dean-history-list')!.scrollTop = 120;
         conversation.isArchived = true;
 
         controller.renderHistoryDropdown(container, options);
 
-        expect(container.querySelector('.claudian-history-list')!.scrollTop).toBe(120);
+        expect(container.querySelector('.dean-history-list')!.scrollTop).toBe(120);
       });
 
       it('installs surface controls before restoring preserved list position', () => {
@@ -1891,7 +1891,7 @@ describe('ConversationController', () => {
           preserveListState: true,
           onBeforeRestoreListState: (listContainer) => {
             order.push('decorate');
-            const list = listContainer.querySelector('.claudian-history-list')!;
+            const list = listContainer.querySelector('.dean-history-list')!;
             list.insertBefore(createMockEl(), list.firstChild);
           },
         });
@@ -1905,7 +1905,7 @@ describe('ConversationController', () => {
         (sessionScope) => {
           const container = createMockEl();
           const onBeforeRestoreListState = jest.fn((listContainer: HTMLElement) => {
-            const list = listContainer.querySelector('.claudian-history-list')!;
+            const list = listContainer.querySelector('.dean-history-list')!;
             list.insertBefore(createMockEl(), list.firstChild);
           });
           (deps.plugin.getConversationList as jest.Mock).mockReturnValue([]);
@@ -1917,9 +1917,9 @@ describe('ConversationController', () => {
             onBeforeRestoreListState,
           });
 
-          const list = container.querySelector('.claudian-history-list')!;
+          const list = container.querySelector('.dean-history-list')!;
           expect(onBeforeRestoreListState).toHaveBeenCalledWith(container);
-          const emptyState = list.querySelector('.claudian-history-empty');
+          const emptyState = list.querySelector('.dean-history-empty');
           expect(list.children[0]).not.toBe(emptyState);
           expect(emptyState).not.toBeNull();
         },
@@ -1960,13 +1960,13 @@ describe('ConversationController', () => {
           },
         });
 
-        const labels = container.querySelectorAll('.claudian-session-group-label');
+        const labels = container.querySelectorAll('.dean-session-group-label');
         expect(labels.map((label: { textContent: string }) => label.textContent))
           .toEqual(['A', 'B']);
-        expect(container.querySelectorAll('.claudian-history-item')).toHaveLength(1);
-        expect(container.querySelector('.claudian-history-load-more')).toBeNull();
+        expect(container.querySelectorAll('.dean-history-item')).toHaveLength(1);
+        expect(container.querySelector('.dean-history-load-more')).toBeNull();
 
-        container.querySelectorAll('.claudian-session-group-header')[0].click();
+        container.querySelectorAll('.dean-session-group-header')[0].click();
         expect(onRerender).toHaveBeenCalledTimes(1);
       });
 
@@ -2000,7 +2000,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const openItem = list.children[1];
-        const openItemDate = openItem.querySelector('.claudian-history-item-date');
+        const openItemDate = openItem.querySelector('.dean-history-item-date');
 
         expect(openItem.hasClass('open')).toBe(true);
         expect(openItem.hasClass('active')).toBe(false);
@@ -2028,7 +2028,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const currentItem = list.children[0];
-        const currentItemDate = currentItem.querySelector('.claudian-history-item-date');
+        const currentItemDate = currentItem.querySelector('.dean-history-item-date');
 
         expect(currentItem.getAttribute('data-tab-index')).toBe('1');
         expect(currentItem.getAttribute('data-tab-location')).toBe('current-view');
@@ -2053,7 +2053,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const openItem = list.children[1];
-        const openItemDate = openItem.querySelector('.claudian-history-item-date');
+        const openItemDate = openItem.querySelector('.dean-history-item-date');
 
         expect(openItem.getAttribute('data-tab-index')).toBe('2');
         expect(openItem.getAttribute('data-tab-location')).toBe('current-view');
@@ -2081,12 +2081,12 @@ describe('ConversationController', () => {
         });
 
         const list = container.children[1];
-        expect(list.children[0].querySelector('.claudian-history-item-date')?.textContent)
+        expect(list.children[0].querySelector('.dean-history-item-date')?.textContent)
           .toBe('Date 2000');
-        expect(list.children[1].querySelector('.claudian-history-item-date')?.textContent)
+        expect(list.children[1].querySelector('.dean-history-item-date')?.textContent)
           .toBe('Date 1000');
         const runningIndicators = list.querySelectorAll(
-          '.claudian-session-running-indicator',
+          '.dean-session-running-indicator',
         );
         expect(runningIndicators).toHaveLength(1);
         expect(setIcon).toHaveBeenCalledWith(runningIndicators[0], 'loader-2');
@@ -2112,7 +2112,7 @@ describe('ConversationController', () => {
           showOpenStateLabels: false,
         });
 
-        expect(container.querySelector('.claudian-history-item-date')?.textContent)
+        expect(container.querySelector('.dean-history-item-date')?.textContent)
           .toBe('Date 2000');
 
         controller.renderHistoryDropdown(container, {
@@ -2121,7 +2121,7 @@ describe('ConversationController', () => {
           showOpenStateLabels: false,
         });
 
-        expect(container.querySelector('.claudian-history-item-date')?.textContent)
+        expect(container.querySelector('.dean-history-item-date')?.textContent)
           .toBe('Date 1000');
       });
 
@@ -2154,19 +2154,19 @@ describe('ConversationController', () => {
           }),
         });
 
-        const header = container.querySelector('.claudian-session-group-header')!;
+        const header = container.querySelector('.dean-session-group-header')!;
         const headerIndicator = header.querySelector(
-          '.claudian-session-group-running-indicator',
+          '.dean-session-group-running-indicator',
         )!;
         expect(headerIndicator).not.toBeNull();
         expect(headerIndicator.hasClass(
-          'claudian-session-group-running-indicator--visible',
+          'dean-session-group-running-indicator--visible',
         )).toBe(false);
 
         header.click();
 
         expect(headerIndicator.hasClass(
-          'claudian-session-group-running-indicator--visible',
+          'dean-session-group-running-indicator--visible',
         )).toBe(true);
         expect(setIcon).toHaveBeenCalledWith(headerIndicator, 'loader-2');
       });
@@ -2203,13 +2203,13 @@ describe('ConversationController', () => {
           }),
         });
 
-        const header = container.querySelector('.claudian-session-group-header')!;
-        expect(header.hasClass('claudian-session-group-header--attention')).toBe(false);
-        expect(header.querySelector('.claudian-session-group-attention-indicator')).toBeNull();
+        const header = container.querySelector('.dean-session-group-header')!;
+        expect(header.hasClass('dean-session-group-header--attention')).toBe(false);
+        expect(header.querySelector('.dean-session-group-attention-indicator')).toBeNull();
 
         header.click();
 
-        expect(header.hasClass('claudian-session-group-header--attention')).toBe(true);
+        expect(header.hasClass('dean-session-group-header--attention')).toBe(true);
       });
 
       it('should display running status for the current conversation', () => {
@@ -2230,7 +2230,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const currentItem = list.children[0];
-        const currentItemDate = currentItem.querySelector('.claudian-history-item-date');
+        const currentItemDate = currentItem.querySelector('.dean-history-item-date');
 
         expect(currentItem.hasClass('active')).toBe(true);
         expect(currentItem.hasClass('running')).toBe(true);
@@ -2256,7 +2256,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const runningItem = list.children[1];
-        const runningItemDate = runningItem.querySelector('.claudian-history-item-date');
+        const runningItemDate = runningItem.querySelector('.dean-history-item-date');
 
         expect(runningItem.hasClass('open')).toBe(true);
         expect(runningItem.hasClass('running')).toBe(true);
@@ -2291,8 +2291,8 @@ describe('ConversationController', () => {
         const list = container.children[1];
         const openOtherPaneItem = list.children[1];
         const runningOtherPaneItem = list.children[2];
-        const runningOtherPaneDate = runningOtherPaneItem.querySelector('.claudian-history-item-date');
-        const openOtherPaneDate = openOtherPaneItem.querySelector('.claudian-history-item-date');
+        const runningOtherPaneDate = runningOtherPaneItem.querySelector('.dean-history-item-date');
+        const openOtherPaneDate = openOtherPaneItem.querySelector('.dean-history-item-date');
 
         expect(runningOtherPaneItem.getAttribute('data-tab-location')).toBe('other-view');
         expect(runningOtherPaneItem.getAttribute('data-tab-index')).toBeNull();
@@ -2319,7 +2319,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const closedItem = list.children[1];
-        const openInNewTabBtn = closedItem.querySelector('.claudian-open-new-tab-btn');
+        const openInNewTabBtn = closedItem.querySelector('.dean-open-new-tab-btn');
         const clickHandlers = openInNewTabBtn?._eventListeners?.get('click');
 
         expect(openInNewTabBtn).toBeTruthy();
@@ -2349,7 +2349,7 @@ describe('ConversationController', () => {
         const list = container.children[1];
         const openItem = list.children[1];
 
-        expect(openItem.querySelector('.claudian-open-new-tab-btn')).toBeNull();
+        expect(openItem.querySelector('.dean-open-new-tab-btn')).toBeNull();
       });
 
       it('should open a conversation in a new tab on modifier click when supported', async () => {
@@ -2371,7 +2371,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const otherItem = list.children[1];
-        const content = otherItem.querySelector('.claudian-history-item-content');
+        const content = otherItem.querySelector('.dean-history-item-content');
         const clickHandlers = content?._eventListeners?.get('click');
         expect(clickHandlers).toBeDefined();
 
@@ -2407,7 +2407,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const otherItem = list.children[1];
-        const content = otherItem.querySelector('.claudian-history-item-content');
+        const content = otherItem.querySelector('.dean-history-item-content');
         const auxClickHandlers = content?._eventListeners?.get('auxclick');
         expect(auxClickHandlers).toBeDefined();
 
@@ -2535,7 +2535,7 @@ describe('ConversationController', () => {
           showOpenStateLabels: false,
         });
 
-        container.querySelector('.claudian-history-item')!.dispatchEvent({
+        container.querySelector('.dean-history-item')!.dispatchEvent({
           type: 'contextmenu',
           stopPropagation: jest.fn(),
           preventDefault: jest.fn(),
@@ -2562,8 +2562,8 @@ describe('ConversationController', () => {
           showOpenStateActions: false,
         });
 
-        const normalItem = container.querySelector('.claudian-history-section--sessions')!
-          .querySelector('.claudian-history-item')!;
+        const normalItem = container.querySelector('.dean-history-section--sessions')!
+          .querySelector('.dean-history-item')!;
         normalItem.dispatchEvent({
           type: 'contextmenu',
           stopPropagation: jest.fn(),
@@ -2577,8 +2577,8 @@ describe('ConversationController', () => {
         await Promise.resolve();
         expect(onSetConversationPinned).toHaveBeenCalledWith('normal', true);
 
-        const pinnedItem = container.querySelector('.claudian-history-section--pinned')!
-          .querySelector('.claudian-history-item')!;
+        const pinnedItem = container.querySelector('.dean-history-section--pinned')!
+          .querySelector('.dean-history-item')!;
         pinnedItem.dispatchEvent({
           type: 'contextmenu',
           stopPropagation: jest.fn(),
@@ -2608,9 +2608,9 @@ describe('ConversationController', () => {
           showOpenStateActions: false,
         });
 
-        const item = container.querySelector('.claudian-history-item')!;
-        expect(item.querySelector('.claudian-pin-btn')).toBeNull();
-        expect(item.querySelector('.claudian-archive-btn')).not.toBeNull();
+        const item = container.querySelector('.dean-history-item')!;
+        expect(item.querySelector('.dean-pin-btn')).toBeNull();
+        expect(item.querySelector('.dean-archive-btn')).not.toBeNull();
 
         item.dispatchEvent({
           type: 'contextmenu',
@@ -2641,7 +2641,7 @@ describe('ConversationController', () => {
           onSetConversationPinned: jest.fn().mockResolvedValue(undefined),
           onSetConversationArchived: jest.fn().mockResolvedValue(undefined),
         });
-        activeContainer.querySelector('.claudian-history-item')!.dispatchEvent({
+        activeContainer.querySelector('.dean-history-item')!.dispatchEvent({
           type: 'contextmenu',
           stopPropagation: jest.fn(),
           preventDefault: jest.fn(),
@@ -2667,7 +2667,7 @@ describe('ConversationController', () => {
           showOpenStateActions: false,
           onSetConversationArchived: jest.fn().mockResolvedValue(undefined),
         });
-        archivedContainer.querySelector('.claudian-history-item')!.dispatchEvent({
+        archivedContainer.querySelector('.dean-history-item')!.dispatchEvent({
           type: 'contextmenu',
           stopPropagation: jest.fn(),
           preventDefault: jest.fn(),
@@ -2698,8 +2698,8 @@ describe('ConversationController', () => {
           showOpenStateActions: true,
         });
 
-        const item = container.querySelector('.claudian-history-item')!;
-        const title = item.querySelector('.claudian-history-item-title')!;
+        const item = container.querySelector('.dean-history-item')!;
+        const title = item.querySelector('.dean-history-item-title')!;
         title.replaceWith = jest.fn();
         item.dispatchEvent({
           type: 'contextmenu',
@@ -2715,14 +2715,14 @@ describe('ConversationController', () => {
         menu.items.find(menuItem => menuItem.title === 'Rename')?.clickHandler?.();
 
         expect(title.replaceWith).not.toHaveBeenCalled();
-        expect(item.querySelector('.claudian-rename-input')).toBeNull();
+        expect(item.querySelector('.dean-rename-input')).toBeNull();
         expect(onRequestInlineRename).toHaveBeenCalledWith({
           beginRename: expect.any(Function),
           conversationId: 'active',
         });
 
         onRequestInlineRename.mock.calls[0][0].beginRename(item);
-        const input = item.querySelector('.claudian-rename-input')!;
+        const input = item.querySelector('.dean-rename-input')!;
         expect(title.replaceWith).toHaveBeenCalledWith(input);
         input.value = 'Renamed title';
         input.blur();
@@ -2758,7 +2758,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const otherItem = list.children[1];
-      const content = otherItem.querySelector('.claudian-history-item-content');
+      const content = otherItem.querySelector('.dean-history-item-content');
       const clickHandlers = content?._eventListeners?.get('click');
       expect(clickHandlers).toBeDefined();
 
@@ -2787,7 +2787,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const item = list.children[0];
-      const actions = item.querySelector('.claudian-history-item-actions');
+      const actions = item.querySelector('.dean-history-item-actions');
       // First child is the regenerate button
       const regenerateBtn = actions!.children[0];
       const clickHandlers = regenerateBtn._eventListeners?.get('click');
@@ -2815,7 +2815,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const item = list.children[0];
-      const actions = item.querySelector('.claudian-history-item-actions');
+      const actions = item.querySelector('.dean-history-item-actions');
       expect(actions).toBeTruthy();
       // For non-failed items: rename is children[0], delete is children[1]
       const rBtn = actions!.children[0];
@@ -2830,7 +2830,7 @@ describe('ConversationController', () => {
       (mockInput as any).focus = jest.fn();
       (mockInput as any).select = jest.fn();
 
-      const titleEl = item.querySelector('.claudian-history-item-title');
+      const titleEl = item.querySelector('.dean-history-item-title');
       if (titleEl) {
         (titleEl as any).replaceWith = jest.fn();
       }
@@ -2842,7 +2842,7 @@ describe('ConversationController', () => {
         clickHandlers![0]({ stopPropagation: jest.fn() });
 
         expect(item.createEl).toHaveBeenCalledWith('input', {
-          cls: 'claudian-rename-input',
+          cls: 'dean-rename-input',
           attr: { type: 'text', value: 'Test Title' },
         });
         expect(titleEl!.replaceWith).toHaveBeenCalledWith(mockInput);
@@ -2865,11 +2865,11 @@ describe('ConversationController', () => {
         sort: 'created',
       });
 
-      const item = container.querySelector('.claudian-history-item')!;
-      const title = item.querySelector('.claudian-history-item-title')!;
+      const item = container.querySelector('.dean-history-item')!;
+      const title = item.querySelector('.dean-history-item-title')!;
       title.replaceWith = jest.fn();
-      item.querySelector('.claudian-history-item-actions')!.children[0].click();
-      const input = item.querySelector('.claudian-rename-input')!;
+      item.querySelector('.dean-history-item-actions')!.children[0].click();
+      const input = item.querySelector('.dean-rename-input')!;
       input.value = 'New title';
       input.blur();
       await Promise.resolve();
@@ -2891,11 +2891,11 @@ describe('ConversationController', () => {
         onRerender,
       });
 
-      const item = container.querySelector('.claudian-history-item')!;
-      const title = item.querySelector('.claudian-history-item-title')!;
+      const item = container.querySelector('.dean-history-item')!;
+      const title = item.querySelector('.dean-history-item-title')!;
       title.replaceWith = jest.fn();
-      item.querySelector('.claudian-history-item-actions')!.children[0].click();
-      const input = item.querySelector('.claudian-rename-input')!;
+      item.querySelector('.dean-history-item-actions')!.children[0].click();
+      const input = item.querySelector('.dean-rename-input')!;
       input.value = '  Original title  ';
       input.blur();
       await Promise.resolve();
@@ -2916,11 +2916,11 @@ describe('ConversationController', () => {
         onRerender,
       });
 
-      const item = container.querySelector('.claudian-history-item')!;
-      const title = item.querySelector('.claudian-history-item-title')!;
+      const item = container.querySelector('.dean-history-item')!;
+      const title = item.querySelector('.dean-history-item-title')!;
       title.replaceWith = jest.fn();
-      item.querySelector('.claudian-history-item-actions')!.children[0].click();
-      const input = item.querySelector('.claudian-rename-input')!;
+      item.querySelector('.dean-history-item-actions')!.children[0].click();
+      const input = item.querySelector('.dean-rename-input')!;
       input.value = 'Unsaved title';
 
       expect(controller.cancelInlineRename()).toBe(true);
@@ -2943,11 +2943,11 @@ describe('ConversationController', () => {
       ]);
 
       controller.renderHistoryDropdown(container, options);
-      const item = container.querySelector('.claudian-history-item')!;
-      const title = item.querySelector('.claudian-history-item-title')!;
+      const item = container.querySelector('.dean-history-item')!;
+      const title = item.querySelector('.dean-history-item-title')!;
       title.replaceWith = jest.fn();
-      item.querySelector('.claudian-history-item-actions')!.children[0].click();
-      const input = item.querySelector('.claudian-rename-input')!;
+      item.querySelector('.dean-history-item-actions')!.children[0].click();
+      const input = item.querySelector('.dean-rename-input')!;
       input.value = 'Detached draft';
 
       controller.renderHistoryDropdown(container, options);
@@ -2967,7 +2967,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const item = list.children[0];
-      const deleteBtn = item.querySelector('.claudian-delete-btn');
+      const deleteBtn = item.querySelector('.dean-delete-btn');
       expect(deleteBtn).toBeTruthy();
 
       const clickHandlers = deleteBtn!._eventListeners?.get('click');
@@ -2990,7 +2990,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const otherItem = list.children[1]; // conv-2
-      const deleteBtn = otherItem.querySelector('.claudian-delete-btn');
+      const deleteBtn = otherItem.querySelector('.dean-delete-btn');
       const clickHandlers = deleteBtn!._eventListeners?.get('click');
 
       await clickHandlers![0]({ stopPropagation: jest.fn() });

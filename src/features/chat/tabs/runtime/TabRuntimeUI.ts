@@ -195,7 +195,7 @@ function buildInputToolbar(
   const { dom } = shell;
   const { plugin } = options;
 
-  const inputToolbar = dom.inputWrapper.createDiv({ cls: 'claudian-input-toolbar' });
+  const inputToolbar = dom.inputWrapper.createDiv({ cls: 'dean-input-toolbar' });
 
   const blankTabUIConfigProxy = (): ProviderChatUIConfig => {
     const draftProvider = shell.providerId;
@@ -413,7 +413,7 @@ function buildInputToolbar(
       });
       tab.ui.permissionToggle.updateDisplay();
       shell.dom.inputWrapper.toggleClass(
-        'claudian-input-plan-mode',
+        'dean-input-plan-mode',
         mode === 'plan' && getTabCapabilities(tab, plugin).supportsPlanMode,
       );
       onUserModified();

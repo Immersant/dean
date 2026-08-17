@@ -29,7 +29,7 @@ export interface SlashCommandDropdownCallbacks {
 export interface SlashCommandDropdownOptions {
   fixed?: boolean;
   hiddenCommands?: Set<string>;
-  /** Whether to include Claudian chat-action built-ins such as /clear and /fast. */
+  /** Whether to include Dean chat-action built-ins such as /clear and /fast. */
   includeBuiltIns?: boolean;
   /** Active provider identity, independent of optional catalog availability. */
   providerId?: ProviderId;
@@ -370,27 +370,27 @@ export class SlashCommandDropdown {
     this.dropdownEl.empty();
 
     if (this.filteredItems.length === 0 && !this.providerDiscoveryState) {
-      const emptyEl = this.dropdownEl.createDiv({ cls: 'claudian-slash-empty' });
+      const emptyEl = this.dropdownEl.createDiv({ cls: 'dean-slash-empty' });
       emptyEl.setText('No matching commands');
     } else {
       for (let i = 0; i < this.filteredItems.length; i++) {
         const item = this.filteredItems[i];
-        const itemEl = this.dropdownEl.createDiv({ cls: 'claudian-slash-item' });
+        const itemEl = this.dropdownEl.createDiv({ cls: 'dean-slash-item' });
 
         if (i === this.selectedIndex) {
           itemEl.addClass('selected');
         }
 
-        const nameEl = itemEl.createSpan({ cls: 'claudian-slash-name' });
+        const nameEl = itemEl.createSpan({ cls: 'dean-slash-name' });
         nameEl.setText(`${item.displayPrefix}${item.name}`);
 
         if (item.argumentHint) {
-          const hintEl = itemEl.createSpan({ cls: 'claudian-slash-hint' });
+          const hintEl = itemEl.createSpan({ cls: 'dean-slash-hint' });
           hintEl.setText(normalizeArgumentHint(item.argumentHint));
         }
 
         if (item.description) {
-          const descEl = itemEl.createDiv({ cls: 'claudian-slash-desc' });
+          const descEl = itemEl.createDiv({ cls: 'dean-slash-desc' });
           descEl.setText(item.description);
         }
 
@@ -422,9 +422,9 @@ export class SlashCommandDropdown {
     if (state.status === 'ready') return;
 
     const stateEl = this.dropdownEl.createDiv({
-      cls: `claudian-slash-provider-state is-${state.status}`,
+      cls: `dean-slash-provider-state is-${state.status}`,
     });
-    const messageEl = stateEl.createSpan({ cls: 'claudian-slash-provider-state-message' });
+    const messageEl = stateEl.createSpan({ cls: 'dean-slash-provider-state-message' });
 
     switch (state.status) {
       case 'loading':
@@ -439,7 +439,7 @@ export class SlashCommandDropdown {
       case 'error': {
         messageEl.setText(state.message);
         const retryEl = stateEl.createEl('button', {
-          cls: 'claudian-slash-provider-retry',
+          cls: 'dean-slash-provider-retry',
           text: 'Retry',
           attr: { type: 'button' },
         });
@@ -454,10 +454,10 @@ export class SlashCommandDropdown {
   private createDropdownElement(): HTMLElement {
     if (this.isFixed) {
       return this.containerEl.createDiv({
-        cls: 'claudian-slash-dropdown claudian-slash-dropdown-fixed',
+        cls: 'dean-slash-dropdown dean-slash-dropdown-fixed',
       });
     } else {
-      return this.containerEl.createDiv({ cls: 'claudian-slash-dropdown' });
+      return this.containerEl.createDiv({ cls: 'dean-slash-dropdown' });
     }
   }
 
@@ -466,9 +466,9 @@ export class SlashCommandDropdown {
 
     const inputRect = this.inputEl.getBoundingClientRect();
     this.dropdownEl.setCssProps({
-      '--claudian-fixed-dropdown-bottom': `${window.innerHeight - inputRect.top + 4}px`,
-      '--claudian-fixed-dropdown-left': `${inputRect.left}px`,
-      '--claudian-fixed-dropdown-width': `${Math.max(inputRect.width, 280)}px`,
+      '--dean-fixed-dropdown-bottom': `${window.innerHeight - inputRect.top + 4}px`,
+      '--dean-fixed-dropdown-left': `${inputRect.left}px`,
+      '--dean-fixed-dropdown-width': `${Math.max(inputRect.width, 280)}px`,
     });
   }
 
@@ -479,7 +479,7 @@ export class SlashCommandDropdown {
   }
 
   private updateSelection(): void {
-    const items = this.dropdownEl?.querySelectorAll('.claudian-slash-item');
+    const items = this.dropdownEl?.querySelectorAll('.dean-slash-item');
     items?.forEach((item, index) => {
       if (index === this.selectedIndex) {
         item.addClass('selected');

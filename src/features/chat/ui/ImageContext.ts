@@ -53,7 +53,7 @@ export class ImageContextManager {
     this.callbacks = callbacks;
     const ownedTrayContainer = contextTray
       ? null
-      : (previewContainerEl ?? containerEl).createDiv({ cls: 'claudian-context-row' });
+      : (previewContainerEl ?? containerEl).createDiv({ cls: 'dean-context-row' });
     this.contextTray = contextTray ?? new ComposerContextTray(ownedTrayContainer!);
     if (!contextTray) {
       this.ownedContextTray = this.contextTray;
@@ -120,12 +120,12 @@ export class ImageContextManager {
   }
 
   private setupDragAndDrop() {
-    const inputWrapper = this.containerEl.querySelector('.claudian-input-wrapper') as HTMLElement;
+    const inputWrapper = this.containerEl.querySelector('.dean-input-wrapper') as HTMLElement;
     if (!inputWrapper) return;
     this.dropZoneEl = inputWrapper;
 
-    this.dropOverlay = inputWrapper.createDiv({ cls: 'claudian-drop-overlay' });
-    const dropContent = this.dropOverlay.createDiv({ cls: 'claudian-drop-content' });
+    this.dropOverlay = inputWrapper.createDiv({ cls: 'dean-drop-overlay' });
+    const dropContent = this.dropOverlay.createDiv({ cls: 'dean-drop-content' });
     const svg = dropContent.createSvg('svg');
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('width', '32');
@@ -171,7 +171,7 @@ export class ImageContextManager {
     e.preventDefault();
     e.stopPropagation();
 
-    const inputWrapper = this.containerEl.querySelector('.claudian-input-wrapper');
+    const inputWrapper = this.containerEl.querySelector('.dean-input-wrapper');
     if (!inputWrapper) {
       this.dropOverlay?.removeClass('visible');
       return;
@@ -317,8 +317,8 @@ export class ImageContextManager {
     this.closeImageModal?.();
 
     const ownerDocument = this.containerEl.ownerDocument ?? window.document;
-    const overlay = ownerDocument.body.createDiv({ cls: 'claudian-image-modal-overlay' });
-    const modal = overlay.createDiv({ cls: 'claudian-image-modal' });
+    const overlay = ownerDocument.body.createDiv({ cls: 'dean-image-modal-overlay' });
+    const modal = overlay.createDiv({ cls: 'dean-image-modal' });
 
     modal.createEl('img', {
       attr: {
@@ -327,7 +327,7 @@ export class ImageContextManager {
       },
     });
 
-    const closeBtn = modal.createDiv({ cls: 'claudian-image-modal-close' });
+    const closeBtn = modal.createDiv({ cls: 'dean-image-modal-close' });
     closeBtn.setText('\u00D7');
 
     const handleEsc = (e: KeyboardEvent) => {

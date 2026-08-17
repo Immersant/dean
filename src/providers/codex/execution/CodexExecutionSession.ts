@@ -100,7 +100,7 @@ import { CodexExecutionServerRequestRouter } from './CodexExecutionServerRequest
 const PASSIVE_INSTRUCTIONS =
   'Do not invoke tools. Complete the request only from the supplied input and context.';
 const LEGACY_WORKSPACE_DEPENDENCY_INSTRUCTIONS =
-  'This thread predates Claudian client-hosted workspace dependency tools. Do not emulate load_workspace_dependencies or install replacement dependencies.';
+  'This thread predates Dean client-hosted workspace dependency tools. Do not emulate load_workspace_dependencies or install replacement dependencies.';
 const CODEX_SUPPORTS_EXACT_BUILT_IN_TOOL_ALLOW_LIST = false;
 const MISSED_TURN_COMPLETION_GRACE_MS = 1_000;
 const MISSED_TURN_COMPLETION_MAX_ATTEMPTS = 3;
@@ -468,7 +468,7 @@ export class CodexExecutionSession
         this.finishError(
           run,
           'configuration',
-          'No Codex model is selected. Enable a model in Claudian settings.',
+          'No Codex model is selected. Enable a model in Dean settings.',
           true,
         );
         return;
@@ -1956,7 +1956,7 @@ export class CodexExecutionSession
         .map(block => block.image);
       if (images.length > 0) {
         tempDirectory = fs.mkdtempSync(
-          path.join(os.tmpdir(), 'claudian-codex-images-'),
+          path.join(os.tmpdir(), 'dean-codex-images-'),
         );
         images.forEach((image, index) => {
           if (!image.mediaType.startsWith('image/')) return;

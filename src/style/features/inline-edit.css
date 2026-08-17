@@ -1,8 +1,8 @@
 /* Inline Edit (CM6 decorations) */
 
 /* Selection highlight (shared by inline edit and chat) */
-.cm-line .claudian-selection-highlight,
-.claudian-selection-highlight.claudian-selection-highlight {
+.cm-line .dean-selection-highlight,
+.dean-selection-highlight.dean-selection-highlight {
   background: var(--text-selection);
   border-radius: 2px;
   padding: 3px 0;
@@ -10,18 +10,18 @@
 }
 
 /* Preview mode selection highlight via CSS Custom Highlight API */
-::highlight(claudian-selection) {
+::highlight(dean-selection) {
   background: var(--text-selection);
 }
 
 /* CM6 widget container - ensure transparent background */
 .markdown-source-view.mod-cm6 .cm-widgetBuffer,
-.markdown-source-view.mod-cm6 .cm-line.claudian-inline-input-line {
+.markdown-source-view.mod-cm6 .cm-line.dean-inline-input-line {
   background: transparent;
 }
 
 /* Input container - fully transparent */
-.claudian-inline-input-container {
+.dean-inline-input-container {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -30,7 +30,7 @@
 }
 
 /* Input wrapper - contains input and spinner */
-.claudian-inline-input-wrap {
+.dean-inline-input-wrap {
   flex: 1;
   position: relative;
   background: transparent;
@@ -38,7 +38,7 @@
 }
 
 /* Input - fully transparent */
-.claudian-inline-input-wrap input.claudian-inline-input {
+.dean-inline-input-wrap input.dean-inline-input {
   width: 100%;
   padding: 4px 8px;
   padding-inline-end: 30px;
@@ -52,22 +52,22 @@
   font-size: var(--font-ui-small, 13px);
 }
 
-.claudian-inline-input-wrap input.claudian-inline-input:focus,
-.claudian-inline-input-wrap input.claudian-inline-input:focus-visible {
+.dean-inline-input-wrap input.dean-inline-input:focus,
+.dean-inline-input-wrap input.dean-inline-input:focus-visible {
   outline: none;
   box-shadow: none;
 }
 
-.claudian-inline-input-wrap input.claudian-inline-input::placeholder {
+.dean-inline-input-wrap input.dean-inline-input::placeholder {
   color: var(--text-faint);
 }
 
-.claudian-inline-input-wrap input.claudian-inline-input:disabled {
+.dean-inline-input-wrap input.dean-inline-input:disabled {
   opacity: 0.6;
 }
 
 /* Spinner - inside input box on end side */
-.claudian-inline-spinner {
+.dean-inline-spinner {
   position: absolute;
   inset-inline-end: 8px;
   top: 50%;
@@ -75,14 +75,14 @@
   height: 14px;
   margin-top: -7px;
   border: 2px solid var(--background-modifier-border);
-  border-top-color: var(--claudian-brand);
+  border-top-color: var(--dean-brand);
   border-radius: 50%;
   box-sizing: border-box;
-  animation: claudian-spin 0.8s linear infinite;
+  animation: dean-spin 0.8s linear infinite;
 }
 
 /* Agent reply - shown when agent asks clarifying question */
-.claudian-inline-agent-reply {
+.dean-inline-agent-reply {
   padding: 8px;
   margin-bottom: 4px;
   background: transparent;
@@ -98,17 +98,17 @@
   word-wrap: break-word;
 }
 
-.claudian-inline-agent-reply > :first-child,
-.claudian-inline-diff-preview-body > :first-child {
+.dean-inline-agent-reply > :first-child,
+.dean-inline-diff-preview-body > :first-child {
   margin-top: 0;
 }
 
-.claudian-inline-agent-reply > :last-child,
-.claudian-inline-diff-preview-body > :last-child {
+.dean-inline-agent-reply > :last-child,
+.dean-inline-diff-preview-body > :last-child {
   margin-bottom: 0;
 }
 
-.claudian-inline-diff-preview {
+.dean-inline-diff-preview {
   margin: 4px 0 6px;
   padding: 8px 10px;
   border: 1px solid var(--background-modifier-border);
@@ -118,7 +118,7 @@
   overflow: hidden;
 }
 
-.claudian-inline-diff-preview-body {
+.dean-inline-diff-preview-body {
   font-family: var(--font-text);
   font-size: var(--font-text-size);
   line-height: var(--line-height-normal);
@@ -127,116 +127,116 @@
   --heading-spacing: 0.5rem;
 }
 
-.claudian-inline-diff-preview img {
+.dean-inline-diff-preview img {
   max-width: 100%;
   height: auto;
 }
 
-.claudian-inline-diff-preview .markdown-rendered p {
+.dean-inline-diff-preview .markdown-rendered p {
   margin: 0 0 6px;
 }
 
-.claudian-inline-diff-preview .markdown-rendered p:last-child {
+.dean-inline-diff-preview .markdown-rendered p:last-child {
   margin-bottom: 0;
 }
 
-.claudian-inline-diff-preview .markdown-rendered h1,
-.claudian-inline-diff-preview .markdown-rendered h2,
-.claudian-inline-diff-preview .markdown-rendered h3,
-.claudian-inline-diff-preview .markdown-rendered h4,
-.claudian-inline-diff-preview .markdown-rendered h5,
-.claudian-inline-diff-preview .markdown-rendered h6 {
+.dean-inline-diff-preview .markdown-rendered h1,
+.dean-inline-diff-preview .markdown-rendered h2,
+.dean-inline-diff-preview .markdown-rendered h3,
+.dean-inline-diff-preview .markdown-rendered h4,
+.dean-inline-diff-preview .markdown-rendered h5,
+.dean-inline-diff-preview .markdown-rendered h6 {
   margin: 0 0 6px;
   line-height: 1.25;
 }
 
-.claudian-inline-diff-preview .markdown-rendered h1:first-child,
-.claudian-inline-diff-preview .markdown-rendered h2:first-child,
-.claudian-inline-diff-preview .markdown-rendered h3:first-child,
-.claudian-inline-diff-preview .markdown-rendered h4:first-child,
-.claudian-inline-diff-preview .markdown-rendered h5:first-child,
-.claudian-inline-diff-preview .markdown-rendered h6:first-child {
+.dean-inline-diff-preview .markdown-rendered h1:first-child,
+.dean-inline-diff-preview .markdown-rendered h2:first-child,
+.dean-inline-diff-preview .markdown-rendered h3:first-child,
+.dean-inline-diff-preview .markdown-rendered h4:first-child,
+.dean-inline-diff-preview .markdown-rendered h5:first-child,
+.dean-inline-diff-preview .markdown-rendered h6:first-child {
   margin-top: 0;
 }
 
-.claudian-inline-diff-preview .markdown-rendered ul,
-.claudian-inline-diff-preview .markdown-rendered ol {
+.dean-inline-diff-preview .markdown-rendered ul,
+.dean-inline-diff-preview .markdown-rendered ol {
   margin: 2px 0 8px;
   padding-inline-start: 1.5em;
 }
 
-.claudian-inline-diff-preview .markdown-rendered li {
+.dean-inline-diff-preview .markdown-rendered li {
   margin: 2px 0;
 }
 
-.claudian-inline-diff-preview .markdown-rendered li > p {
+.dean-inline-diff-preview .markdown-rendered li > p {
   margin: 0;
 }
 
-.claudian-inline-diff-preview .markdown-rendered pre,
-.claudian-inline-diff-preview .markdown-rendered table,
-.claudian-inline-diff-preview .markdown-rendered blockquote {
+.dean-inline-diff-preview .markdown-rendered pre,
+.dean-inline-diff-preview .markdown-rendered table,
+.dean-inline-diff-preview .markdown-rendered blockquote {
   margin: 2px 0 8px;
 }
 
-.claudian-inline-diff-preview .markdown-rendered .el-h1,
-.claudian-inline-diff-preview .markdown-rendered .el-h2,
-.claudian-inline-diff-preview .markdown-rendered .el-h3,
-.claudian-inline-diff-preview .markdown-rendered .el-h4,
-.claudian-inline-diff-preview .markdown-rendered .el-h5,
-.claudian-inline-diff-preview .markdown-rendered .el-h6,
-.claudian-inline-diff-preview .markdown-rendered .el-p,
-.claudian-inline-diff-preview .markdown-rendered .el-ul,
-.claudian-inline-diff-preview .markdown-rendered .el-ol,
-.claudian-inline-diff-preview .markdown-rendered .el-pre,
-.claudian-inline-diff-preview .markdown-rendered .el-table,
-.claudian-inline-diff-preview .markdown-rendered .el-blockquote {
+.dean-inline-diff-preview .markdown-rendered .el-h1,
+.dean-inline-diff-preview .markdown-rendered .el-h2,
+.dean-inline-diff-preview .markdown-rendered .el-h3,
+.dean-inline-diff-preview .markdown-rendered .el-h4,
+.dean-inline-diff-preview .markdown-rendered .el-h5,
+.dean-inline-diff-preview .markdown-rendered .el-h6,
+.dean-inline-diff-preview .markdown-rendered .el-p,
+.dean-inline-diff-preview .markdown-rendered .el-ul,
+.dean-inline-diff-preview .markdown-rendered .el-ol,
+.dean-inline-diff-preview .markdown-rendered .el-pre,
+.dean-inline-diff-preview .markdown-rendered .el-table,
+.dean-inline-diff-preview .markdown-rendered .el-blockquote {
   margin-block-start: 0;
   margin-block-end: 6px;
 }
 
-.claudian-inline-markdown-fallback {
+.dean-inline-markdown-fallback {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-.claudian-diff-block {
+.dean-diff-block {
   border-radius: 4px;
   padding: 2px 4px;
 }
 
-.claudian-diff-block + .claudian-diff-block {
+.dean-diff-block + .dean-diff-block {
   margin-top: 2px;
 }
 
-.claudian-diff-block > :first-child {
+.dean-diff-block > :first-child {
   margin-top: 0;
 }
 
-.claudian-diff-block > :last-child {
+.dean-diff-block > :last-child {
   margin-bottom: 0;
 }
 
-.claudian-diff-del:not(.claudian-diff-block) {
+.dean-diff-del:not(.dean-diff-block) {
   background: rgba(255, 80, 80, 0.2);
   text-decoration: line-through;
   color: var(--text-muted);
 }
 
-.claudian-diff-ins:not(.claudian-diff-block) {
+.dean-diff-ins:not(.dean-diff-block) {
   background: rgba(80, 200, 80, 0.2);
 }
 
-.claudian-diff-block.claudian-diff-del {
+.dean-diff-block.dean-diff-del {
   background: rgba(255, 80, 80, 0.14);
   color: var(--text-muted);
 }
 
-.claudian-diff-block.claudian-diff-ins {
+.dean-diff-block.dean-diff-ins {
   background: rgba(80, 200, 80, 0.14);
 }
 
-.claudian-inline-preview-actions {
+.dean-inline-preview-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -245,7 +245,7 @@
   border-top: 1px solid var(--background-modifier-border);
 }
 
-.claudian-inline-preview-actions button.claudian-inline-preview-action {
+.dean-inline-preview-actions button.dean-inline-preview-action {
   min-height: 28px;
   padding: 4px 10px;
   border: 1px solid var(--background-modifier-border);
@@ -259,20 +259,20 @@
   cursor: pointer;
 }
 
-.claudian-inline-preview-actions button.claudian-inline-preview-action:hover {
+.dean-inline-preview-actions button.dean-inline-preview-action:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudian-inline-preview-actions button.claudian-inline-preview-action.reject {
+.dean-inline-preview-actions button.dean-inline-preview-action.reject {
   color: var(--color-red);
 }
 
-.claudian-inline-preview-actions button.claudian-inline-preview-action.accept {
+.dean-inline-preview-actions button.dean-inline-preview-action.accept {
   border-color: var(--interactive-accent);
   background: var(--interactive-accent);
   color: var(--text-on-accent);
 }
 
-.claudian-inline-preview-actions button.claudian-inline-preview-action.accept:hover {
+.dean-inline-preview-actions button.dean-inline-preview-action.accept:hover {
   background: var(--interactive-accent-hover);
 }

@@ -112,7 +112,7 @@ export class VaultFileTree {
       event.key !== 'Escape'
       || event.isComposing
       || this.isSearchComposing
-      || this.searchFieldEl?.classList.contains('claudian-hidden') !== false
+      || this.searchFieldEl?.classList.contains('dean-hidden') !== false
     ) return false;
 
     event.preventDefault();
@@ -174,7 +174,7 @@ export class VaultFileTree {
       const module = await (this.options.loadTreeModule?.() ?? import('@pierre/trees'));
       if (this.destroyed || !this.bodyEl || !this.mainTreeHostEl) return;
 
-      const loadingEl = this.bodyEl.querySelector('.claudian-vault-file-tree-loading');
+      const loadingEl = this.bodyEl.querySelector('.dean-vault-file-tree-loading');
       this.treeConstructor = module.FileTree;
       const tree = this.createTree(this.collectPaths(), 'closed');
       this.tree = tree;
@@ -186,7 +186,7 @@ export class VaultFileTree {
       this.bodyEl.replaceChildren();
       this.bodyEl.append(this.createElement(
         'div',
-        'claudian-vault-file-tree-error',
+        'dean-vault-file-tree-error',
         'Failed to load files',
       ));
       new Notice(error instanceof Error ? error.message : 'Failed to load vault files');
@@ -196,20 +196,20 @@ export class VaultFileTree {
   private buildShell(): void {
     const { hostEl } = this.options;
     hostEl.replaceChildren();
-    hostEl.classList.add('claudian-vault-file-tree');
+    hostEl.classList.add('dean-vault-file-tree');
 
-    const header = this.createElement('div', 'claudian-vault-file-tree-header');
+    const header = this.createElement('div', 'dean-vault-file-tree-header');
     this.defaultHeaderEl = this.createElement(
       'div',
-      'claudian-vault-file-tree-default-header',
+      'dean-vault-file-tree-default-header',
     );
     this.defaultHeaderEl.append(this.createElement(
       'div',
-      'claudian-vault-file-tree-title',
+      'dean-vault-file-tree-title',
       this.options.app.vault.getName(),
     ));
 
-    const headerActions = this.createElement('div', 'claudian-vault-file-tree-header-actions');
+    const headerActions = this.createElement('div', 'dean-vault-file-tree-header-actions');
     const newNoteButton = this.createHeaderButton('New note', 'file-plus', () => {
       const activeFilePath = this.options.app.workspace.getActiveFile()?.path ?? '';
       const parent = this.options.app.fileManager.getNewFileParent(activeFilePath);
@@ -220,14 +220,14 @@ export class VaultFileTree {
     });
     this.searchButtonEl = this.createElement(
       'button',
-      'claudian-vault-file-tree-header-button',
+      'dean-vault-file-tree-header-button',
     );
     this.searchButtonEl.type = 'button';
     this.searchButtonEl.setAttribute('aria-label', 'Search files');
     this.searchButtonEl.setAttribute('aria-expanded', 'false');
     setIcon(this.searchButtonEl, 'search');
     this.searchButtonEl.addEventListener('click', () => {
-      if (this.searchFieldEl?.classList.contains('claudian-hidden')) {
+      if (this.searchFieldEl?.classList.contains('dean-hidden')) {
         this.openFileSearch();
       } else {
         this.closeFileSearch();
@@ -239,13 +239,13 @@ export class VaultFileTree {
 
     this.searchFieldEl = this.createElement(
       'div',
-      'claudian-vault-file-tree-search claudian-hidden',
+      'dean-vault-file-tree-search dean-hidden',
     );
-    const searchIcon = this.createElement('span', 'claudian-vault-file-tree-search-icon');
+    const searchIcon = this.createElement('span', 'dean-vault-file-tree-search-icon');
     setIcon(searchIcon, 'search');
     this.searchInputEl = this.createElement(
       'input',
-      'claudian-vault-file-tree-search-input',
+      'dean-vault-file-tree-search-input',
     );
     this.searchInputEl.type = 'search';
     this.searchInputEl.autocomplete = 'off';
@@ -285,16 +285,16 @@ export class VaultFileTree {
     this.searchFieldEl.append(this.searchInputEl, searchIcon);
     header.append(this.defaultHeaderEl, this.searchFieldEl);
 
-    this.bodyEl = this.createElement('div', 'claudian-vault-file-tree-body');
+    this.bodyEl = this.createElement('div', 'dean-vault-file-tree-body');
     this.bodyEl.append(this.createElement(
       'div',
-      'claudian-vault-file-tree-loading',
+      'dean-vault-file-tree-loading',
       'Loading files…',
     ));
-    this.mainTreeHostEl = this.createElement('div', 'claudian-vault-file-tree-pane');
+    this.mainTreeHostEl = this.createElement('div', 'dean-vault-file-tree-pane');
     this.searchPaneEl = this.createElement(
       'div',
-      'claudian-vault-file-tree-pane claudian-hidden',
+      'dean-vault-file-tree-pane dean-hidden',
     );
     this.bodyEl.addEventListener('click', (event) => this.handleTreeRowClick(event));
     this.bodyEl.append(this.mainTreeHostEl, this.searchPaneEl);
@@ -308,8 +308,8 @@ export class VaultFileTree {
       || !this.searchInputEl
       || !this.searchButtonEl
     ) return;
-    this.defaultHeaderEl.classList.add('claudian-hidden');
-    this.searchFieldEl.classList.remove('claudian-hidden');
+    this.defaultHeaderEl.classList.add('dean-hidden');
+    this.searchFieldEl.classList.remove('dean-hidden');
     this.searchButtonEl.setAttribute('aria-expanded', 'true');
     this.searchInputEl.focus();
     this.searchInputEl.setSelectionRange?.(
@@ -325,15 +325,15 @@ export class VaultFileTree {
       || !this.searchInputEl
       || !this.searchButtonEl
       || !this.defaultHeaderEl
-      || this.searchFieldEl.classList.contains('claudian-hidden')
+      || this.searchFieldEl.classList.contains('dean-hidden')
     ) return;
     this.clearFileSearchDismissHandlers();
     this.isSearchComposing = false;
     this.searchInputEl.value = '';
     this.updateFileSearch('');
     this.searchInputEl.blur();
-    this.searchFieldEl.classList.add('claudian-hidden');
-    this.defaultHeaderEl.classList.remove('claudian-hidden');
+    this.searchFieldEl.classList.add('dean-hidden');
+    this.defaultHeaderEl.classList.remove('dean-hidden');
     this.searchButtonEl.setAttribute('aria-expanded', 'false');
   }
 
@@ -407,12 +407,12 @@ export class VaultFileTree {
     if (truncated) {
       this.searchPaneEl.append(this.createElement(
         'div',
-        'claudian-vault-file-tree-search-limit',
+        'dean-vault-file-tree-search-limit',
         `Showing the first ${SEARCH_RESULT_LIMIT} matches`,
       ));
     }
-    this.mainTreeHostEl.classList.add('claudian-hidden');
-    this.searchPaneEl.classList.remove('claudian-hidden');
+    this.mainTreeHostEl.classList.add('dean-hidden');
+    this.searchPaneEl.classList.remove('dean-hidden');
   }
 
   private clearSearchResults(): void {
@@ -420,15 +420,15 @@ export class VaultFileTree {
     this.searchTree = null;
     this.searchSourcePaths = null;
     this.searchPaneEl?.replaceChildren();
-    this.searchPaneEl?.classList.add('claudian-hidden');
-    this.mainTreeHostEl?.classList.remove('claudian-hidden');
+    this.searchPaneEl?.classList.add('dean-hidden');
+    this.mainTreeHostEl?.classList.remove('dean-hidden');
   }
 
   private scheduleFileSearchDismissHandlers(): void {
     queueMicrotask(() => {
       if (
         this.destroyed
-        || this.searchFieldEl?.classList.contains('claudian-hidden') !== false
+        || this.searchFieldEl?.classList.contains('dean-hidden') !== false
         || !this.searchInputEl
       ) return;
 
@@ -518,7 +518,7 @@ export class VaultFileTree {
   ): HTMLButtonElement {
     const button = this.createElement(
       'button',
-      'claudian-vault-file-tree-header-button',
+      'dean-vault-file-tree-header-button',
     );
     button.type = 'button';
     button.setAttribute('aria-label', ariaLabel);

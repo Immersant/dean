@@ -242,7 +242,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.slashCommands.name')).setHeading();
 
-    const slashCommandsDesc = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+    const slashCommandsDesc = container.createDiv({ cls: 'dean-sp-settings-desc' });
     const descP = slashCommandsDesc.createEl('p', { cls: 'setting-item-description' });
     descP.appendText(t('settings.slashCommands.desc') + ' ');
     descP.createEl('a', {
@@ -250,7 +250,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       href: 'https://code.claude.com/docs/en/skills',
     });
 
-    const slashCommandsContainer = container.createDiv({ cls: 'claudian-slash-commands-container' });
+    const slashCommandsContainer = container.createDiv({ cls: 'dean-slash-commands-container' });
     new SlashCommandSettings(
       slashCommandsContainer,
       context.plugin.app,
@@ -267,13 +267,13 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.subagents.name')).setHeading();
 
-    const agentsDesc = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+    const agentsDesc = container.createDiv({ cls: 'dean-sp-settings-desc' });
     agentsDesc.createEl('p', {
       text: t('settings.subagents.desc'),
       cls: 'setting-item-description',
     });
 
-    const agentsContainer = container.createDiv({ cls: 'claudian-agents-container' });
+    const agentsContainer = container.createDiv({ cls: 'dean-agents-container' });
     new AgentSettings(agentsContainer, {
       app: context.plugin.app,
       agentManager: claudeWorkspace.agentManager,
@@ -295,13 +295,13 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.plugins.name')).setHeading();
 
-    const pluginsDesc = container.createDiv({ cls: 'claudian-plugin-settings-desc' });
+    const pluginsDesc = container.createDiv({ cls: 'dean-plugin-settings-desc' });
     pluginsDesc.createEl('p', {
       text: t('settings.plugins.desc'),
       cls: 'setting-item-description',
     });
 
-    const pluginsContainer = container.createDiv({ cls: 'claudian-plugins-container' });
+    const pluginsContainer = container.createDiv({ cls: 'dean-plugins-container' });
     new PluginSettingsManager(pluginsContainer, {
       pluginManager: claudeWorkspace.pluginManager,
       agentManager: claudeWorkspace.agentManager,
@@ -349,13 +349,13 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
         toggle
           .setValue(claudeSettings.enableBangBash)
           .onChange(async (value) => {
-            bangBashValidationEl.toggleClass('claudian-hidden', true);
+            bangBashValidationEl.toggleClass('dean-hidden', true);
             if (value) {
               const { findNodeExecutable, getEnhancedPath } = await import('../../../utils/env');
               const nodePath = findNodeExecutable(getEnhancedPath());
               if (!nodePath) {
                 bangBashValidationEl.setText(t('settings.enableBangBash.validation.noNode'));
-                bangBashValidationEl.toggleClass('claudian-hidden', false);
+                bangBashValidationEl.toggleClass('dean-hidden', false);
                 toggle.setValue(false);
                 return;
               }
@@ -367,7 +367,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       );
 
     const bangBashValidationEl = container.createDiv({
-      cls: 'claudian-bang-bash-validation claudian-setting-validation claudian-setting-validation-error claudian-hidden',
+      cls: 'dean-bang-bash-validation dean-setting-validation dean-setting-validation-error dean-hidden',
     });
   },
 };

@@ -17,7 +17,7 @@ import type {
   ProviderId,
   ProviderUIOption,
 } from '../../../core/providers/types';
-import type { ClaudianSettings, Conversation } from '../../../core/types';
+import type { Conversation,DeanSettings } from '../../../core/types';
 import type { FeatureHost } from '../../FeatureHost';
 import { toggleServiceTier } from '../actions/toggleServiceTier';
 import { getTabProviderId } from './providerResolution';
@@ -84,7 +84,7 @@ export function getTabSettingsSnapshot(
 export function getWritableTabSettingsSnapshot(
   tab: TabProviderContext,
   plugin: FeatureHost,
-  settings: ClaudianSettings = plugin.settings,
+  settings: DeanSettings = plugin.settings,
 ): TabProviderSettings {
   return getProviderSettingsSnapshotWithModel(
     settings,
@@ -242,7 +242,7 @@ export function refreshTabProviderUI(tab: AssembledTabRuntime, plugin: FeatureHo
   tab.ui.permissionToggle.updateDisplay();
   tab.ui.serviceTierToggle.updateDisplay();
   tab.dom.inputWrapper.toggleClass(
-    'claudian-input-plan-mode',
+    'dean-input-plan-mode',
     permissionMode === 'plan' && capabilities.supportsPlanMode,
   );
 }
@@ -517,7 +517,7 @@ export async function updatePlanModeUI(
     const activeMode = getTabPermissionMode(tab, plugin);
     tab.ui.permissionToggle.updateDisplay();
     tab.dom.inputWrapper.toggleClass(
-      'claudian-input-plan-mode',
+      'dean-input-plan-mode',
       activeMode === 'plan' && getTabCapabilities(tab, plugin).supportsPlanMode,
     );
   }

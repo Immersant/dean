@@ -149,11 +149,11 @@ const allowedProviderAppImports = new Set([
   ),
   resolvedImportKey(
     path.join(providersRoot, 'claude', 'storage', 'StorageService.ts'),
-    path.join(appRoot, 'settings', 'ClaudianSettingsStorage'),
+    path.join(appRoot, 'settings', 'DeanSettingsStorage'),
   ),
   resolvedImportKey(
-    path.join(providersRoot, 'claude', 'storage', 'ClaudianSettingsStorage.ts'),
-    path.join(appRoot, 'settings', 'ClaudianSettingsStorage'),
+    path.join(providersRoot, 'claude', 'storage', 'DeanSettingsStorage.ts'),
+    path.join(appRoot, 'settings', 'DeanSettingsStorage'),
   ),
 ]);
 
@@ -228,8 +228,8 @@ test('features and shared UI are independent from concrete providers', () => {
 
 test('persisted settings changes use the coordinator boundary', () => {
   const matches = findMatches([sourceRoot], /\.saveSettings\(\)/).filter(file => ![
-    'src/main.ts',
-    'src/app/providers/ClaudianProviderHost.ts',
+    path.join('src', 'main.ts'),
+    path.join('src', 'app', 'providers', 'DeanProviderHost.ts'),
   ].includes(file));
   assert.deepEqual(matches, []);
 });

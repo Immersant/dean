@@ -2,7 +2,7 @@
 
 ## Goal
 
-Rename the Obsidian plugin product from Claudian to Dean throughout the currently present repository. This is a clean-slate identity change: Dean will not preserve or migrate Claudian plugin IDs, persisted data, storage paths, selectors, or code-level compatibility aliases.
+Rename the Obsidian plugin product from Claudian to Dean throughout the complete repository. This is a clean-slate identity change: Dean will not preserve or migrate Claudian plugin IDs, persisted data, storage paths, selectors, or code-level compatibility aliases.
 
 ## Scope
 
@@ -39,7 +39,7 @@ No migration logic, fallback reads, legacy constants, compatibility exports, or 
 
 Perform a semantic inventory before editing, then rename one coherent dependency chain at a time. Rename tests alongside their owned source symbols and paths. Update imports and architecture checks after file renames. Review each remaining case-insensitive `claudian` match manually; the final repository should contain none unless an unavoidable external historical reference is explicitly documented.
 
-The current checkout reports the original tracked tree as deleted and the present partial tree as untracked. Preserve that pre-existing state. Modify only currently present files plus rename-specific files created during this work, and do not restore, delete, or stage unrelated paths.
+The initially partial checkout was restored from `HEAD` before implementation at the user's request. Apply the rename across the complete tracked tree and avoid unrelated behavior changes.
 
 ## Verification
 
@@ -48,13 +48,13 @@ Verification consists of:
 1. A case-insensitive repository search, excluding Git metadata and dependencies, finds no unintended `claudian` references.
 2. Manifest, package, and lockfile identities agree on `dean`.
 3. Imports and architecture checks reference renamed files and symbols.
-4. The full repository check passes where supported by the partial checkout:
+4. The full repository check is run:
 
    ```bash
    npm run typecheck && npm run lint && npm run test && npm run build
    ```
 
-If the partial checkout prevents a command from running, report the exact missing prerequisite and still run every independent check that remains available.
+Pre-existing platform-specific failures must be compared against the recorded baseline and reported separately from rename regressions.
 
 ## Acceptance Criteria
 

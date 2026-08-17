@@ -121,8 +121,8 @@ export function classifyOpencodeSessionLoadError(
 }
 
 const AUX_AGENT_IDS: Record<Exclude<OpencodeExecutionProfile, 'managed'>, string> = {
-  passive: 'claudian-execution-passive',
-  readonly: 'claudian-execution-readonly',
+  passive: 'dean-execution-passive',
+  readonly: 'dean-execution-readonly',
 };
 
 const READ_PERMISSION = Object.freeze({
@@ -252,7 +252,7 @@ export class DefaultOpencodeAcpSessionKernel
       this.assertNotDisposed();
       const connection = new AcpClientConnection({
         clientInfo: {
-          name: 'claudian',
+          name: 'dean',
           version: this.options.plugin.manifest?.version ?? '0.0.0',
         },
         delegate: {
@@ -727,7 +727,7 @@ function buildAgentConfig(
   return profile === 'readonly'
     ? {
       definition: {
-        description: 'Claudian read-only execution agent.',
+        description: 'Dean read-only execution agent.',
         mode: 'primary',
         permission: {
           '*': 'deny',
@@ -745,7 +745,7 @@ function buildAgentConfig(
     }
     : {
       definition: {
-        description: 'Claudian passive execution agent.',
+        description: 'Dean passive execution agent.',
         mode: 'primary',
         permission: {
           '*': 'deny',

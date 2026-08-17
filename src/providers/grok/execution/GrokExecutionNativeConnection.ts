@@ -63,7 +63,7 @@ implements GrokExecutionNativeConnection {
       output: this.process.stdin,
     });
     this.connection = new AcpClientConnection({
-      clientInfo: { name: 'claudian', version: options.version },
+      clientInfo: { name: 'dean', version: options.version },
       delegate: {
         onSessionNotification: notification => this.notify(notification, 'standard'),
         requestPermission: request => options.requestPermission(request),

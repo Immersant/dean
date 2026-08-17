@@ -1,9 +1,9 @@
-import type { ClaudianSettings } from '../../core/types';
+import type { DeanSettings } from '../../core/types';
 import type { SettingsCoordinator } from './SettingsCoordinator';
 
 export class PinnedLinkedNotePathCoordinator {
   constructor(
-    private readonly settingsCoordinator: SettingsCoordinator<ClaudianSettings>,
+    private readonly settingsCoordinator: SettingsCoordinator<DeanSettings>,
   ) {}
 
   async setPinned(notePath: string, isPinned: boolean): Promise<boolean> {

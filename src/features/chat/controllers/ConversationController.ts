@@ -775,16 +775,16 @@ export class ConversationController {
     }
 
     const previousList = options.preserveListState
-      ? container.querySelector<HTMLElement>('.claudian-history-list')
+      ? container.querySelector<HTMLElement>('.dean-history-list')
       : null;
     const previousSessionList = previousList?.querySelector<HTMLElement>(
-      '.claudian-session-list-items',
+      '.dean-session-list-items',
     ) ?? previousList;
     const previousPinnedSection = previousList?.querySelector<HTMLElement>(
-      '.claudian-history-section--pinned',
+      '.dean-history-section--pinned',
     );
     const previousPinnedList = previousPinnedSection?.querySelector<HTMLElement>(
-      '.claudian-history-section-items',
+      '.dean-history-section-items',
     );
     const previousSessionScrollTop = previousSessionList?.scrollTop ?? 0;
     const previousPinnedScrollTop = previousPinnedList?.scrollTop ?? 0;
@@ -792,7 +792,7 @@ export class ConversationController {
     const previousVisibleCount = Number.isFinite(previousVisibleCountFromState)
       && previousVisibleCountFromState > 0
       ? previousVisibleCountFromState
-      : previousList?.querySelectorAll('.claudian-history-item').length ?? 0;
+      : previousList?.querySelectorAll('.dean-history-item').length ?? 0;
     const previousScrollAnchors = previousSessionList
       ? this.captureHistoryScrollAnchors(previousSessionList)
       : [];
@@ -875,49 +875,49 @@ export class ConversationController {
     let sessionList: HTMLElement;
     let pinnedList: HTMLElement | null = null;
     if (showSessionSections) {
-      list = container.createDiv({ cls: 'claudian-history-list' });
+      list = container.createDiv({ cls: 'dean-history-list' });
       if (pinnedConversations.length > 0 || pinnedNoteSections.length > 0) {
         const pinnedSection = list.createDiv({
-          cls: 'claudian-history-section claudian-history-section--pinned',
+          cls: 'dean-history-section dean-history-section--pinned',
         });
         const pinnedHeader = pinnedSection.createDiv({
-          cls: 'claudian-history-header claudian-session-section-header',
+          cls: 'dean-history-header dean-session-section-header',
         });
         pinnedHeader.createSpan({
-          cls: 'claudian-history-section-label',
+          cls: 'dean-history-section-label',
           text: 'Pinned',
         });
         pinnedList = pinnedSection.createDiv({
-          cls: 'claudian-history-section-items',
+          cls: 'dean-history-section-items',
         });
       }
 
       const sessionsSection = list.createDiv({
         cls: [
-          'claudian-history-section',
+          'dean-history-section',
           options.showArchivedSection
-            ? 'claudian-history-section--archived'
-            : 'claudian-history-section--sessions',
+            ? 'dean-history-section--archived'
+            : 'dean-history-section--sessions',
         ].join(' '),
       });
       const sessionsHeader = sessionsSection.createDiv({
         cls: [
-          'claudian-history-header',
-          'claudian-session-section-header',
-          'claudian-session-list-header',
+          'dean-history-header',
+          'dean-session-section-header',
+          'dean-session-list-header',
         ].join(' '),
       });
       sessionsHeader.createSpan({
-        cls: 'claudian-history-section-label',
+        cls: 'dean-history-section-label',
         text: options.showArchivedSection ? 'Archived' : 'Sessions',
       });
       sessionList = sessionsSection.createDiv({
-        cls: 'claudian-history-section-items claudian-session-list-items',
+        cls: 'dean-history-section-items dean-session-list-items',
       });
     } else {
-      const dropdownHeader = container.createDiv({ cls: 'claudian-history-header' });
+      const dropdownHeader = container.createDiv({ cls: 'dean-history-header' });
       dropdownHeader.createSpan({ text: options.historyHeaderLabel ?? 'Sessions' });
-      list = container.createDiv({ cls: 'claudian-history-list' });
+      list = container.createDiv({ cls: 'dean-history-list' });
       sessionList = list;
     }
 
@@ -933,7 +933,7 @@ export class ConversationController {
         options.onGroupKeysChange?.([]);
       }
       sessionList.createDiv({
-        cls: 'claudian-history-empty',
+        cls: 'dean-history-empty',
         text: searchTerms.length > 0 ? 'No matching sessions' : 'No conversations',
       });
       options.onBeforeRestoreListState?.(container);
@@ -1040,7 +1040,7 @@ export class ConversationController {
 
     if (renderedConversationCount < visibleConversationTotal && !options.signal?.aborted) {
       const loadMoreButton = sessionList.createEl('button', {
-        cls: 'claudian-history-load-more',
+        cls: 'dean-history-load-more',
         text: `Load more (${visibleConversationTotal - renderedConversationCount} remaining)`,
       });
       loadMoreButton.addEventListener('click', () => {
@@ -1086,10 +1086,10 @@ export class ConversationController {
       ));
     const groupHeader = list.createDiv({
       cls: [
-        'claudian-session-group-header',
-        `claudian-session-group-header--${section.kind}`,
+        'dean-session-group-header',
+        `dean-session-group-header--${section.kind}`,
         hasAttentionConversation && isCollapsed
-          ? 'claudian-session-group-header--attention'
+          ? 'dean-session-group-header--attention'
           : '',
       ].filter(Boolean).join(' '),
     });
@@ -1101,31 +1101,31 @@ export class ConversationController {
       groupHeader.setAttribute('data-note-path', section.notePath);
       groupHeader.setAttribute('title', section.notePath);
       const noteIcon = groupHeader.createSpan({
-        cls: 'claudian-session-group-icon',
+        cls: 'dean-session-group-icon',
       });
       setIcon(noteIcon, 'file-text');
     } else if (section.kind === 'ungrouped') {
       const ungroupedIcon = groupHeader.createSpan({
-        cls: 'claudian-session-group-icon',
+        cls: 'dean-session-group-icon',
       });
       setIcon(ungroupedIcon, 'inbox');
     }
     groupHeader.createSpan({
-      cls: 'claudian-session-group-label',
+      cls: 'dean-session-group-label',
       text: section.label ?? '',
     });
     if (section.kind === 'missing') {
       groupHeader.createSpan({
-        cls: 'claudian-session-group-status',
+        cls: 'dean-session-group-status',
         text: 'Missing',
       });
     }
     const groupRunningIndicator = hasRunningConversation
       ? groupHeader.createSpan({
           cls: [
-            'claudian-session-group-running-indicator',
+            'dean-session-group-running-indicator',
             isCollapsed
-              ? 'claudian-session-group-running-indicator--visible'
+              ? 'dean-session-group-running-indicator--visible'
               : '',
           ].filter(Boolean).join(' '),
         })
@@ -1142,7 +1142,7 @@ export class ConversationController {
       const notePath = section.notePath;
       const startLinkedNoteConversation = options.onStartLinkedNoteConversation;
       const newConversationButton = groupHeader.createSpan({
-        cls: 'claudian-session-group-new-action',
+        cls: 'dean-session-group-new-action',
       });
       newConversationButton.setAttribute('role', 'button');
       newConversationButton.setAttribute('tabindex', '0');
@@ -1175,8 +1175,8 @@ export class ConversationController {
 
     const groupBody = list.createDiv({
       cls: [
-        'claudian-session-group-body',
-        isCollapsed ? 'claudian-session-group-body--collapsed' : '',
+        'dean-session-group-body',
+        isCollapsed ? 'dean-session-group-body--collapsed' : '',
       ].filter(Boolean).join(' '),
     });
     groupBody.setAttribute('data-group-key', section.key);
@@ -1184,13 +1184,13 @@ export class ConversationController {
     const toggleGroup = (): void => {
       const collapsed = groupHeader.getAttribute('aria-expanded') === 'true';
       groupHeader.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-      groupBody.toggleClass('claudian-session-group-body--collapsed', collapsed);
+      groupBody.toggleClass('dean-session-group-body--collapsed', collapsed);
       groupRunningIndicator?.toggleClass(
-        'claudian-session-group-running-indicator--visible',
+        'dean-session-group-running-indicator--visible',
         collapsed,
       );
       if (hasAttentionConversation) {
-        groupHeader.toggleClass('claudian-session-group-header--attention', collapsed);
+        groupHeader.toggleClass('dean-session-group-header--attention', collapsed);
       }
       options.onGroupCollapseChange?.(section.key, collapsed);
       options.onRerender();
@@ -1272,7 +1272,7 @@ export class ConversationController {
     const listRect = list.getBoundingClientRect();
     if (listRect.height <= 0) return [];
 
-    return Array.from(list.querySelectorAll<HTMLElement>('.claudian-history-item'))
+    return Array.from(list.querySelectorAll<HTMLElement>('.dean-history-item'))
       .map((item): HistoryScrollAnchor | null => {
         const conversationId = item.getAttribute('data-conversation-id');
         const itemRect = item.getBoundingClientRect();
@@ -1299,7 +1299,7 @@ export class ConversationController {
     if (anchors.length === 0) return;
 
     const items = Array.from(
-      list.querySelectorAll<HTMLElement>('.claudian-history-item'),
+      list.querySelectorAll<HTMLElement>('.dean-history-item'),
     );
     const listTop = list.getBoundingClientRect().top;
     for (const anchor of anchors) {
@@ -1336,13 +1336,13 @@ export class ConversationController {
     const isSelectable = !isCurrent && options.allowConversationSelection !== false;
     const item = list.createDiv({
       cls: [
-        'claudian-history-item',
+        'dean-history-item',
         isCurrent ? 'active' : '',
         isOpen ? 'open' : '',
         isRunning ? 'running' : '',
-        showAttentionState ? 'claudian-history-item--attention' : '',
+        showAttentionState ? 'dean-history-item--attention' : '',
         options.allowConversationSelection === false
-          ? 'claudian-history-item--noninteractive'
+          ? 'dean-history-item--noninteractive'
           : '',
       ].filter(Boolean).join(' '),
     });
@@ -1354,12 +1354,12 @@ export class ConversationController {
       item.setAttribute('data-tab-index', String(conversationStatus.tabIndex));
     }
 
-    const iconEl = item.createDiv({ cls: 'claudian-history-item-icon' });
+    const iconEl = item.createDiv({ cls: 'dean-history-item-icon' });
     setIcon(iconEl, this.getHistoryItemIcon(openState, isRunning));
 
-    const content = item.createDiv({ cls: 'claudian-history-item-content' });
+    const content = item.createDiv({ cls: 'dean-history-item-content' });
     const titleEl = content.createDiv({
-      cls: 'claudian-history-item-title',
+      cls: 'dean-history-item-title',
       text: conversation.title,
     });
     titleEl.setAttribute('title', conversation.title);
@@ -1372,7 +1372,7 @@ export class ConversationController {
       this.attachSessionMetadataPopover(item, focusTarget, conversation, options);
     } else {
       content.createDiv({
-        cls: 'claudian-history-item-date',
+        cls: 'dean-history-item-date',
         text: this.getHistoryItemStatusText(
           conversationStatus,
           this.getHistoryItemTimestamp(conversation, options),
@@ -1447,15 +1447,15 @@ export class ConversationController {
       );
     });
 
-    const actions = item.createDiv({ cls: 'claudian-history-item-actions' });
+    const actions = item.createDiv({ cls: 'dean-history-item-actions' });
     if (conversation.titleGenerationStatus === 'pending') {
       const loadingEl = actions.createSpan({
-        cls: 'claudian-action-btn claudian-action-loading',
+        cls: 'dean-action-btn dean-action-loading',
       });
       setIcon(loadingEl, 'loader-2');
       loadingEl.setAttribute('aria-label', 'Generating title...');
     } else if (conversation.titleGenerationStatus === 'failed') {
-      const regenerateBtn = actions.createEl('button', { cls: 'claudian-action-btn' });
+      const regenerateBtn = actions.createEl('button', { cls: 'dean-action-btn' });
       setIcon(regenerateBtn, 'refresh-cw');
       regenerateBtn.setAttribute('aria-label', 'Regenerate title');
       regenerateBtn.addEventListener('click', (event) => {
@@ -1469,7 +1469,7 @@ export class ConversationController {
 
     if (openState === 'closed' && options.onOpenConversationInNewTab) {
       const openInNewTabBtn = actions.createEl('button', {
-        cls: 'claudian-action-btn claudian-open-new-tab-btn',
+        cls: 'dean-action-btn dean-open-new-tab-btn',
       });
       setIcon(openInNewTabBtn, 'square-plus');
       openInNewTabBtn.setAttribute('aria-label', 'Open in new tab');
@@ -1487,7 +1487,7 @@ export class ConversationController {
 
     const createDeleteButton = (): void => {
       const deleteBtn = actions.createEl('button', {
-        cls: 'claudian-action-btn claudian-delete-btn',
+        cls: 'dean-action-btn dean-delete-btn',
       });
       setIcon(deleteBtn, 'trash-2');
       deleteBtn.setAttribute('aria-label', 'Delete');
@@ -1508,7 +1508,7 @@ export class ConversationController {
         const isPinned = conversation.isPinned === true;
         if (options.showInlinePinAction !== false) {
           const pinBtn = actions.createEl('button', {
-            cls: 'claudian-action-btn claudian-pin-btn',
+            cls: 'dean-action-btn dean-pin-btn',
           });
           setIcon(pinBtn, isPinned ? 'pin-off' : 'pin');
           pinBtn.setAttribute('aria-label', isPinned ? 'Unpin' : 'Pin');
@@ -1525,7 +1525,7 @@ export class ConversationController {
         }
 
         const archiveBtn = actions.createEl('button', {
-          cls: 'claudian-action-btn claudian-archive-btn',
+          cls: 'dean-action-btn dean-archive-btn',
         });
         setIcon(archiveBtn, 'archive');
         archiveBtn.setAttribute(
@@ -1549,7 +1549,7 @@ export class ConversationController {
       }
     } else if (options.sessionActionMode === 'archived') {
       const restoreBtn = actions.createEl('button', {
-        cls: 'claudian-action-btn claudian-restore-btn',
+        cls: 'dean-action-btn dean-restore-btn',
       });
       setIcon(restoreBtn, 'undo-2');
       restoreBtn.setAttribute('aria-label', 'Restore');
@@ -1565,7 +1565,7 @@ export class ConversationController {
       });
       createDeleteButton();
     } else {
-      const renameBtn = actions.createEl('button', { cls: 'claudian-action-btn' });
+      const renameBtn = actions.createEl('button', { cls: 'dean-action-btn' });
       setIcon(renameBtn, 'pencil');
       renameBtn.setAttribute('aria-label', 'Rename');
       renameBtn.addEventListener('click', (event) => {
@@ -1577,7 +1577,7 @@ export class ConversationController {
 
     if (isRunning && options.showOpenStateLabels === false) {
       const runningIndicator = item.createSpan({
-        cls: 'claudian-session-running-indicator',
+        cls: 'dean-session-running-indicator',
       });
       setIcon(runningIndicator, 'loader-2');
       runningIndicator.setAttribute('aria-label', 'Running');
@@ -1645,11 +1645,11 @@ export class ConversationController {
     const body = document.body;
     if (!body) return;
 
-    const hoverEl = body.createDiv({ cls: 'claudian-session-metadata-popover' });
+    const hoverEl = body.createDiv({ cls: 'dean-session-metadata-popover' });
     this.metadataPopoverEl = hoverEl;
     this.metadataPopoverTarget = item;
 
-    const popoverId = `claudian-session-metadata-${++this.metadataPopoverSequence}`;
+    const popoverId = `dean-session-metadata-${++this.metadataPopoverSequence}`;
     hoverEl.setAttribute('id', popoverId);
     hoverEl.setAttribute('role', 'tooltip');
     descriptionTarget.setAttribute('aria-describedby', popoverId);
@@ -1665,7 +1665,7 @@ export class ConversationController {
         null,
         getLinkedNoteTitle(linkedNotePath),
         {
-          className: 'claudian-session-metadata-value--note',
+          className: 'dean-session-metadata-value--note',
           title: linkedNotePath,
         },
       );
@@ -1781,18 +1781,18 @@ export class ConversationController {
   ): void {
     const row = parent.createDiv({
       cls: [
-        'claudian-session-metadata-row',
-        label ? '' : 'claudian-session-metadata-row--unlabeled',
+        'dean-session-metadata-row',
+        label ? '' : 'dean-session-metadata-row--unlabeled',
       ].filter(Boolean).join(' '),
     });
-    const iconEl = row.createSpan({ cls: 'claudian-session-metadata-icon' });
+    const iconEl = row.createSpan({ cls: 'dean-session-metadata-icon' });
     setIcon(iconEl, icon);
     if (label) {
-      row.createSpan({ cls: 'claudian-session-metadata-label', text: label });
+      row.createSpan({ cls: 'dean-session-metadata-label', text: label });
     }
     const valueEl = row.createSpan({
       cls: [
-        'claudian-session-metadata-value',
+        'dean-session-metadata-value',
         options.className ?? '',
       ].filter(Boolean).join(' '),
       text: value,
@@ -1808,14 +1808,14 @@ export class ConversationController {
   ): void {
     const row = parent.createDiv({
       cls: [
-        'claudian-session-metadata-row',
-        'claudian-session-metadata-row--provider',
-        icon ? '' : 'claudian-session-metadata-row--provider-no-icon',
+        'dean-session-metadata-row',
+        'dean-session-metadata-row--provider',
+        icon ? '' : 'dean-session-metadata-row--provider-no-icon',
       ].filter(Boolean).join(' '),
     });
     if (icon) {
       createProviderIconSvg(icon, {
-        className: 'claudian-session-metadata-provider-icon',
+        className: 'dean-session-metadata-provider-icon',
         dataProvider: conversation.providerId,
         height: 14,
         parent: row,
@@ -1823,7 +1823,7 @@ export class ConversationController {
       });
     }
     row.createSpan({
-      cls: 'claudian-session-metadata-value claudian-session-metadata-value--provider',
+      cls: 'dean-session-metadata-value dean-session-metadata-value--provider',
       text: value,
     });
   }
@@ -1835,7 +1835,7 @@ export class ConversationController {
     this.metadataPopoverCleanup = null;
     this.metadataPopoverEl = null;
     this.metadataPopoverTarget = null;
-    popover?.addClass('claudian-hidden');
+    popover?.addClass('dean-hidden');
     popover?.remove();
   }
 
@@ -2091,11 +2091,11 @@ export class ConversationController {
     currentTitle: string,
     options: HistoryRenderOptions,
   ): void {
-    const titleEl = item.querySelector('.claudian-history-item-title') as HTMLElement;
+    const titleEl = item.querySelector('.dean-history-item-title') as HTMLElement;
     if (!titleEl) return;
 
     const input = item.createEl('input', {
-      cls: 'claudian-rename-input',
+      cls: 'dean-rename-input',
       attr: { type: 'text', value: currentTitle },
     });
 
@@ -2176,7 +2176,7 @@ export class ConversationController {
     // Time-specific greetings
     const getTimeGreetings = (): string[] => {
       if (hour >= 5 && hour < 12) {
-        return [personalize('Good morning'), 'Coffee and Claudian time?'];
+        return [personalize('Good morning'), 'Coffee and Dean time?'];
       } else if (hour >= 12 && hour < 18) {
         return [personalize('Good afternoon'), personalize('Hey there'), personalize("How's it going") + '?'];
       } else if (hour >= 18 && hour < 22) {
@@ -2213,9 +2213,9 @@ export class ConversationController {
     if (!welcomeEl) return;
 
     if (this.deps.state.messages.length === 0) {
-      welcomeEl.removeClass('claudian-hidden');
+      welcomeEl.removeClass('dean-hidden');
     } else {
-      welcomeEl.addClass('claudian-hidden');
+      welcomeEl.addClass('dean-hidden');
     }
   }
 
@@ -2233,7 +2233,7 @@ export class ConversationController {
     fileCtx?.autoAttachActiveFile();
 
     // Only add greeting if not already present
-    if (!welcomeEl.querySelector('.claudian-welcome-greeting')) {
+    if (!welcomeEl.querySelector('.dean-welcome-greeting')) {
       renderWelcomeContent(welcomeEl, this.getGreeting());
     }
 
@@ -2336,12 +2336,12 @@ export class ConversationController {
   }
 
   // ============================================
-  // History Dropdown Rendering (for ClaudianView)
+  // History Dropdown Rendering (for DeanView)
   // ============================================
 
   /**
    * Renders the history dropdown content to a provided container.
-   * Used by ClaudianView to render the dropdown with custom selection callback.
+   * Used by DeanView to render the dropdown with custom selection callback.
    */
   renderHistoryDropdown(
     container: HTMLElement,

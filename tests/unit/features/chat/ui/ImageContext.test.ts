@@ -31,7 +31,7 @@ function createMockCallbacks() {
 
 function createContainerWithInputWrapper(): { container: any; inputWrapper: any } {
   const container = createMockEl();
-  const inputWrapper = container.createDiv({ cls: 'claudian-input-wrapper' });
+  const inputWrapper = container.createDiv({ cls: 'dean-input-wrapper' });
   return { container, inputWrapper };
 }
 
@@ -184,7 +184,7 @@ describe('ImageContextManager', () => {
 
       const mgr = new ImageContextManager(c, input, cb, previewContainer);
       expect(mgr).toBeDefined();
-      const trayEl = previewContainer.querySelector('.claudian-context-row');
+      const trayEl = previewContainer.querySelector('.dean-context-row');
       expect(trayEl).not.toBeNull();
     });
 
@@ -198,7 +198,7 @@ describe('ImageContextManager', () => {
 
       new ImageContextManager(c, input, cb, previewContainer);
       expect(previewContainer.children).toContain(existingContent);
-      expect(previewContainer.querySelector('.claudian-context-row')).not.toBeNull();
+      expect(previewContainer.querySelector('.dean-context-row')).not.toBeNull();
     });
   });
 });
@@ -665,7 +665,7 @@ describe('ImageContextManager - Private Helpers', () => {
 
   describe('destroy', () => {
     it('unregisters paste and drag/drop listeners', () => {
-      const inputWrapper = manager['containerEl'].querySelector('.claudian-input-wrapper');
+      const inputWrapper = manager['containerEl'].querySelector('.dean-input-wrapper');
       const inputEl = manager['inputEl'];
 
       expect(inputEl.getEventListenerCount('paste')).toBe(1);
@@ -699,16 +699,16 @@ describe('ImageContextManager - Private Helpers', () => {
       manager.setImages([createImageAttachment({ id: 'img-1', name: 'photo.png', size: 2048 })]);
 
       const trayEl = manager['contextTray']['containerEl'];
-      const chipEl = trayEl.querySelector('.claudian-context-chip--image');
+      const chipEl = trayEl.querySelector('.dean-context-chip--image');
       expect(chipEl).not.toBeNull();
 
-      const thumbEl = chipEl.querySelector('.claudian-context-chip-thumbnail');
+      const thumbEl = chipEl.querySelector('.dean-context-chip-thumbnail');
       expect(thumbEl).toBeNull();
 
-      const labelEl = chipEl.querySelector('.claudian-context-chip-label');
+      const labelEl = chipEl.querySelector('.dean-context-chip-label');
       expect(labelEl?.textContent).toBe('Image');
 
-      const removeEl = chipEl.querySelector('.claudian-context-chip-remove');
+      const removeEl = chipEl.querySelector('.dean-context-chip-remove');
       expect(removeEl).not.toBeNull();
     });
 
@@ -719,7 +719,7 @@ describe('ImageContextManager - Private Helpers', () => {
       ]);
 
       const trayEl = manager['contextTray']['containerEl'];
-      const labels = trayEl.querySelectorAll('.claudian-context-chip-label');
+      const labels = trayEl.querySelectorAll('.dean-context-chip-label');
 
       expect(labels.map((label: any) => label.textContent)).toEqual(['Image 1', 'Image 2']);
     });
@@ -739,8 +739,8 @@ describe('ImageContextManager - Private Helpers', () => {
       cb.onImagesChanged.mockClear();
 
       const trayEl = mgr['contextTray']['containerEl'];
-      const firstChip = trayEl.querySelector('.claudian-context-chip--image');
-      const removeEl = firstChip.querySelector('.claudian-context-chip-remove');
+      const firstChip = trayEl.querySelector('.dean-context-chip--image');
+      const removeEl = firstChip.querySelector('.dean-context-chip-remove');
       removeEl.dispatchEvent({ type: 'click', stopPropagation: jest.fn() });
 
       expect(mgr.getAttachedImages()).toHaveLength(1);
@@ -778,7 +778,7 @@ describe('ImageContextManager - Private Helpers', () => {
       const image = createImageAttachment({ name: 'test.png', mediaType: 'image/png', data: 'abc123' });
       manager['showFullImage'](image);
 
-      expect(mockBody.createDiv).toHaveBeenCalledWith({ cls: 'claudian-image-modal-overlay' });
+      expect(mockBody.createDiv).toHaveBeenCalledWith({ cls: 'dean-image-modal-overlay' });
     });
 
     it('should register Escape key handler and close button', () => {

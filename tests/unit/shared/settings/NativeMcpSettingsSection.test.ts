@@ -42,7 +42,7 @@ describe('renderNativeMcpSettingsSection', () => {
     } as unknown as HTMLElement;
 
     renderNativeMcpSettingsSection(container, {
-      descriptionAfterCommand: ' and they will be available in Claudian. ',
+      descriptionAfterCommand: ' and they will be available in Dean. ',
       descriptionBeforeCommand: 'Grok Build manages MCP servers through its own CLI. Configure them with ',
       documentationLabel: 'Learn more',
       documentationUrl: 'https://docs.x.ai/build/features/mcp-servers',
@@ -52,7 +52,7 @@ describe('renderNativeMcpSettingsSection', () => {
 
     expect(createdSettings).toEqual([{ heading: true, name: 'MCP Servers' }]);
     expect((container as any).createDiv).toHaveBeenCalledWith({
-      cls: 'claudian-mcp-settings-desc',
+      cls: 'dean-mcp-settings-desc',
     });
     expect(notice.createEl).toHaveBeenCalledWith('p', {
       cls: 'setting-item-description',
@@ -65,7 +65,7 @@ describe('renderNativeMcpSettingsSection', () => {
     );
     expect(description.appendText).toHaveBeenNthCalledWith(
       2,
-      ' and they will be available in Claudian. ',
+      ' and they will be available in Dean. ',
     );
     expect(description.createEl).toHaveBeenCalledWith('code');
     expect(description.createEl.mock.results[0].value.appendText)

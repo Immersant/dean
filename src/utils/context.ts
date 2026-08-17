@@ -1,5 +1,5 @@
 /**
- * Claudian - Context Utilities
+ * Dean - Context Utilities
  *
  * Note and context file formatting for prompts.
  */

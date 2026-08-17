@@ -1,5 +1,5 @@
 /* @ Mention dropdown */
-.claudian-mention-dropdown {
+.dean-mention-dropdown {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -17,21 +17,21 @@
   overflow-y: auto;
 }
 
-.claudian-mention-dropdown.visible {
+.dean-mention-dropdown.visible {
   display: block;
 }
 
 /* Fixed positioning for inline editor */
-.claudian-mention-dropdown-fixed {
+.dean-mention-dropdown-fixed {
   position: fixed;
-  bottom: var(--claudian-fixed-dropdown-bottom);
-  left: var(--claudian-fixed-dropdown-left);
+  bottom: var(--dean-fixed-dropdown-bottom);
+  left: var(--dean-fixed-dropdown-left);
   right: auto;
-  width: var(--claudian-fixed-dropdown-width);
+  width: var(--dean-fixed-dropdown-width);
   z-index: 10001;
 }
 
-.claudian-mention-item {
+.dean-mention-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -40,24 +40,24 @@
   transition: background 0.1s ease;
 }
 
-.claudian-mention-item:hover,
-.claudian-mention-item.selected {
+.dean-mention-item:hover,
+.dean-mention-item.selected {
   background: var(--background-modifier-hover);
 }
 
-.claudian-mention-icon {
+.dean-mention-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.claudian-mention-icon svg {
+.dean-mention-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.claudian-mention-path {
+.dean-mention-path {
   font-size: 13px;
   color: var(--text-normal);
   overflow: hidden;
@@ -65,7 +65,7 @@
   white-space: nowrap;
 }
 
-.claudian-mention-empty {
+.dean-mention-empty {
   padding: 12px;
   text-align: center;
   color: var(--text-muted);
@@ -73,24 +73,24 @@
 }
 
 /* Scrollbar for mention dropdown */
-.claudian-mention-dropdown::-webkit-scrollbar {
+.dean-mention-dropdown::-webkit-scrollbar {
   width: 6px;
 }
 
-.claudian-mention-dropdown::-webkit-scrollbar-track {
+.dean-mention-dropdown::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.claudian-mention-dropdown::-webkit-scrollbar-thumb {
+.dean-mention-dropdown::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }
 
-.claudian-mention-item.vault-folder .claudian-mention-icon {
+.dean-mention-item.vault-folder .dean-mention-icon {
   color: var(--text-muted);
 }
 
-.claudian-mention-text {
+.dean-mention-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -98,13 +98,13 @@
   flex: 1;
 }
 
-.claudian-mention-name {
+.dean-mention-name {
   font-size: 13px;
   font-weight: 500;
   color: var(--interactive-accent);
 }
 
-.claudian-mention-desc {
+.dean-mention-desc {
   font-size: 11px;
   color: var(--text-muted);
   overflow: hidden;
@@ -113,17 +113,17 @@
 }
 
 /* Context file items in @-mention dropdown */
-.claudian-mention-item.context-file .claudian-mention-icon {
-  color: var(--claudian-brand);
+.dean-mention-item.context-file .dean-mention-icon {
+  color: var(--dean-brand);
 }
 
-.claudian-mention-item.context-file .claudian-mention-text {
+.dean-mention-item.context-file .dean-mention-text {
   flex-direction: row;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.claudian-mention-item.context-file .claudian-mention-name-context {
+.dean-mention-item.context-file .dean-mention-name-context {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -131,35 +131,35 @@
 }
 
 /* Context folder filter items in @-mention dropdown */
-.claudian-mention-item.context-folder .claudian-mention-icon {
+.dean-mention-item.context-folder .dean-mention-icon {
   color: var(--text-muted);
 }
 
-.claudian-mention-name-folder {
+.dean-mention-name-folder {
   color: var(--text-normal);
   font-weight: 500;
 }
 
-.claudian-mention-name-context {
+.dean-mention-name-context {
   color: var(--text-normal);
 }
 
 /* Agent folder items in @-mention dropdown */
-.claudian-mention-item.agent-folder .claudian-mention-icon {
+.dean-mention-item.agent-folder .dean-mention-icon {
   color: var(--link-color);
 }
 
-.claudian-mention-name-agent-folder {
+.dean-mention-name-agent-folder {
   color: var(--link-color);
   font-weight: 600;
 }
 
 /* Agent items in @-mention dropdown (inside @Agents/) */
-.claudian-mention-item.agent .claudian-mention-icon {
+.dean-mention-item.agent .dean-mention-icon {
   color: var(--link-color);
 }
 
-.claudian-mention-item.agent .claudian-mention-text {
+.dean-mention-item.agent .dean-mention-text {
   flex-direction: row;
   align-items: baseline;
   gap: 6px;
@@ -167,13 +167,13 @@
   white-space: nowrap;
 }
 
-.claudian-mention-item.agent .claudian-mention-name-agent {
+.dean-mention-item.agent .dean-mention-name-agent {
   color: var(--text-normal);
   font-size: 13px;
   flex-shrink: 0;
 }
 
-.claudian-mention-item.agent .claudian-mention-agent-desc {
+.dean-mention-item.agent .dean-mention-agent-desc {
   font-size: 11px;
   color: var(--text-muted);
   overflow: hidden;

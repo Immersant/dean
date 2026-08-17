@@ -388,7 +388,7 @@ export class InputController {
     // Hide welcome message when sending first message
     const welcomeEl = this.deps.getWelcomeEl();
     if (welcomeEl) {
-      welcomeEl.addClass('claudian-hidden');
+      welcomeEl.addClass('dean-hidden');
     }
 
     fileContextManager?.startSession();
@@ -463,7 +463,7 @@ export class InputController {
 
     streamController.showThinkingIndicator(
       isCompact ? 'Compacting...' : undefined,
-      isCompact ? 'claudian-thinking--compact' : undefined,
+      isCompact ? 'dean-thinking--compact' : undefined,
     );
     state.responseStartTime = performance.now();
 
@@ -549,11 +549,11 @@ export class InputController {
           this.finishAcceptedMissingSession(streamGeneration);
         }
         const notice = resolution === 'deleted'
-            ? 'The provider session no longer exists. Its Claudian record was removed; send again to start a new session.'
+            ? 'The provider session no longer exists. Its Dean record was removed; send again to start a new session.'
             : resolution === 'reset'
-              ? 'The provider session no longer exists. Claudian preserved the recoverable history; send again to rebuild the session.'
+              ? 'The provider session no longer exists. Dean preserved the recoverable history; send again to rebuild the session.'
               : resolution === 'preserved'
-                ? 'The provider session no longer exists. Claudian preserved its record because the remaining history could not be verified.'
+                ? 'The provider session no longer exists. Dean preserved its record because the remaining history could not be verified.'
                 : 'The provider session no longer exists. Send again to start a new session.';
         new Notice(notice);
         wasInvalidated = true;
@@ -614,10 +614,10 @@ export class InputController {
               finalAssistantMsg.durationFlavorWord = flavorWord;
               // Add footer to live message in DOM
               if (state.currentContentEl) {
-                const footerEl = state.currentContentEl.createDiv({ cls: 'claudian-response-footer' });
+                const footerEl = state.currentContentEl.createDiv({ cls: 'dean-response-footer' });
                 footerEl.createSpan({
                   text: `* ${flavorWord} for ${formatDurationMmSs(durationSeconds)}`,
-                  cls: 'claudian-baked-duration',
+                  cls: 'dean-baked-duration',
                 });
               }
             }
@@ -771,16 +771,16 @@ export class InputController {
     if (visibleQueuedMessage) {
       const isPendingSteerOnly = !state.queuedMessage && !!visiblePendingSteer;
       indicatorEl.createSpan({
-        cls: 'claudian-queue-indicator-text',
+        cls: 'dean-queue-indicator-text',
         text: `${isPendingSteerOnly ? '⌙ Steering: ' : '⌙ Queued: '}${this.getQueuedMessageDisplay(visibleQueuedMessage)}`,
       });
 
       if (state.queuedMessage) {
-        const actionsEl = indicatorEl.createDiv({ cls: 'claudian-queue-indicator-actions' });
+        const actionsEl = indicatorEl.createDiv({ cls: 'dean-queue-indicator-actions' });
 
         if (this.canSteerQueuedMessage()) {
           const steerButton = actionsEl.createEl('button', {
-            cls: 'claudian-queue-indicator-action',
+            cls: 'dean-queue-indicator-action',
             text: pendingSteer?.providerDisposition === 'awaiting-result'
               ? 'Steering...'
               : 'Steer Now',
@@ -817,13 +817,13 @@ export class InputController {
         });
       }
 
-      indicatorEl.addClass('claudian-visible-flex');
-      indicatorEl.removeClass('claudian-hidden');
+      indicatorEl.addClass('dean-visible-flex');
+      indicatorEl.removeClass('dean-hidden');
       return;
     }
 
-    indicatorEl.removeClass('claudian-visible-flex');
-    indicatorEl.addClass('claudian-hidden');
+    indicatorEl.removeClass('dean-visible-flex');
+    indicatorEl.addClass('dean-hidden');
   }
 
   clearQueuedMessage(): void {
@@ -1129,7 +1129,7 @@ export class InputController {
     label: string,
   ): HTMLElement {
     const button = parentEl.createEl('button', {
-      cls: 'claudian-queue-indicator-icon-action',
+      cls: 'dean-queue-indicator-icon-action',
       attr: {
         'aria-label': label,
         title: label,
@@ -1390,7 +1390,7 @@ export class InputController {
   private activateStreamingAssistantMessage(message: ChatMessage): void {
     const { state, renderer } = this.deps;
     const msgEl = renderer.addMessage(message);
-    const contentEl = msgEl.querySelector<HTMLElement>('.claudian-message-content');
+    const contentEl = msgEl.querySelector<HTMLElement>('.dean-message-content');
 
     if (!contentEl) {
       return;
@@ -1564,7 +1564,7 @@ export class InputController {
     this.resetTurnStreamingState();
 
     if (messagesBeforeTurn.length === 0) {
-      this.deps.getWelcomeEl()?.removeClass('claudian-hidden');
+      this.deps.getWelcomeEl()?.removeClass('dean-hidden');
     }
   }
 
@@ -1838,26 +1838,26 @@ export class InputController {
     }
 
     // Build header element, then detach — InlineAskUserQuestion will re-attach it
-    const headerEl = parentEl.createDiv({ cls: 'claudian-ask-approval-info' });
+    const headerEl = parentEl.createDiv({ cls: 'dean-ask-approval-info' });
     headerEl.remove();
 
-    const toolEl = headerEl.createDiv({ cls: 'claudian-ask-approval-tool' });
-    const iconEl = toolEl.createSpan({ cls: 'claudian-ask-approval-icon' });
+    const toolEl = headerEl.createDiv({ cls: 'dean-ask-approval-tool' });
+    const iconEl = toolEl.createSpan({ cls: 'dean-ask-approval-icon' });
     iconEl.setAttribute('aria-hidden', 'true');
     setToolIcon(iconEl, toolName);
-    toolEl.createSpan({ text: toolName, cls: 'claudian-ask-approval-tool-name' });
+    toolEl.createSpan({ text: toolName, cls: 'dean-ask-approval-tool-name' });
 
     if (approvalOptions?.decisionReason) {
-      headerEl.createDiv({ text: approvalOptions.decisionReason, cls: 'claudian-ask-approval-reason' });
+      headerEl.createDiv({ text: approvalOptions.decisionReason, cls: 'dean-ask-approval-reason' });
     }
     if (approvalOptions?.blockedPath) {
-      headerEl.createDiv({ text: approvalOptions.blockedPath, cls: 'claudian-ask-approval-blocked-path' });
+      headerEl.createDiv({ text: approvalOptions.blockedPath, cls: 'dean-ask-approval-blocked-path' });
     }
     if (approvalOptions?.agentID) {
-      headerEl.createDiv({ text: `Agent: ${approvalOptions.agentID}`, cls: 'claudian-ask-approval-agent' });
+      headerEl.createDiv({ text: `Agent: ${approvalOptions.agentID}`, cls: 'dean-ask-approval-agent' });
     }
 
-    headerEl.createDiv({ text: description, cls: 'claudian-ask-approval-desc' });
+    headerEl.createDiv({ text: description, cls: 'dean-ask-approval-desc' });
 
     const decisionOptions = approvalOptions?.decisionOptions ?? DEFAULT_APPROVAL_DECISION_OPTIONS;
     const optionDecisionMap = new Map<string, ApprovalDecision>();
@@ -2095,21 +2095,21 @@ export class InputController {
 
   private hideInputContainer(inputContainerEl: HTMLElement): void {
     this.inputContainerHideDepth++;
-    inputContainerEl.addClass('claudian-hidden');
+    inputContainerEl.addClass('dean-hidden');
   }
 
   private restoreInputContainer(inputContainerEl: HTMLElement): void {
     if (this.inputContainerHideDepth <= 0) return;
     this.inputContainerHideDepth--;
     if (this.inputContainerHideDepth === 0) {
-      inputContainerEl.removeClass('claudian-hidden');
+      inputContainerEl.removeClass('dean-hidden');
     }
   }
 
   private resetInputContainerVisibility(): void {
     if (this.inputContainerHideDepth > 0) {
       this.inputContainerHideDepth = 0;
-      this.deps.getInputContainerEl().removeClass('claudian-hidden');
+      this.deps.getInputContainerEl().removeClass('dean-hidden');
     }
   }
 

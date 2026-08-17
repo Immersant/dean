@@ -1,4 +1,4 @@
-# Contributing to Claudian
+# Contributing to Dean
 
 Issues and pull requests are welcome. Issues are the preferred way to contribute: if you describe the problem and your environment clearly, I will review it and make a best effort to address it.
 
@@ -15,7 +15,7 @@ A useful issue explains the problem well enough for someone else to understand a
 - What you were trying to do.
 - What happened and what you expected instead.
 - Clear reproduction steps or a minimal example.
-- Your Claudian version, Obsidian version, operating system, provider, provider CLI version, and installation method.
+- Your Dean version, Obsidian version, operating system, provider, provider CLI version, and installation method.
 - Relevant logs, screenshots, or recordings.
 
 Remove API keys, tokens, private vault content, personal paths, and other sensitive information before attaching logs or screenshots.
@@ -57,7 +57,7 @@ Contributions that improve an existing provider are welcome when they follow the
 
 ## Development
 
-Claudian requires the Node.js version declared in `.node-version`.
+Dean requires the Node.js version declared in `.node-version`.
 
 ```bash
 npm install
@@ -73,4 +73,4 @@ npm run test
 npm run build
 ```
 
-The project architecture and area-specific development rules are documented in `AGENTS.md` and the scoped `AGENTS.md` files under `src/`.
+Human-readable project documentation lives in [`docs/`](docs/README.md). Agent execution rules and area-specific invariants live in `AGENTS.md` and the scoped `AGENTS.md` files under `src/`.

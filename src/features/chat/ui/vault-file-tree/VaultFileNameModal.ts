@@ -56,7 +56,7 @@ class VaultFileNameModal extends Modal {
 
   onOpen(): void {
     this.setTitle(this.options.title);
-    this.modalEl.addClass('claudian-vault-file-name-modal');
+    this.modalEl.addClass('dean-vault-file-name-modal');
 
     new Setting(this.contentEl)
       .setName('Name')

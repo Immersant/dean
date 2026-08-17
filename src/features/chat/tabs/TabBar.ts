@@ -39,7 +39,7 @@ export class TabBar {
 
   /** Builds the tab bar UI. */
   private build(): void {
-    this.containerEl.addClass('claudian-tab-badges');
+    this.containerEl.addClass('dean-tab-badges');
     this.containerEl.addEventListener('scroll', this.handleScroll);
   }
 
@@ -73,23 +73,23 @@ export class TabBar {
   /** Renders a single tab badge. */
   private renderBadge(item: TabBarItem): void {
     // Determine state class (priority: active > attention > streaming > idle)
-    let stateClass = 'claudian-tab-badge-idle';
+    let stateClass = 'dean-tab-badge-idle';
     if (item.isActive) {
-      stateClass = 'claudian-tab-badge-active';
+      stateClass = 'dean-tab-badge-active';
     } else if (item.attention) {
       stateClass = item.attention.kind === 'action-required'
-        ? 'claudian-tab-badge-action-required'
-        : 'claudian-tab-badge-review';
+        ? 'dean-tab-badge-action-required'
+        : 'dean-tab-badge-review';
     } else if (item.isStreaming) {
-      stateClass = 'claudian-tab-badge-streaming';
+      stateClass = 'dean-tab-badge-streaming';
     }
 
     const isTitleExpanded = this.expandedTitleTabIds.has(item.id);
     const badgeEl = this.containerEl.createDiv({
       cls: [
-        'claudian-tab-badge',
+        'dean-tab-badge',
         stateClass,
-        isTitleExpanded ? 'claudian-tab-badge-expanded' : '',
+        isTitleExpanded ? 'dean-tab-badge-expanded' : '',
       ].filter(Boolean).join(' '),
       text: this.getBadgeLabel(item),
     });
@@ -123,7 +123,7 @@ export class TabBar {
   /** Destroys the tab bar. */
   destroy(): void {
     this.containerEl.empty();
-    this.containerEl.removeClass('claudian-tab-badges');
+    this.containerEl.removeClass('dean-tab-badges');
     this.containerEl.removeEventListener('scroll', this.handleScroll);
     this.expandedTitleTabIds.clear();
     this.lastKnownScrollLeft = 0;
@@ -169,7 +169,7 @@ export class TabBar {
 
     const isTitleExpanded = this.expandedTitleTabIds.has(item.id);
     badgeEl.textContent = this.getBadgeLabel(item);
-    badgeEl.toggleClass('claudian-tab-badge-expanded', isTitleExpanded);
+    badgeEl.toggleClass('dean-tab-badge-expanded', isTitleExpanded);
     badgeEl.setAttribute('data-title-expanded', isTitleExpanded ? 'true' : 'false');
     this.callbacks.onTitleExpansionChanged?.(this.getExpandedTitleTabIds());
   }

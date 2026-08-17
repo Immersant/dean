@@ -6,16 +6,16 @@ describe('Persistent sidebar surface pager styles', () => {
     const css = readFileSync(path.resolve('src/style/components/history.css'), 'utf8');
 
     expect(css).toMatch(
-      /\.claudian-sidebar-surface-switcher\s*{[^}]*flex:\s*0 0 28px;/,
+      /\.dean-sidebar-surface-switcher\s*{[^}]*flex:\s*0 0 28px;/,
     );
     expect(css).toMatch(
-      /\.claudian-session-sidebar \.claudian-sidebar-surface-button::before\s*{[^}]*width:\s*6px;[^}]*height:\s*6px;/,
+      /\.dean-session-sidebar \.dean-sidebar-surface-button::before\s*{[^}]*width:\s*6px;[^}]*height:\s*6px;/,
     );
     expect(css).not.toMatch(
-      /\.claudian-sidebar-surface-switcher\s*{[^}]*(?:position:\s*absolute|opacity:\s*0);/,
+      /\.dean-sidebar-surface-switcher\s*{[^}]*(?:position:\s*absolute|opacity:\s*0);/,
     );
     expect(css).not.toMatch(
-      /\.claudian-session-sidebar:has\([^}]*clip-path:/,
+      /\.dean-session-sidebar:has\([^}]*clip-path:/,
     );
   });
 });
@@ -25,10 +25,10 @@ describe('Single-pane history action styles', () => {
     const css = readFileSync(path.resolve('src/style/components/history.css'), 'utf8');
 
     expect(css).toMatch(
-      /\.claudian-history-menu \.claudian-history-item-actions \.claudian-action-btn\s*{[^}]*background:\s*transparent;[^}]*border:\s*none;[^}]*box-shadow:\s*none;[^}]*color:\s*var\(--text-muted\);/,
+      /\.dean-history-menu \.dean-history-item-actions \.dean-action-btn\s*{[^}]*background:\s*transparent;[^}]*border:\s*none;[^}]*box-shadow:\s*none;[^}]*color:\s*var\(--text-muted\);/,
     );
     expect(css).toMatch(
-      /\.claudian-history-menu \.claudian-history-item-actions \.claudian-action-btn:hover,[\s\S]*?\.claudian-history-menu \.claudian-history-item-actions \.claudian-action-btn:focus-visible\s*{[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;[^}]*color:\s*var\(--text-normal\);/,
+      /\.dean-history-menu \.dean-history-item-actions \.dean-action-btn:hover,[\s\S]*?\.dean-history-menu \.dean-history-item-actions \.dean-action-btn:focus-visible\s*{[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;[^}]*color:\s*var\(--text-normal\);/,
     );
   });
 });

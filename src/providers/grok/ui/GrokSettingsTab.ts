@@ -9,7 +9,7 @@ import type {
   ProviderSettingsTabRenderer,
   ProviderSettingsTabRendererContext,
 } from '../../../core/providers/types';
-import type { ClaudianSettings } from '../../../core/types';
+import type { DeanSettings } from '../../../core/types';
 import { t } from '../../../i18n/i18n';
 import { renderEnvironmentSettingsSection } from '../../../shared/settings/EnvironmentSettingsSection';
 import { renderHostnameCliPathSetting } from '../../../shared/settings/HostnameCliPathSetting';
@@ -123,7 +123,7 @@ export const grokSettingsTabRenderer: ProviderSettingsTabRenderer = {
         } else {
           delete cliPathsByHost[hostnameKey];
         }
-        const mutation = (settings: ClaudianSettings): void => {
+        const mutation = (settings: DeanSettings): void => {
           updateGrokProviderSettings(settings, {
             cliPath: '',
             cliPathsByHost,
@@ -157,7 +157,7 @@ export const grokSettingsTabRenderer: ProviderSettingsTabRenderer = {
     });
 
     renderNativeMcpSettingsSection(container, {
-      descriptionAfterCommand: ' and they will be available in Claudian. ',
+      descriptionAfterCommand: ' and they will be available in Dean. ',
       descriptionBeforeCommand: 'Grok Build manages MCP servers through its own CLI. Configure them with ',
       documentationLabel: 'Learn more',
       documentationUrl: 'https://docs.x.ai/build/features/mcp-servers',

@@ -196,15 +196,15 @@ describe('ModelSelector', () => {
   });
 
   it('should create a container with model-selector class', () => {
-    const container = parentEl.querySelector('.claudian-model-selector');
+    const container = parentEl.querySelector('.dean-model-selector');
     expect(container).not.toBeNull();
   });
 
   it('should display current model label', () => {
     // Default model is 'sonnet' which maps to 'Sonnet'
-    const btn = parentEl.querySelector('.claudian-model-btn');
+    const btn = parentEl.querySelector('.dean-model-btn');
     expect(btn).not.toBeNull();
-    const label = btn?.querySelector('.claudian-model-label');
+    const label = btn?.querySelector('.dean-model-label');
     expect(label).not.toBeNull();
     expect(label?.textContent).toBe('Sonnet');
   });
@@ -221,9 +221,9 @@ describe('ModelSelector', () => {
 
     selector.updateDisplay();
 
-    const btn = parentEl.querySelector('.claudian-model-btn');
-    const icon = btn?.querySelector('.claudian-model-provider-icon');
-    const label = btn?.querySelector('.claudian-model-label');
+    const btn = parentEl.querySelector('.dean-model-btn');
+    const icon = btn?.querySelector('.dean-model-provider-icon');
+    const label = btn?.querySelector('.dean-model-label');
     expect(icon).not.toBeNull();
     expect(icon?.getAttribute('width')).toBe('12');
     expect(icon?.getAttribute('height')).toBe('12');
@@ -244,8 +244,8 @@ describe('ModelSelector', () => {
 
     selector.updateDisplay();
 
-    const icon = parentEl.querySelector('.claudian-model-btn')
-      ?.querySelector('.claudian-model-provider-icon');
+    const icon = parentEl.querySelector('.dean-model-btn')
+      ?.querySelector('.dean-model-provider-icon');
     expect(icon?.getAttribute('viewBox')).toBe(selectedProviderIcon.viewBox);
   });
 
@@ -259,12 +259,12 @@ describe('ModelSelector', () => {
       enableSonnet1M: false,
     });
     selector.updateDisplay();
-    const label = parentEl.querySelector('.claudian-model-label');
+    const label = parentEl.querySelector('.dean-model-label');
     expect(label?.textContent).toBe('Haiku');
   });
 
   it('should render model options in reverse order', () => {
-    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const dropdown = parentEl.querySelector('.dean-model-dropdown');
     expect(dropdown).not.toBeNull();
     // DEFAULT_CLAUDE_MODELS is [haiku, sonnet, opus] -> reversed is [opus, sonnet, haiku]
     const options = dropdown?.children || [];
@@ -289,10 +289,10 @@ describe('ModelSelector', () => {
       permissionMode: 'normal',
     });
 
-    parentEl.querySelector('.claudian-model-selector')?.dispatchEvent('mouseenter');
+    parentEl.querySelector('.dean-model-selector')?.dispatchEvent('mouseenter');
 
-    expect(parentEl.querySelector('.claudian-model-label')?.textContent).toBe('GPT New');
-    const options = parentEl.querySelector('.claudian-model-dropdown')?.children ?? [];
+    expect(parentEl.querySelector('.dean-model-label')?.textContent).toBe('GPT New');
+    const options = parentEl.querySelector('.dean-model-dropdown')?.children ?? [];
     expect(options.map((option: any) => option.children[0]?.textContent)).toEqual([
       'GPT Fast',
       'GPT New',
@@ -300,7 +300,7 @@ describe('ModelSelector', () => {
   });
 
   it('should mark current model as selected', () => {
-    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const dropdown = parentEl.querySelector('.dean-model-dropdown');
     const options = dropdown?.children || [];
     // Sonnet is current (index 1 in reversed order)
     const sonnetOption = options.find((o: any) => o.children[0]?.textContent === 'Sonnet');
@@ -308,7 +308,7 @@ describe('ModelSelector', () => {
   });
 
   it('should call onModelChange when option clicked', async () => {
-    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const dropdown = parentEl.querySelector('.dean-model-dropdown');
     const options = dropdown?.children || [];
     const opusOption = options.find((o: any) => o.children[0]?.textContent === 'Opus');
 
@@ -317,7 +317,7 @@ describe('ModelSelector', () => {
   });
 
   it('should always show brand color on model button', () => {
-    const btn = parentEl.querySelector('.claudian-model-btn');
+    const btn = parentEl.querySelector('.dean-model-btn');
     expect(btn).toBeTruthy();
     expect(btn?.hasClass('ready')).toBe(false);
   });
@@ -336,7 +336,7 @@ describe('ModelSelector', () => {
     selector.renderOptions();
     selector.updateDisplay();
     // Custom models should be available in dropdown
-    const label = parentEl.querySelector('.claudian-model-label');
+    const label = parentEl.querySelector('.dean-model-label');
     expect(label?.textContent).toBeDefined();
   });
 
@@ -355,7 +355,7 @@ describe('ModelSelector', () => {
     selector.renderOptions();
     selector.updateDisplay();
 
-    const label = parentEl.querySelector('.claudian-model-label');
+    const label = parentEl.querySelector('.dean-model-label');
     expect(label?.textContent).toBe('Opus');
   });
 
@@ -378,10 +378,10 @@ describe('ModelSelector', () => {
 
     selector.renderOptions();
 
-    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const dropdown = parentEl.querySelector('.dean-model-dropdown');
     const children = dropdown?.children || [];
     // Reversed: [Codex group, built-in Codex model, Claude group, Sonnet, Opus]
-    const groups = children.filter((c: any) => c.hasClass('claudian-model-group'));
+    const groups = children.filter((c: any) => c.hasClass('dean-model-group'));
     expect(groups.length).toBe(2);
     expect(groups[0]?.textContent).toBe('Codex');
     expect(groups[1]?.textContent).toBe('Claude');
@@ -390,9 +390,9 @@ describe('ModelSelector', () => {
   it('should not render group separators when models have no group field', () => {
     selector.renderOptions();
 
-    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const dropdown = parentEl.querySelector('.dean-model-dropdown');
     const children = dropdown?.children || [];
-    const groups = children.filter((c: any) => c.hasClass('claudian-model-group'));
+    const groups = children.filter((c: any) => c.hasClass('dean-model-group'));
     expect(groups.length).toBe(0);
   });
 
@@ -409,13 +409,13 @@ describe('ModelSelector', () => {
     selector.renderOptions();
     selector.updateDisplay();
 
-    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const dropdown = parentEl.querySelector('.dean-model-dropdown');
     const options = dropdown?.children || [];
     expect(options.find((o: any) => o.children[0]?.textContent === 'Opus 1M')).toBeDefined();
     expect(options.find((o: any) => o.children[0]?.textContent === 'Sonnet 1M')).toBeDefined();
     expect(options.find((o: any) => o.children[0]?.textContent === 'Opus')).toBeUndefined();
     expect(options.find((o: any) => o.children[0]?.textContent === 'Sonnet')).toBeUndefined();
-    expect(parentEl.querySelector('.claudian-model-label')?.textContent).toBe('Opus 1M');
+    expect(parentEl.querySelector('.dean-model-label')?.textContent).toBe('Opus 1M');
   });
 });
 
@@ -432,17 +432,17 @@ describe('ModeSelector', () => {
   });
 
   it('should create a container with mode-selector class', () => {
-    const container = parentEl.querySelector('.claudian-mode-selector');
+    const container = parentEl.querySelector('.dean-mode-selector');
     expect(container).not.toBeNull();
   });
 
   it('should display the current mode label', () => {
-    const label = parentEl.querySelector('.claudian-mode-label');
+    const label = parentEl.querySelector('.dean-mode-label');
     expect(label?.textContent).toBe('Build');
   });
 
   it('should call onModeChange when the toggle is clicked', async () => {
-    const toggle = parentEl.querySelector('.claudian-toggle-switch');
+    const toggle = parentEl.querySelector('.dean-toggle-switch');
     await toggle?.dispatchEvent('click');
 
     expect(callbacks.onModeChange).toHaveBeenCalledWith('plan');
@@ -463,8 +463,8 @@ describe('ModeSelector', () => {
     const parentEl2 = createMockEl();
     new ModeSelector(parentEl2, callbacks);
 
-    const label = parentEl2.querySelector('.claudian-mode-label');
-    const toggle = parentEl2.querySelector('.claudian-toggle-switch');
+    const label = parentEl2.querySelector('.dean-mode-label');
+    const toggle = parentEl2.querySelector('.dean-toggle-switch');
     expect(label?.textContent).toBe('Build');
     expect(label?.hasClass('active')).toBe(true);
     expect(toggle?.hasClass('active')).toBe(true);
@@ -485,8 +485,8 @@ describe('ModeSelector', () => {
     const parentEl2 = createMockEl();
     new ModeSelector(parentEl2, callbacks);
 
-    const label = parentEl2.querySelector('.claudian-mode-label');
-    const toggle = parentEl2.querySelector('.claudian-toggle-switch');
+    const label = parentEl2.querySelector('.dean-mode-label');
+    const toggle = parentEl2.querySelector('.dean-toggle-switch');
     expect(label?.textContent).toBe('Plan');
     expect(label?.hasClass('active')).toBe(false);
     expect(toggle?.hasClass('active')).toBe(false);
@@ -499,7 +499,7 @@ describe('ModeSelector', () => {
 
     selector.updateDisplay();
 
-    const container = parentEl.querySelector('.claudian-mode-selector');
+    const container = parentEl.querySelector('.dean-mode-selector');
     expect(container?.style?.display).toBe('none');
   });
 });
@@ -518,29 +518,29 @@ describe('ThinkingBudgetSelector', () => {
     });
 
     it('should create a container with thinking-selector class', () => {
-      const container = parentEl.querySelector('.claudian-thinking-selector');
+      const container = parentEl.querySelector('.dean-thinking-selector');
       expect(container).not.toBeNull();
     });
 
     it('should show effort selector for Claude models', () => {
-      const effort = parentEl.querySelector('.claudian-thinking-effort');
+      const effort = parentEl.querySelector('.dean-thinking-effort');
       expect(effort).not.toBeNull();
       expect(effort?.style?.display).not.toBe('none');
     });
 
     it('should hide budget selector for Claude models', () => {
-      const budget = parentEl.querySelector('.claudian-thinking-budget');
+      const budget = parentEl.querySelector('.dean-thinking-budget');
       expect(budget?.style?.display).toBe('none');
     });
 
     it('should display current effort level for Claude models', () => {
-      const current = parentEl.querySelector('.claudian-thinking-current');
+      const current = parentEl.querySelector('.dean-thinking-current');
       expect(current?.textContent).toBe('High');
     });
 
     it('should render the effort label for responsive styling', () => {
-      const effort = parentEl.querySelector('.claudian-thinking-effort');
-      expect(effort?.querySelector('.claudian-thinking-label-text')?.textContent).toBe('Effort:');
+      const effort = parentEl.querySelector('.dean-thinking-effort');
+      expect(effort?.querySelector('.dean-thinking-label-text')?.textContent).toBe('Effort:');
     });
   });
 
@@ -563,17 +563,17 @@ describe('ThinkingBudgetSelector', () => {
     });
 
     it('should hide effort selector for custom models', () => {
-      const effort = parentEl.querySelector('.claudian-thinking-effort');
+      const effort = parentEl.querySelector('.dean-thinking-effort');
       expect(effort?.style?.display).toBe('none');
     });
 
     it('should show budget selector for custom models', () => {
-      const budget = parentEl.querySelector('.claudian-thinking-budget');
+      const budget = parentEl.querySelector('.dean-thinking-budget');
       expect(budget?.style?.display).not.toBe('none');
     });
 
     it('should display current budget label', () => {
-      const current = parentEl.querySelector('.claudian-thinking-current');
+      const current = parentEl.querySelector('.dean-thinking-current');
       expect(current?.textContent).toBe('Low');
     });
 
@@ -587,12 +587,12 @@ describe('ThinkingBudgetSelector', () => {
         enableSonnet1M: false,
       });
       selector.updateDisplay();
-      const current = parentEl.querySelector('.claudian-thinking-current');
+      const current = parentEl.querySelector('.dean-thinking-current');
       expect(current?.textContent).toBe('Off');
     });
 
     it('should render budget options in reverse order', () => {
-      const options = parentEl.querySelector('.claudian-thinking-options');
+      const options = parentEl.querySelector('.dean-thinking-options');
       expect(options).not.toBeNull();
       // THINKING_BUDGETS reversed: [xhigh, high, medium, low, off]
       const gears = options?.children || [];
@@ -602,14 +602,14 @@ describe('ThinkingBudgetSelector', () => {
     });
 
     it('should mark current budget as selected', () => {
-      const options = parentEl.querySelector('.claudian-thinking-options');
+      const options = parentEl.querySelector('.dean-thinking-options');
       const gears = options?.children || [];
       const lowGear = gears.find((g: any) => g.textContent === 'Low');
       expect(lowGear?.hasClass('selected')).toBe(true);
     });
 
     it('should call onThinkingBudgetChange when gear clicked', async () => {
-      const options = parentEl.querySelector('.claudian-thinking-options');
+      const options = parentEl.querySelector('.dean-thinking-options');
       const gears = options?.children || [];
       const highGear = gears.find((g: any) => g.textContent === 'High');
 
@@ -618,14 +618,14 @@ describe('ThinkingBudgetSelector', () => {
     });
 
     it('should set title with token count for non-off budgets', () => {
-      const options = parentEl.querySelector('.claudian-thinking-options');
+      const options = parentEl.querySelector('.dean-thinking-options');
       const gears = options?.children || [];
       const highGear = gears.find((g: any) => g.textContent === 'High');
       expect(highGear?.getAttribute('title')).toContain('16,000 tokens');
     });
 
     it('should set title as Disabled for off budget', () => {
-      const options = parentEl.querySelector('.claudian-thinking-options');
+      const options = parentEl.querySelector('.dean-thinking-options');
       const gears = options?.children || [];
       const offGear = gears.find((g: any) => g.textContent === 'Off');
       expect(offGear?.getAttribute('title')).toBe('Disabled');
@@ -645,12 +645,12 @@ describe('PermissionToggle', () => {
   });
 
   it('should create a container with permission-toggle class', () => {
-    const container = parentEl.querySelector('.claudian-permission-toggle');
+    const container = parentEl.querySelector('.dean-permission-toggle');
     expect(container).not.toBeNull();
   });
 
   it('should display Safe label when in normal mode', () => {
-    const label = parentEl.querySelector('.claudian-permission-label');
+    const label = parentEl.querySelector('.dean-permission-label');
     expect(label?.textContent).toBe('Safe');
   });
 
@@ -666,7 +666,7 @@ describe('PermissionToggle', () => {
     const parentEl2 = createMockEl();
     new PermissionToggle(parentEl2, callbacks);
 
-    const label = parentEl2.querySelector('.claudian-permission-label');
+    const label = parentEl2.querySelector('.dean-permission-label');
     expect(label?.textContent).toBe('YOLO');
   });
 
@@ -682,11 +682,11 @@ describe('PermissionToggle', () => {
     const parentEl2 = createMockEl();
     new PermissionToggle(parentEl2, callbacks);
 
-    const label = parentEl2.querySelector('.claudian-permission-label');
+    const label = parentEl2.querySelector('.dean-permission-label');
     expect(label?.textContent).toBe('PLAN');
     expect(label?.hasClass('plan-active')).toBe(true);
 
-    const toggle = parentEl2.querySelector('.claudian-toggle-switch');
+    const toggle = parentEl2.querySelector('.dean-toggle-switch');
     expect(toggle?.style.display).toBe('none');
   });
 
@@ -700,17 +700,17 @@ describe('PermissionToggle', () => {
     const parentEl2 = createMockEl();
     new PermissionToggle(parentEl2, callbacks);
 
-    const toggle = parentEl2.querySelector('.claudian-toggle-switch');
+    const toggle = parentEl2.querySelector('.dean-toggle-switch');
     expect(toggle?.hasClass('active')).toBe(true);
   });
 
   it('should not have active class in normal mode', () => {
-    const toggle = parentEl.querySelector('.claudian-toggle-switch');
+    const toggle = parentEl.querySelector('.dean-toggle-switch');
     expect(toggle?.hasClass('active')).toBe(false);
   });
 
   it('should toggle from normal to yolo on click', async () => {
-    const toggle = parentEl.querySelector('.claudian-toggle-switch');
+    const toggle = parentEl.querySelector('.dean-toggle-switch');
     await toggle?.dispatchEvent('click');
     expect(callbacks.onPermissionModeChange).toHaveBeenCalledWith('yolo');
   });
@@ -724,7 +724,7 @@ describe('PermissionToggle', () => {
     const parentEl2 = createMockEl();
     new PermissionToggle(parentEl2, callbacks);
 
-    const toggle = parentEl2.querySelector('.claudian-toggle-switch');
+    const toggle = parentEl2.querySelector('.dean-toggle-switch');
     await toggle?.dispatchEvent('click');
     expect(callbacks.onPermissionModeChange).toHaveBeenCalledWith('normal');
   });
@@ -737,7 +737,7 @@ describe('PermissionToggle', () => {
     const parentEl2 = createMockEl();
     new PermissionToggle(parentEl2, callbacks);
 
-    const container = parentEl2.querySelector('.claudian-permission-toggle');
+    const container = parentEl2.querySelector('.dean-permission-toggle');
     expect(container?.style.display).toBe('none');
   });
 
@@ -747,7 +747,7 @@ describe('PermissionToggle', () => {
 
     toggle.setVisible(false);
 
-    const container = parentEl2.querySelector('.claudian-permission-toggle');
+    const container = parentEl2.querySelector('.dean-permission-toggle');
     expect(container?.style.display).toBe('none');
   });
 });
@@ -783,15 +783,15 @@ describe('ServiceTierToggle', () => {
   });
 
   it('shows the control when the provider exposes service tier options', () => {
-    const container = parentEl.querySelector('.claudian-service-tier-toggle');
+    const container = parentEl.querySelector('.dean-service-tier-toggle');
     expect(container).not.toBeNull();
-    expect(container?.hasClass('claudian-hidden')).toBe(false);
+    expect(container?.hasClass('dean-hidden')).toBe(false);
   });
 
   it('renders the icon button in the inactive state when fast mode is off', () => {
-    const button = parentEl.querySelector('.claudian-service-tier-button');
-    const icon = parentEl.querySelector('.claudian-service-tier-icon');
-    const container = parentEl.querySelector('.claudian-service-tier-toggle');
+    const button = parentEl.querySelector('.dean-service-tier-button');
+    const icon = parentEl.querySelector('.dean-service-tier-icon');
+    const container = parentEl.querySelector('.dean-service-tier-toggle');
     expect(button?.hasClass('active')).toBe(false);
     expect(icon).not.toBeNull();
     expect(container?.getAttribute('title')).toBe('Fast mode: Standard');
@@ -809,14 +809,14 @@ describe('ServiceTierToggle', () => {
     const parentEl2 = createMockEl();
     new ServiceTierToggle(parentEl2, callbacks);
 
-    const button = parentEl2.querySelector('.claudian-service-tier-button');
-    const container = parentEl2.querySelector('.claudian-service-tier-toggle');
+    const button = parentEl2.querySelector('.dean-service-tier-button');
+    const container = parentEl2.querySelector('.dean-service-tier-toggle');
     expect(button?.hasClass('active')).toBe(true);
     expect(container?.getAttribute('title')).toBe('Fast mode: Fast');
   });
 
   it('toggles from Standard to Fast on click', async () => {
-    const button = parentEl.querySelector('.claudian-service-tier-button');
+    const button = parentEl.querySelector('.dean-service-tier-button');
     await button?.dispatchEvent('click');
     expect(callbacks.onServiceTierChange).toHaveBeenCalledWith('fast');
   });
@@ -840,7 +840,7 @@ describe('ServiceTierToggle', () => {
     const parentEl2 = createMockEl();
     new ServiceTierToggle(parentEl2, callbacks);
 
-    const button = parentEl2.querySelector('.claudian-service-tier-button');
+    const button = parentEl2.querySelector('.dean-service-tier-button');
     await button?.dispatchEvent('click');
     expect(callbacks.onServiceTierChange).toHaveBeenCalledWith('default');
   });
@@ -853,7 +853,7 @@ describe('ServiceTierToggle', () => {
     const parentEl2 = createMockEl();
     new ServiceTierToggle(parentEl2, callbacks);
 
-    const container = parentEl2.querySelector('.claudian-service-tier-toggle');
+    const container = parentEl2.querySelector('.dean-service-tier-toggle');
     expect(container?.style.display).toBe('none');
   });
 
@@ -882,42 +882,42 @@ describe('ContextUsageMeter', () => {
   });
 
   it('should create a container with context-meter class', () => {
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container).not.toBeNull();
   });
 
   it('should be hidden initially', () => {
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.style.display).toBe('none');
   });
 
   it('should remain hidden when update called with null', () => {
     meter.update(null);
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.style.display).toBe('none');
   });
 
   it('should remain hidden when contextTokens is 0', () => {
     meter.update(makeUsage({ contextTokens: 0, contextWindow: 200000, percentage: 0 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.style.display).toBe('none');
   });
 
   it('should become visible when contextTokens > 0', () => {
     meter.update(makeUsage({ contextTokens: 50000, contextWindow: 200000, percentage: 25 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.style.display).toBe('flex');
   });
 
   it('should render percentage text for responsive styling', () => {
     meter.update(makeUsage({ contextTokens: 50000, contextWindow: 200000, percentage: 25 }));
-    const percent = parentEl.querySelector('.claudian-context-meter-percent');
+    const percent = parentEl.querySelector('.dean-context-meter-percent');
     expect(percent?.textContent).toBe('25%');
   });
 
   it('should expose usage details to assistive technology', () => {
     meter.update(makeUsage({ contextTokens: 50000, contextWindow: 200000, percentage: 25 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.getAttribute('role')).toBe('progressbar');
     expect(container?.getAttribute('aria-label')).toBe('Context usage');
     expect(container?.getAttribute('aria-valuemin')).toBe('0');
@@ -928,38 +928,38 @@ describe('ContextUsageMeter', () => {
 
   it('should add warning class when usage > 80%', () => {
     meter.update(makeUsage({ contextTokens: 170000, contextWindow: 200000, percentage: 85 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.hasClass('warning')).toBe(true);
   });
 
   it('should remove warning class when usage drops below 80%', () => {
     meter.update(makeUsage({ contextTokens: 170000, contextWindow: 200000, percentage: 85 }));
     meter.update(makeUsage({ contextTokens: 50000, contextWindow: 200000, percentage: 25 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.hasClass('warning')).toBe(false);
   });
 
   it('should set tooltip with formatted token counts', () => {
     meter.update(makeUsage({ contextTokens: 50000, contextWindow: 200000, percentage: 25 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.getAttribute('data-tooltip')).toBe('50k / 200k');
   });
 
   it('should format small token counts without k suffix', () => {
     meter.update(makeUsage({ contextTokens: 500, contextWindow: 200000, percentage: 0 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.getAttribute('data-tooltip')).toBe('500 / 200k');
   });
 
   it('should add compact reminder to tooltip when usage > 80%', () => {
     meter.update(makeUsage({ contextTokens: 170000, contextWindow: 200000, percentage: 85 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.getAttribute('data-tooltip')).toBe('170k / 200k (Approaching limit, run `/compact` to continue)');
   });
 
   it('should not add compact reminder to tooltip when usage ≤ 80%', () => {
     meter.update(makeUsage({ contextTokens: 160000, contextWindow: 200000, percentage: 80 }));
-    const container = parentEl.querySelector('.claudian-context-meter');
+    const container = parentEl.querySelector('.dean-context-meter');
     expect(container?.getAttribute('data-tooltip')).toBe('160k / 200k');
   });
 });
@@ -989,7 +989,7 @@ describe('InputToolbarLayoutController', () => {
     const controller = new InputToolbarLayoutController(toolbarEl);
     controller.refreshLayout();
 
-    expect(toolbarEl.hasClass('claudian-input-toolbar--compact')).toBe(true);
+    expect(toolbarEl.hasClass('dean-input-toolbar--compact')).toBe(true);
     controller.destroy();
   });
 
@@ -999,12 +999,12 @@ describe('InputToolbarLayoutController', () => {
     const secondItem = toolbarEl.createDiv();
     setRect(firstItem, 0, 40, 24);
     setRect(secondItem, 3, 40, 18);
-    toolbarEl.addClass('claudian-input-toolbar--compact');
+    toolbarEl.addClass('dean-input-toolbar--compact');
 
     const controller = new InputToolbarLayoutController(toolbarEl);
     controller.refreshLayout();
 
-    expect(toolbarEl.hasClass('claudian-input-toolbar--compact')).toBe(false);
+    expect(toolbarEl.hasClass('dean-input-toolbar--compact')).toBe(false);
     controller.destroy();
   });
 
@@ -1037,12 +1037,12 @@ describe('InputToolbarLayoutController', () => {
     const controller = new InputToolbarLayoutController(toolbarEl);
     expect(observe).toHaveBeenCalledWith(toolbarEl);
     observerCallbacks.frame?.(0);
-    expect(toolbarEl.hasClass('claudian-input-toolbar--compact')).toBe(false);
+    expect(toolbarEl.hasClass('dean-input-toolbar--compact')).toBe(false);
 
     setRect(secondItem, 36);
     observerCallbacks.resize?.([], {} as ResizeObserver);
     observerCallbacks.frame?.(0);
-    expect(toolbarEl.hasClass('claudian-input-toolbar--compact')).toBe(true);
+    expect(toolbarEl.hasClass('dean-input-toolbar--compact')).toBe(true);
 
     controller.destroy();
     expect(disconnect).toHaveBeenCalledTimes(1);
@@ -1094,8 +1094,8 @@ describe('createInputToolbar', () => {
 
     createInputToolbar(parentEl, callbacks);
 
-    const permissionIndex = parentEl.children.findIndex((child: any) => child.hasClass('claudian-permission-toggle'));
-    const modeIndex = parentEl.children.findIndex((child: any) => child.hasClass('claudian-mode-selector'));
+    const permissionIndex = parentEl.children.findIndex((child: any) => child.hasClass('dean-permission-toggle'));
+    const modeIndex = parentEl.children.findIndex((child: any) => child.hasClass('dean-mode-selector'));
     expect(permissionIndex).toBeGreaterThanOrEqual(0);
     expect(modeIndex).toBeGreaterThan(permissionIndex);
     expect(modeIndex).toBe(parentEl.children.length - 1);

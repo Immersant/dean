@@ -1033,21 +1033,21 @@ export class TabManager implements TabManagerInterface {
     const messagesEl = tab.dom.messagesEl;
     messagesEl.empty();
 
-    const statusEl = messagesEl.createDiv({ cls: 'claudian-tab-hydration' });
+    const statusEl = messagesEl.createDiv({ cls: 'dean-tab-hydration' });
     if (!error) {
       statusEl.createDiv({
-        cls: 'claudian-tab-hydration-loading',
+        cls: 'dean-tab-hydration-loading',
         text: 'Loading conversation…',
       });
       return;
     }
 
     statusEl.createDiv({
-      cls: 'claudian-tab-hydration-error',
+      cls: 'dean-tab-hydration-error',
       text: error instanceof Error ? error.message : 'Failed to load conversation',
     });
     const retryButton = statusEl.createEl('button', {
-      cls: 'mod-cta claudian-tab-hydration-retry',
+      cls: 'mod-cta dean-tab-hydration-retry',
       text: 'Retry',
     });
     retryButton.addEventListener('click', () => {

@@ -31,14 +31,14 @@ export function renderHostnameCliPathSetting(
     .setName(options.name)
     .setDesc(options.description);
   const validationEl = options.container.createDiv({
-    cls: 'claudian-cli-path-validation claudian-setting-validation claudian-setting-validation-error claudian-hidden',
+    cls: 'dean-cli-path-validation dean-setting-validation dean-setting-validation-error dean-hidden',
   });
 
   const updateValidation = (value: string): boolean => {
     const error = options.validate?.(value) ?? null;
     setElementText(validationEl, error ?? '');
-    toggleElementClass(validationEl, 'claudian-hidden', !error);
-    toggleElementClass(text.inputEl, 'claudian-input-error', Boolean(error));
+    toggleElementClass(validationEl, 'dean-hidden', !error);
+    toggleElementClass(text.inputEl, 'dean-input-error', Boolean(error));
     return !error;
   };
 
@@ -78,7 +78,7 @@ export function renderHostnameCliPathSetting(
       });
   });
 
-  addElementClass(text.inputEl, 'claudian-settings-cli-path-input');
+  addElementClass(text.inputEl, 'dean-settings-cli-path-input');
   text.inputEl.setAttribute?.('aria-label', options.name);
   updateValidation(currentValue);
 

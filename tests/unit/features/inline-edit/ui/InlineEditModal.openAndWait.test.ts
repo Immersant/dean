@@ -1590,8 +1590,8 @@ describe('InlineEditModal - openAndWait', () => {
       const previewEl = widgetRef.createDiffPreviewDOM([
         { type: 'insert', text: 'Updated text' },
       ]);
-      const actionBar = previewEl.querySelector('.claudian-inline-preview-actions');
-      const actionButtons = previewEl.querySelectorAll('.claudian-inline-preview-action');
+      const actionBar = previewEl.querySelector('.dean-inline-preview-actions');
+      const actionButtons = previewEl.querySelectorAll('.dean-inline-preview-action');
 
       expect(actionBar).not.toBeNull();
       expect(actionButtons).toHaveLength(2);
@@ -1747,10 +1747,10 @@ describe('InlineEditModal - openAndWait', () => {
         plugin
       );
 
-      const diffBlocks = previewEl.querySelectorAll('.claudian-diff-block');
+      const diffBlocks = previewEl.querySelectorAll('.dean-diff-block');
       expect(diffBlocks).toHaveLength(2);
-      expect(diffBlocks[0].hasClass('claudian-diff-del')).toBe(true);
-      expect(diffBlocks[1].hasClass('claudian-diff-ins')).toBe(true);
+      expect(diffBlocks[0].hasClass('dean-diff-del')).toBe(true);
+      expect(diffBlocks[1].hasClass('dean-diff-ins')).toBe(true);
 
       widgetRef.reject();
       await expect(resultPromise).resolves.toEqual({ decision: 'reject' });

@@ -6,14 +6,14 @@ import type { SessionMetadataReader } from './SessionStorage';
  * Minimal shared app storage contract.
  *
  * This interface covers only the storage concerns that are shared across
- * all providers: Claudian settings, tab manager state, and session metadata.
+ * all providers: Dean settings, tab manager state, and session metadata.
  *
  * Provider-specific storage surfaces (CC settings, slash commands, skills,
  * agents, MCP config) live behind provider-owned modules.
  */
 export interface SharedAppStorage {
-  initialize(): Promise<{ claudian: Record<string, unknown> }>;
-  saveClaudianSettings(settings: Record<string, unknown>): Promise<void>;
+  initialize(): Promise<{ dean: Record<string, unknown> }>;
+  saveDeanSettings(settings: Record<string, unknown>): Promise<void>;
   setTabManagerState(state: AppTabManagerState): Promise<void>;
   getTabManagerState(): Promise<AppTabManagerState | null>;
   /** Read-only startup metadata access; conversation writers stay repository-private. */

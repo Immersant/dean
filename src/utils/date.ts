@@ -1,5 +1,5 @@
 /**
- * Claudian - Date Utilities
+ * Dean - Date Utilities
  *
  * Date formatting helpers for system prompts.
  */

@@ -7,14 +7,14 @@ import type { SharedAppStorage } from '../../core/bootstrap/storage';
 import { normalizeTabManagerState } from '../../core/bootstrap/tabManagerState';
 import type { AppTabManagerState } from '../../core/providers/types';
 import { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
-import { ClaudianSettingsStorage, type StoredClaudianSettings } from '../settings/ClaudianSettingsStorage';
+import { DeanSettingsStorage, type StoredDeanSettings } from '../settings/DeanSettingsStorage';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
 export class SharedStorageService implements SharedAppStorage {
-  readonly claudianSettings: ClaudianSettingsStorage;
+  readonly deanSettings: DeanSettingsStorage;
   readonly sessions: SessionStorage;
   readonly conversationPersistence: ConversationPersistenceStore;
 
@@ -24,18 +24,18 @@ export class SharedStorageService implements SharedAppStorage {
   constructor(plugin: Plugin) {
     this.plugin = plugin;
     this.adapter = new VaultFileAdapter(plugin.app);
-    this.claudianSettings = new ClaudianSettingsStorage(this.adapter);
+    this.deanSettings = new DeanSettingsStorage(this.adapter);
     this.sessions = new SessionStorage(this.adapter);
     this.conversationPersistence = new ConversationPersistenceStore(this.adapter);
   }
 
-  async initialize(): Promise<{ claudian: Record<string, unknown> }> {
-    const claudian = await this.claudianSettings.load();
-    return { claudian };
+  async initialize(): Promise<{ dean: Record<string, unknown> }> {
+    const dean = await this.deanSettings.load();
+    return { dean };
   }
 
-  async saveClaudianSettings(settings: Record<string, unknown>): Promise<void> {
-    await this.claudianSettings.save(settings as StoredClaudianSettings);
+  async saveDeanSettings(settings: Record<string, unknown>): Promise<void> {
+    await this.deanSettings.save(settings as StoredDeanSettings);
   }
 
   async setTabManagerState(state: AppTabManagerState): Promise<void> {

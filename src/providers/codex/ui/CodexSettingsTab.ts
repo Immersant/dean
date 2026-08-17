@@ -193,7 +193,7 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
       cliPathControl.setPlaceholder(cliCopy.placeholder);
       cliPathControl.revalidate();
       if (wslDistroSettingEl) {
-        wslDistroSettingEl.toggleClass('claudian-hidden', installationMethod !== 'wsl');
+        wslDistroSettingEl.toggleClass('dean-hidden', installationMethod !== 'wsl');
       }
       if (wslDistroInputEl) {
         wslDistroInputEl.disabled = installationMethod !== 'wsl';
@@ -220,7 +220,7 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
             );
           });
 
-        text.inputEl.addClass('claudian-settings-cli-path-input');
+        text.inputEl.addClass('dean-settings-cli-path-input');
         text.inputEl.disabled = installationMethod !== 'wsl';
         wslDistroInputEl = text.inputEl;
       });
@@ -310,13 +310,13 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.codex.subagents.name')).setHeading();
 
-    const subagentDesc = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+    const subagentDesc = container.createDiv({ cls: 'dean-sp-settings-desc' });
     subagentDesc.createEl('p', {
       cls: 'setting-item-description',
       text: t('settings.codex.subagents.desc'),
     });
 
-    const subagentContainer = container.createDiv({ cls: 'claudian-slash-commands-container' });
+    const subagentContainer = container.createDiv({ cls: 'dean-slash-commands-container' });
     new CodexSubagentSettings(subagentContainer, codexWorkspace.subagentStorage, context.plugin.app, () => {
       void codexWorkspace.refreshAgentMentions?.();
     });

@@ -6,7 +6,7 @@
 
 - `src/main.ts` is the concrete composition root. It constructs app services and wires core registries, providers, and features.
 - App repositories, storage, and settings services depend on core contracts. They must not import chat views, feature controllers, renderers, or provider-native protocol implementations.
-- `FeatureHost` is the feature-facing application boundary; user-facing features must not import `ClaudianPlugin` from `src/main.ts`.
+- `FeatureHost` is the feature-facing application boundary; user-facing features must not import `DeanPlugin` from `src/main.ts`.
 - `ProviderHost` is the provider-facing application boundary; provider runtime code must not reach through it to chat views or feature controllers.
 - Concrete provider imports are allowed only in composition and provider-default assembly. Do not introduce them into conversation, storage, or settings transaction logic.
 - Existing Claude compatibility imports of app settings or storage are migration seams. Do not use them as precedent; move a shared contract into `core/` before creating another provider-to-app dependency.
@@ -15,19 +15,19 @@
 
 | Component | Authority |
 | --- | --- |
-| `ConversationRepository` | The canonical in-memory Claudian conversation collection, hydration status, pin/archive and note-link metadata, deletion transactions, per-conversation persistence queues, input-ledger coordination, historical model recovery, selected-model availability reconciliation, and execution-snapshot binding |
+| `ConversationRepository` | The canonical in-memory Dean conversation collection, hydration status, pin/archive and note-link metadata, deletion transactions, per-conversation persistence queues, input-ledger coordination, historical model recovery, selected-model availability reconciliation, and execution-snapshot binding |
 | `SharedStorageService` | Plugin-data and vault persistence I/O plus construction of shared persistence adapters |
 | `SettingsCoordinator` | Serialization of settings mutations, rollback before failed persistence, and post-commit publication ordering |
 | `ChatModelSelectionCoordinator` | Application-wide ordering and durable settings commits for explicit future-tab model-seed intents |
 | `PinnedLinkedNotePathCoordinator` | Pinned linked-note path mutation, folder-descendant rewrite, deduplication, and deletion cleanup through ordered settings transactions |
-| `ClaudianProviderHost` | Typed delegation to application capabilities; it owns no duplicate settings, storage, view, or execution state |
+| `DeanProviderHost` | Typed delegation to application capabilities; it owns no duplicate settings, storage, view, or execution state |
 
 Storage adapters own I/O mechanics, not domain decisions. Callers decide what state is valid; adapters merge and persist it without inventing conversation, tab, provider, or settings semantics.
 
 ## State and Persistence Boundaries
 
-- `ConversationRepository` is the source of truth for Claudian's current in-memory conversation projection. Feature code must request conversation mutations through `FeatureHost` instead of mutating cached conversations independently.
-- Claudian metadata and accepted-input ledgers are durable Claudian state.
+- `ConversationRepository` is the source of truth for Dean's current in-memory conversation projection. Feature code must request conversation mutations through `FeatureHost` instead of mutating cached conversations independently.
+- Dean metadata and accepted-input ledgers are durable Dean state.
 - Provider session IDs, resume checkpoints, and opaque `providerState` may be interpreted only by provider snapshots or typed provider history/state helpers. Generic app code may store those opaque values but must not infer or rewrite their fields.
 - `AppTabManagerState` is a separate current-tab snapshot. New writes retain only the active tab identity and conversation binding; legacy multi-tab snapshots are restored as the active entry only. It must not duplicate conversation messages, provider state, draft content, or runtime objects.
 - `Conversation.modelRecoverySource` is a read-only native locator used only to recover missing historical model metadata. It must never be treated as a resumable provider binding, and a successful recovery or fresh provider session retires it.

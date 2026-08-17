@@ -71,25 +71,25 @@ export interface MockElement {
 }
 
 const CLASS_DISPLAY: Record<string, string> = {
-  'claudian-context-meter': 'flex',
-  'claudian-mcp-selector': 'flex',
-  'claudian-mode-selector': 'flex',
-  'claudian-permission-toggle': 'flex',
-  'claudian-service-tier-toggle': 'flex',
-  'claudian-status-panel-bash': 'block',
-  'claudian-status-panel-bash-content': 'block',
-  'claudian-status-panel-bash-entry-content': 'block',
-  'claudian-status-panel-content': 'block',
-  'claudian-status-panel-todos': 'block',
-  'claudian-tab-content': 'flex',
-  'claudian-thinking-budget': 'flex',
-  'claudian-thinking-effort': 'flex',
+  'dean-context-meter': 'flex',
+  'dean-mcp-selector': 'flex',
+  'dean-mode-selector': 'flex',
+  'dean-permission-toggle': 'flex',
+  'dean-service-tier-toggle': 'flex',
+  'dean-status-panel-bash': 'block',
+  'dean-status-panel-bash-content': 'block',
+  'dean-status-panel-bash-entry-content': 'block',
+  'dean-status-panel-content': 'block',
+  'dean-status-panel-todos': 'block',
+  'dean-tab-content': 'flex',
+  'dean-thinking-budget': 'flex',
+  'dean-thinking-effort': 'flex',
 };
 
 const DISPLAY_CLASSES = new Set([
-  'claudian-hidden',
-  'claudian-visible-block',
-  'claudian-visible-flex',
+  'dean-hidden',
+  'dean-visible-block',
+  'dean-visible-flex',
   ...Object.keys(CLASS_DISPLAY),
 ]);
 
@@ -103,9 +103,9 @@ export function createMockEl(tag = 'div'): any {
   let textContent = '';
 
   const resolveDisplay = (): string | null => {
-    if (classes.has('claudian-hidden')) return 'none';
-    if (classes.has('claudian-visible-flex')) return 'flex';
-    if (classes.has('claudian-visible-block')) return 'block';
+    if (classes.has('dean-hidden')) return 'none';
+    if (classes.has('dean-visible-flex')) return 'flex';
+    if (classes.has('dean-visible-block')) return 'block';
 
     for (const [cls, display] of Object.entries(CLASS_DISPLAY)) {
       if (classes.has(cls)) return display;

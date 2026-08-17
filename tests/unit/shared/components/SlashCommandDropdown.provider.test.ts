@@ -50,13 +50,13 @@ function createMockCallbacks(overrides: Partial<SlashCommandDropdownCallbacks> =
 
 function getRenderedItems(containerEl: any): { name: string; description: string }[] {
   const dropdownEl = containerEl.children.find(
-    (c: any) => c.hasClass('claudian-slash-dropdown')
+    (c: any) => c.hasClass('dean-slash-dropdown')
   );
   if (!dropdownEl) return [];
-  const items = dropdownEl.querySelectorAll('.claudian-slash-item');
+  const items = dropdownEl.querySelectorAll('.dean-slash-item');
   return items.map((item: any) => {
-    const nameSpan = item.children.find((c: any) => c.hasClass('claudian-slash-name'));
-    const descDiv = item.children.find((c: any) => c.hasClass('claudian-slash-desc'));
+    const nameSpan = item.children.find((c: any) => c.hasClass('dean-slash-name'));
+    const descDiv = item.children.find((c: any) => c.hasClass('dean-slash-desc'));
     return {
       name: nameSpan?.textContent ?? '',
       description: descDiv?.textContent ?? '',
@@ -70,17 +70,17 @@ function getRenderedCommandNames(containerEl: any): string[] {
 
 function getDiscoveryState(containerEl: any): { text: string; retry: any | null } | null {
   const dropdownEl = containerEl.children.find(
-    (c: any) => c.hasClass('claudian-slash-dropdown')
+    (c: any) => c.hasClass('dean-slash-dropdown')
   );
   const stateEl = dropdownEl?.children.find(
-    (c: any) => c.hasClass('claudian-slash-provider-state')
+    (c: any) => c.hasClass('dean-slash-provider-state')
   );
   if (!stateEl) return null;
   const messageEl = stateEl.children.find(
-    (c: any) => c.hasClass('claudian-slash-provider-state-message')
+    (c: any) => c.hasClass('dean-slash-provider-state-message')
   );
   const retry = stateEl.children.find(
-    (c: any) => c.hasClass('claudian-slash-provider-retry')
+    (c: any) => c.hasClass('dean-slash-provider-retry')
   ) ?? null;
   return { text: messageEl?.textContent ?? '', retry };
 }
@@ -429,10 +429,10 @@ describe('SlashCommandDropdown - provider catalog', () => {
 
   describe('typed provider discovery', () => {
     it.each([
-      ['codex', ['/', '$'], 'claudian-v2-shared', '$'],
-      ['grok', ['/'], 'claudian-v2-shared', '/'],
-      ['pi', ['/'], 'skill:claudian-v2-shared', '/'],
-      ['opencode', ['/'], 'claudian-v2-shared', '/'],
+      ['codex', ['/', '$'], 'dean-v2-shared', '$'],
+      ['grok', ['/'], 'dean-v2-shared', '/'],
+      ['pi', ['/'], 'skill:dean-v2-shared', '/'],
+      ['opencode', ['/'], 'dean-v2-shared', '/'],
     ] as const)(
       'settles discovery and renders every %s protocol entry before a prompt',
       async (providerId, triggerChars, commandName, displayPrefix) => {

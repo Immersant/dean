@@ -520,9 +520,9 @@ export class OpencodeExecutionSession implements ProviderExecutionSession {
 
     const profile = resolveProfile(request);
     const mode = profile === 'passive'
-      ? 'claudian-execution-passive'
+      ? 'dean-execution-passive'
       : profile === 'readonly'
-        ? 'claudian-execution-readonly'
+        ? 'dean-execution-readonly'
         : request.configuration.mode
           ?? resolveOpencodeModeForPermissionMode(
             request.configuration.permissionMode,

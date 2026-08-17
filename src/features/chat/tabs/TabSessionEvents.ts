@@ -259,7 +259,7 @@ async function renderAutoTriggeredTurn(
   if (hasVisibleContent) {
     tab.state.addMessage(assistantMessage);
     const messageEl = tab.renderer.addMessage(assistantMessage);
-    const contentEl = messageEl?.querySelector<HTMLElement>('.claudian-message-content');
+    const contentEl = messageEl?.querySelector<HTMLElement>('.dean-message-content');
     if (contentEl) {
       if (!previousContentEl) {
         tab.state.toolCallElements.clear();

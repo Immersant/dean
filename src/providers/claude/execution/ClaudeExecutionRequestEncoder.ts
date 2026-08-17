@@ -18,7 +18,7 @@ import {
 } from '../../../core/tools/toolNames';
 import type { ImageAttachment } from '../../../core/types';
 import type {
-  ClaudianSettings,
+  DeanSettings,
   PermissionMode,
 } from '../../../core/types/settings';
 import { appendBrowserContext } from '../../../utils/browser';
@@ -238,7 +238,7 @@ export class ClaudeExecutionRequestEncoder {
     return safeMode;
   }
 
-  private resolveSettings(request: ProviderExecutionRequest): ClaudianSettings {
+  private resolveSettings(request: ProviderExecutionRequest): DeanSettings {
     const settings = ProviderSettingsCoordinator.getProviderSettingsSnapshot(
       this.deps.host.settings,
       'claude',

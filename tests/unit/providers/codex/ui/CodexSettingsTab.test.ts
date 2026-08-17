@@ -636,14 +636,14 @@ describe('CodexSettingsTab', () => {
     );
     const warningEl = container.createDiv.mock.results[warningCallIndex]?.value;
     expect(warningCallIndex).toBeGreaterThanOrEqual(0);
-    expect(warningEl.toggleClass).toHaveBeenLastCalledWith('claudian-hidden', false);
+    expect(warningEl.toggleClass).toHaveBeenLastCalledWith('dean-hidden', false);
 
     plugin.settings.providerConfigs.codex.customModels = 'gpt-custom';
     const pickerContext = mockRenderCodexModelPicker.mock.calls[0][1];
     pickerContext.notifyProviderModelOptionsChanged('codex');
 
     expect(context.notifyProviderModelOptionsChanged).toHaveBeenCalledWith('codex');
-    expect(warningEl.toggleClass).toHaveBeenLastCalledWith('claudian-hidden', true);
+    expect(warningEl.toggleClass).toHaveBeenLastCalledWith('dean-hidden', true);
   });
 
   it('renders the fixed-root shared skill manager', () => {

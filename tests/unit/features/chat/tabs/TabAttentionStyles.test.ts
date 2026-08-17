@@ -9,10 +9,10 @@ describe('tab attention styles', () => {
 
   it('visually distinguishes review from action-required attention', () => {
     expect(tabsCss).toMatch(
-      /\.claudian-tab-badge-review \{[\s\S]*?border-color: var\(--color-green\);[\s\S]*?\}/,
+      /\.dean-tab-badge-review \{[\s\S]*?border-color: var\(--color-green\);[\s\S]*?\}/,
     );
     expect(tabsCss).toMatch(
-      /\.claudian-tab-badge-action-required \{[\s\S]*?border-color: var\(--text-error\);[\s\S]*?\}/,
+      /\.dean-tab-badge-action-required \{[\s\S]*?border-color: var\(--text-error\);[\s\S]*?\}/,
     );
   });
 });

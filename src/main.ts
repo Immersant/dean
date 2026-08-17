@@ -11,9 +11,9 @@ import type { Editor, TAbstractFile, WorkspaceLeaf } from 'obsidian';
 import { MarkdownView, Notice, Plugin, TFolder } from 'obsidian';
 
 import { ConversationRepository } from './app/conversations/ConversationRepository';
-import { ClaudianProviderHost } from './app/providers/ClaudianProviderHost';
+import { DeanProviderHost } from './app/providers/DeanProviderHost';
 import { ChatModelSelectionCoordinator } from './app/settings/ChatModelSelectionCoordinator';
-import { DEFAULT_CLAUDIAN_SETTINGS } from './app/settings/defaultSettings';
+import { DEFAULT_DEAN_SETTINGS } from './app/settings/defaultSettings';
 import { PinnedLinkedNotePathCoordinator } from './app/settings/PinnedLinkedNotePathCoordinator';
 import type {
   ConditionalSettingsMutation,
@@ -48,16 +48,16 @@ import type {
 } from './core/providers/types';
 import { DEFAULT_CHAT_PROVIDER_ID } from './core/providers/types';
 import type {
-  ClaudianSettings,
   Conversation,
   ConversationMeta,
+  DeanSettings,
   SessionMetadata,
 } from './core/types';
 import {
-  VIEW_TYPE_CLAUDIAN,
+  VIEW_TYPE_DEAN,
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
-import { ClaudianView } from './features/chat/ClaudianView';
+import { DeanView } from './features/chat/DeanView';
 import type { ChatExecutionPersistence } from './features/chat/execution/ChatExecutionCoordinator';
 import {
   DEFAULT_MAX_WARM_AGENT_PROCESSES,
@@ -66,7 +66,7 @@ import {
 } from './features/chat/execution/WarmExecutionPool';
 import { registerFileMenu } from './features/chat/fileMenu';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
-import { ClaudianSettingTab } from './features/settings/ClaudianSettings';
+import { DeanSettingTab } from './features/settings/DeanSettings';
 import { setLocale } from './i18n/i18n';
 import type { Locale } from './i18n/types';
 import { deleteLegacyMcpConfig } from './providers/claude/storage/LegacyMcpConfigCleanup';
@@ -74,7 +74,7 @@ import { buildCursorContext } from './utils/editor';
 import { revealWorkspaceLeaf } from './utils/obsidianCompat';
 import { getVaultPath } from './utils/path';
 
-function isClaudianView(value: unknown): value is ClaudianView {
+function isDeanView(value: unknown): value is DeanView {
   return !!value
     && typeof value === 'object'
     && typeof (value as { getTabManager?: unknown }).getTabManager === 'function';
@@ -123,15 +123,15 @@ function hasSamePendingProviderSessionInvalidations(
     && entries.every(([providerId, generation]) => pending.get(providerId) === generation);
 }
 
-export default class ClaudianPlugin extends Plugin {
-  settings!: ClaudianSettings;
+export default class DeanPlugin extends Plugin {
+  settings!: DeanSettings;
   storage!: SharedAppStorage;
   readonly executionLifecycleRegistry = new ProviderExecutionLifecycleRegistry();
-  readonly providerHost = new ClaudianProviderHost(this);
+  readonly providerHost = new DeanProviderHost(this);
   readonly warmExecutionPool = new WarmExecutionPool(
     () => this.settings?.maxWarmAgentProcesses ?? DEFAULT_MAX_WARM_AGENT_PROCESSES,
   );
-  private settingsCoordinator!: SettingsCoordinator<ClaudianSettings>;
+  private settingsCoordinator!: SettingsCoordinator<DeanSettings>;
   private chatModelSelectionCoordinator!: ChatModelSelectionCoordinator;
   private pinnedLinkedNotePaths!: PinnedLinkedNotePathCoordinator;
   private conversationRepository!: ConversationRepository;
@@ -166,8 +166,8 @@ export default class ClaudianPlugin extends Plugin {
       // Provider workspace services are initialized lazily on first use.
 
       this.registerView(
-        VIEW_TYPE_CLAUDIAN,
-        (leaf) => new ClaudianView(leaf, this)
+        VIEW_TYPE_DEAN,
+        (leaf) => new DeanView(leaf, this)
       );
       registerFileMenu(this);
       this.registerEvent(this.app.vault.on('rename', (file, oldPath) => {
@@ -181,7 +181,7 @@ export default class ClaudianPlugin extends Plugin {
         });
       }));
 
-      this.addRibbonIcon('bot', 'Open Claudian', () => {
+      this.addRibbonIcon('bot', 'Open Dean', () => {
         void this.activateView();
       });
 
@@ -305,7 +305,7 @@ export default class ClaudianPlugin extends Plugin {
         },
       });
 
-      this.addSettingTab(new ClaudianSettingTab(this.app, this));
+      this.addSettingTab(new DeanSettingTab(this.app, this));
       this.scheduleRemainingSessionMetadataLoad();
     } finally {
       StartupProfiler.finishOnload();
@@ -341,13 +341,13 @@ export default class ClaudianPlugin extends Plugin {
 
   async activateView() {
     const { workspace } = this.app;
-    let leaf = workspace.getLeavesOfType(VIEW_TYPE_CLAUDIAN)[0];
+    let leaf = workspace.getLeavesOfType(VIEW_TYPE_DEAN)[0];
 
     if (!leaf) {
       const newLeaf = this.getLeafForPlacement(this.settings.chatViewPlacement);
       if (newLeaf) {
         await newLeaf.setViewState({
-          type: VIEW_TYPE_CLAUDIAN,
+          type: VIEW_TYPE_DEAN,
           active: true,
         });
         leaf = newLeaf;
@@ -372,7 +372,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   private canCreateNewTab(): boolean {
-    const hasClaudianLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDIAN).length > 0;
+    const hasDeanLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_DEAN).length > 0;
     const view = this.getView();
     const tabManager = view?.getTabManager();
 
@@ -380,14 +380,14 @@ export default class ClaudianPlugin extends Plugin {
       return true;
     }
 
-    if (hasClaudianLeaf) {
+    if (hasDeanLeaf) {
       return false;
     }
 
     return true;
   }
 
-  private async ensureViewOpen(): Promise<ClaudianView | null> {
+  private async ensureViewOpen(): Promise<DeanView | null> {
     const existingView = this.getView();
     if (existingView) {
       return existingView;
@@ -424,10 +424,10 @@ export default class ClaudianPlugin extends Plugin {
     } catch {
       new Notice('Failed to remove obsolete Claude configuration');
     }
-    const { claudian } = await sharedStorage.initialize();
+    const { dean } = await sharedStorage.initialize();
     this.settings = {
-      ...DEFAULT_CLAUDIAN_SETTINGS,
-      ...claudian,
+      ...DEFAULT_DEAN_SETTINGS,
+      ...dean,
     };
     const normalizedWarmExecutionLimit = normalizeWarmExecutionLimit(
       this.settings.maxWarmAgentProcesses,
@@ -440,7 +440,7 @@ export default class ClaudianPlugin extends Plugin {
       async (settings) => {
         ProviderSettingsCoordinator.normalizeProviderSelection(settings);
         ProviderSettingsCoordinator.persistProjectedProviderState(settings);
-        await this.storage.saveClaudianSettings(settings);
+        await this.storage.saveDeanSettings(settings);
       },
     );
     this.chatModelSelectionCoordinator = new ChatModelSelectionCoordinator(
@@ -793,7 +793,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   private markPendingSessionInvalidations(
-    settings: ClaudianSettings,
+    settings: DeanSettings,
     providerIds: ProviderId[],
   ): Map<ProviderId, number> {
     const marked = this.stagePendingSessionInvalidations(settings, providerIds);
@@ -802,7 +802,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   private stagePendingSessionInvalidations(
-    settings: ClaudianSettings,
+    settings: DeanSettings,
     providerIds: ProviderId[],
   ): Map<ProviderId, number> {
     const pending = readPendingProviderSessionInvalidations(settings);
@@ -932,8 +932,8 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   async mutateSettings(
-    mutation: SettingsMutation<ClaudianSettings>,
-    onCommitted?: SettingsCommit<ClaudianSettings>,
+    mutation: SettingsMutation<DeanSettings>,
+    onCommitted?: SettingsCommit<DeanSettings>,
   ): Promise<void> {
     await this.settingsCoordinator.mutate(mutation, onCommitted);
   }
@@ -954,7 +954,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   async mutateSettingsConditionally(
-    mutation: ConditionalSettingsMutation<ClaudianSettings>,
+    mutation: ConditionalSettingsMutation<DeanSettings>,
   ): Promise<void> {
     await this.settingsCoordinator.mutateConditionally(mutation);
   }
@@ -977,7 +977,7 @@ export default class ClaudianPlugin extends Plugin {
 
   async applyProviderRuntimeSettings(
     providerIds: ProviderId[],
-    mutation: SettingsMutation<ClaudianSettings>,
+    mutation: SettingsMutation<DeanSettings>,
     onApplied?: () => void | Promise<void>,
   ): Promise<void> {
     const uniqueProviderIds = Array.from(new Set(providerIds));
@@ -995,7 +995,7 @@ export default class ClaudianPlugin extends Plugin {
 
   private async commitProviderRuntimeSettings(
     providerIds: ProviderId[],
-    mutation: SettingsMutation<ClaudianSettings>,
+    mutation: SettingsMutation<DeanSettings>,
     options: {
       failureMessage: string;
       onInvalidationsPersisted?: (
@@ -1433,17 +1433,17 @@ export default class ClaudianPlugin extends Plugin {
     return this.conversationRepository.list();
   }
 
-  getView(): ClaudianView | null {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDIAN);
-    return leaves.map(leaf => leaf.view).find(isClaudianView) ?? null;
+  getView(): DeanView | null {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_DEAN);
+    return leaves.map(leaf => leaf.view).find(isDeanView) ?? null;
   }
 
-  getAllViews(): ClaudianView[] {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDIAN);
-    return leaves.map(leaf => leaf.view).filter(isClaudianView);
+  getAllViews(): DeanView[] {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_DEAN);
+    return leaves.map(leaf => leaf.view).filter(isDeanView);
   }
 
-  findConversationAcrossViews(conversationId: string): { view: ClaudianView; tabId: string } | null {
+  findConversationAcrossViews(conversationId: string): { view: DeanView; tabId: string } | null {
     for (const view of this.getAllViews()) {
       const tabManager = view.getTabManager();
       if (!tabManager) continue;

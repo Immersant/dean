@@ -1,5 +1,5 @@
 /**
- * Claudian - Session Utilities
+ * Dean - Session Utilities
  *
  * Session recovery and history reconstruction.
  */

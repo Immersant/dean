@@ -31,7 +31,7 @@ export function buildTabRuntimeShell(
   const { plugin, conversation } = options;
   const id = options.tabId ?? generateTabId();
   const contentEl = options.containerEl.createDiv({
-    cls: 'claudian-tab-content claudian-hidden',
+    cls: 'dean-tab-content dean-hidden',
   });
   options.registerCleanup('tab DOM root', () => contentEl.remove());
 
@@ -152,18 +152,18 @@ export function buildTabRuntimeShell(
 }
 
 function buildTabDOM(contentEl: HTMLElement): TabDOMElements {
-  const messagesWrapperEl = contentEl.createDiv({ cls: 'claudian-messages-wrapper' });
-  const messagesEl = messagesWrapperEl.createDiv({ cls: 'claudian-messages' });
+  const messagesWrapperEl = contentEl.createDiv({ cls: 'dean-messages-wrapper' });
+  const messagesEl = messagesWrapperEl.createDiv({ cls: 'dean-messages' });
   const welcomeEl = createWelcomeElement(messagesEl);
-  const statusPanelContainerEl = contentEl.createDiv({ cls: 'claudian-status-panel-container' });
-  const inputComposerEl = contentEl.createDiv({ cls: 'claudian-input-composer' });
-  const inputContainerEl = inputComposerEl.createDiv({ cls: 'claudian-input-container' });
-  const queueIndicatorEl = inputContainerEl.createDiv({ cls: 'claudian-input-queue-row' });
-  const navRowEl = inputContainerEl.createDiv({ cls: 'claudian-input-nav-row' });
-  const inputWrapper = inputContainerEl.createDiv({ cls: 'claudian-input-wrapper' });
-  const contextRowEl = inputWrapper.createDiv({ cls: 'claudian-context-row' });
+  const statusPanelContainerEl = contentEl.createDiv({ cls: 'dean-status-panel-container' });
+  const inputComposerEl = contentEl.createDiv({ cls: 'dean-input-composer' });
+  const inputContainerEl = inputComposerEl.createDiv({ cls: 'dean-input-container' });
+  const queueIndicatorEl = inputContainerEl.createDiv({ cls: 'dean-input-queue-row' });
+  const navRowEl = inputContainerEl.createDiv({ cls: 'dean-input-nav-row' });
+  const inputWrapper = inputContainerEl.createDiv({ cls: 'dean-input-wrapper' });
+  const contextRowEl = inputWrapper.createDiv({ cls: 'dean-context-row' });
   const inputEl = inputWrapper.createEl('textarea', {
-    cls: 'claudian-input',
+    cls: 'dean-input',
     attr: {
       placeholder: 'Ask to make changes, @mention files, run /commands',
       rows: '3',

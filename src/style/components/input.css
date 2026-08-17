@@ -1,35 +1,35 @@
 /* Input area */
-.claudian-input-container {
+.dean-input-container {
   position: relative;
   padding: 12px 0 0 0;
 }
 
-.claudian-input-footer {
+.dean-input-footer {
   position: relative;
   flex-shrink: 0;
   padding: 6px 0 0 0;
 }
 
-.claudian-active-input-slot > .claudian-input-composer > .claudian-input-container {
+.dean-active-input-slot > .dean-input-composer > .dean-input-container {
   padding-top: 0;
 }
 
 /* Input wrapper (border container) - flex column so textarea expands when no chips */
-.claudian-input-wrapper {
-  --claudian-input-wrapper-border-color: var(--background-modifier-border);
-  --claudian-input-wrapper-box-shadow: none;
+.dean-input-wrapper {
+  --dean-input-wrapper-border-color: var(--background-modifier-border);
+  --dean-input-wrapper-box-shadow: none;
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 140px;
-  border: 1px solid var(--claudian-input-wrapper-border-color);
+  border: 1px solid var(--dean-input-wrapper-border-color);
   border-radius: 6px;
   background: var(--background-primary);
-  box-shadow: var(--claudian-input-wrapper-box-shadow);
+  box-shadow: var(--dean-input-wrapper-box-shadow);
 }
 
 /* Nav row (tab badges start, action icons end) - above input wrapper */
-.claudian-input-nav-row {
+.dean-input-nav-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,11 +37,11 @@
   min-height: 0;
 }
 
-.claudian-input-nav-row:empty {
+.dean-input-nav-row:empty {
   display: none;
 }
 
-.claudian-input-nav-content {
+.dean-input-nav-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,7 +49,7 @@
   min-width: 0;
 }
 
-.claudian-input-nav-actions {
+.dean-input-nav-actions {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -57,7 +57,7 @@
   margin-inline-start: auto;
 }
 
-.claudian-input-nav-btn {
+.dean-input-nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,26 +72,26 @@
   transition: color 0.15s ease, background 0.15s ease;
 }
 
-.claudian-input-nav-btn:hover {
+.dean-input-nav-btn:hover {
   color: var(--text-normal);
   background: var(--background-modifier-hover);
 }
 
-.claudian-input-nav-btn svg {
+.dean-input-nav-btn svg {
   width: 16px;
   height: 16px;
 }
 
-.claudian-new-tab-btn svg {
+.dean-new-tab-btn svg {
   width: 16.8px;
   height: 16.8px;
 }
 
-.claudian-input-wrapper textarea.claudian-input {
+.dean-input-wrapper textarea.dean-input {
   width: 100%;
   flex: 1 1 0;
-  min-height: var(--claudian-textarea-min-height, 60px);
-  max-height: var(--claudian-textarea-max-height, none);
+  min-height: var(--dean-textarea-min-height, 60px);
+  max-height: var(--dean-textarea-max-height, none);
   resize: none;
   padding: 8px 10px 10px 10px;
   border: none;
@@ -106,20 +106,20 @@
   unicode-bidi: plaintext; /* Proper BiDi text handling for mixed RTL/LTR */
 }
 
-.claudian-input-wrapper textarea.claudian-input:hover,
-.claudian-input-wrapper textarea.claudian-input:focus {
+.dean-input-wrapper textarea.dean-input:hover,
+.dean-input-wrapper textarea.dean-input:focus {
   outline: none;
   border: none;
   background: transparent;
   box-shadow: none;
 }
 
-.claudian-input-wrapper textarea.claudian-input::placeholder {
+.dean-input-wrapper textarea.dean-input::placeholder {
   color: var(--text-muted);
 }
 
 /* Input toolbar */
-.claudian-input-toolbar {
+.dean-input-toolbar {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -130,13 +130,13 @@
 }
 
 /* Hide secondary text when the full toolbar would wrap. */
-.claudian-input-toolbar--compact .claudian-thinking-effort > .claudian-thinking-label-text,
-.claudian-input-toolbar--compact .claudian-context-meter-percent {
+.dean-input-toolbar--compact .dean-thinking-effort > .dean-thinking-label-text,
+.dean-input-toolbar--compact .dean-context-meter-percent {
   display: none;
 }
 
 /* Composer queue status row (queued follow-up preview + steer action) */
-.claudian-input-queue-row {
+.dean-input-queue-row {
   display: none;
   font-size: 12px;
   color: var(--text-muted);
@@ -146,7 +146,7 @@
   padding: 0 2px 8px 2px;
 }
 
-.claudian-queue-indicator-text {
+.dean-queue-indicator-text {
   min-width: 0;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -154,14 +154,14 @@
   text-overflow: ellipsis;
 }
 
-.claudian-queue-indicator-actions {
+.dean-queue-indicator-actions {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.claudian-queue-indicator-action {
+.dean-queue-indicator-action {
   flex: 0 0 auto;
   padding: 1px 8px;
   border: 0;
@@ -171,17 +171,17 @@
   cursor: pointer;
 }
 
-.claudian-queue-indicator-action:hover {
+.dean-queue-indicator-action:hover {
   text-decoration: underline;
 }
 
-.claudian-queue-indicator-action[disabled] {
+.dean-queue-indicator-action[disabled] {
   color: var(--text-faint);
   cursor: default;
   text-decoration: none;
 }
 
-.claudian-queue-indicator-icon-action {
+.dean-queue-indicator-icon-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -196,29 +196,29 @@
   cursor: pointer;
 }
 
-.claudian-queue-indicator-icon-action:hover {
+.dean-queue-indicator-icon-action:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudian-queue-indicator-icon-action svg {
+.dean-queue-indicator-icon-action svg {
   width: 14px;
   height: 14px;
 }
 
 /* Light blue border when instruction mode is active */
-.claudian-input-wrapper.claudian-input-instruction-mode {
-  --claudian-input-wrapper-border-color: #60a5fa;
-  --claudian-input-wrapper-box-shadow: 0 0 0 1px #60a5fa;
+.dean-input-wrapper.dean-input-instruction-mode {
+  --dean-input-wrapper-border-color: #60a5fa;
+  --dean-input-wrapper-box-shadow: 0 0 0 1px #60a5fa;
 }
 
 /* Pink border when bash mode is active */
-.claudian-input-wrapper.claudian-input-bang-bash-mode {
-  --claudian-input-wrapper-border-color: #f472b6;
-  --claudian-input-wrapper-box-shadow: 0 0 0 1px #f472b6;
+.dean-input-wrapper.dean-input-bang-bash-mode {
+  --dean-input-wrapper-border-color: #f472b6;
+  --dean-input-wrapper-box-shadow: 0 0 0 1px #f472b6;
 }
 
 /* Monospace input while in bash mode */
-.claudian-input-wrapper.claudian-input-bang-bash-mode .claudian-input {
+.dean-input-wrapper.dean-input-bang-bash-mode .dean-input {
   font-family: var(--font-monospace);
 }
