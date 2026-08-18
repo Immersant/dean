@@ -288,6 +288,60 @@
       "name": "Включить двухпанельный режим",
       "desc": "Автоматически показывать менеджер сессий рядом с чатом, когда ширина представления не менее 600 px."
     },
+    "enableEditorSessionSections": {
+      "name": "Enable editor session sections",
+      "desc": "Allow agents to leave durable interactive sections in vault notes (Act buttons and Collect forms). Off by default."
+    },
+    "sessionSections": {
+      "blocked": {
+        "flagOff": "Editor session sections are disabled in settings.",
+        "conversationMissing": "That conversation is no longer available.",
+        "epochMismatch": "This section is stale after rewind. Ask the agent to write a new one.",
+        "viewUnavailable": "Could not open the Dean chat view.",
+        "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
+        "rewindInProgress": "Wait for rewind to finish before using section actions.",
+        "invalidRequest": "That section action is invalid."
+      },
+      "queuedReplaced": "Replaced the previous queued section action.",
+      "displayLabel": "Section: {label}",
+      "chip": {
+        "fallback": "Session section",
+        "openNoteAria": "Open session section note {path}"
+      },
+      "action": {
+        "resetAria": "Сбросить действие"
+      },
+      "openChat": {
+        "label": "Открыть чат",
+        "aria": "Открыть и сфокусировать чат Dean на боковой панели"
+      },
+      "badge": {
+        "act": "Actions",
+        "collect": "Questionnaire",
+        "stale": "Stale"
+      },
+      "collect": {
+        "hint": "Answers save into this note when you leave a field. Use an action button (for example I'm done) to send them to the agent.",
+        "writeBackUnavailable": "Answers cannot be saved from this surface. Edit the fence in the note instead.",
+        "readOnlyNote": "Fill answers in the form below. They save into this note on blur.",
+        "answerPrefix": "Answer: {answer}",
+        "multiLeafNote": "If this note is open in multiple panes, the last save wins."
+      },
+      "invalid": {
+        "title": "Invalid session section"
+      },
+      "confirm": {
+        "title": "Send section action",
+        "conversation": "Conversation",
+        "note": "Note",
+        "action": "Action",
+        "prompt": "Prompt that will be sent",
+        "send": "Send",
+        "archived": "Archived",
+        "stale": "Stale",
+        "unknownConversation": "Unknown conversation"
+      }
+    },
     "enableFilePane": {
       "name": "Включить панель файлов",
       "desc": "Показывать вкладку «Файлы» в менеджере сессий двухпанельного режима."
@@ -400,9 +454,40 @@
       }
     },
     "agentSkills": {
-      "sectionTitle": "Skills", "fixedRoot": "Managed in .agents/skills", "sharedExpectation": "Manage shared skills in .agents/skills/ for compatible providers.", "noSkills": "No shared skills configured. Click + to create one.", "skillBadge": "skill", "diagnosticsTitle": "Skills needing attention", "loadFailed": "Could not load shared skills.", "savedRefreshFailed": "Saved, but provider refresh failed.", "validationFailed": "Invalid skill: {message}", "collisionFailed": "A skill named \"{name}\" already exists.", "saveFailed": "Failed to save shared skill: {message}", "deleteFailed": "Failed to move shared skill to trash: {message}", "staleConflict": "This skill changed elsewhere; refresh before saving.", "created": "Shared skill \"{name}\" created.", "updated": "Shared skill \"{name}\" updated.", "deleted": "Shared skill \"{name}\" moved to trash.",
-      "modal": { "titleEdit": "Edit Shared Skill", "titleAdd": "Add Shared Skill", "name": "Skill name", "nameDesc": "Lowercase letters and numbers separated by single hyphens", "namePlaceholder": "code-reviewer", "description": "Description", "descriptionDesc": "Required portable description used by providers to select the skill", "descriptionPlaceholder": "Reviews code for correctness and maintainability", "instructions": "Instructions", "instructionsDesc": "Required SKILL.md instructions", "instructionsPlaceholder": "Review the supplied code and report actionable findings..." },
-      "delete": { "title": "Delete Shared Skill", "description": "The entire skill folder, including scripts, references, and assets, will be moved to trash.", "confirm": "Move to trash" }
+      "sectionTitle": "Skills",
+      "fixedRoot": "Managed in .agents/skills",
+      "sharedExpectation": "Manage shared skills in .agents/skills/ for compatible providers.",
+      "noSkills": "No shared skills configured. Click + to create one.",
+      "skillBadge": "skill",
+      "diagnosticsTitle": "Skills needing attention",
+      "loadFailed": "Could not load shared skills.",
+      "savedRefreshFailed": "Saved, but provider refresh failed.",
+      "validationFailed": "Invalid skill: {message}",
+      "collisionFailed": "A skill named \"{name}\" already exists.",
+      "saveFailed": "Failed to save shared skill: {message}",
+      "deleteFailed": "Failed to move shared skill to trash: {message}",
+      "staleConflict": "This skill changed elsewhere; refresh before saving.",
+      "created": "Shared skill \"{name}\" created.",
+      "updated": "Shared skill \"{name}\" updated.",
+      "deleted": "Shared skill \"{name}\" moved to trash.",
+      "modal": {
+        "titleEdit": "Edit Shared Skill",
+        "titleAdd": "Add Shared Skill",
+        "name": "Skill name",
+        "nameDesc": "Lowercase letters and numbers separated by single hyphens",
+        "namePlaceholder": "code-reviewer",
+        "description": "Description",
+        "descriptionDesc": "Required portable description used by providers to select the skill",
+        "descriptionPlaceholder": "Reviews code for correctness and maintainability",
+        "instructions": "Instructions",
+        "instructionsDesc": "Required SKILL.md instructions",
+        "instructionsPlaceholder": "Review the supplied code and report actionable findings..."
+      },
+      "delete": {
+        "title": "Delete Shared Skill",
+        "description": "The entire skill folder, including scripts, references, and assets, will be moved to trash.",
+        "confirm": "Move to trash"
+      }
     },
     "codexSkills": {
       "modal": {

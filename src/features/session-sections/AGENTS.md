@@ -1,0 +1,31 @@
+# Session Sections (feature)
+
+Obsidian editor widgets for durable `dean-session` fences: Act buttons and Collect forms.
+
+## Ownership
+
+| Module | Authority |
+| --- | --- |
+| `renderSessionSectionBlock` | Markdown code-block processor entry; gating (flag, path, Dean containers). |
+| `SessionSectionWidget` | DOM for one fence (title, Act buttons, Collect form controls). |
+| `CollectSessionSectionController` | In-memory Collect answers; flush on blur/destroy. |
+| `SessionSectionWriteBack` | Sole vault writer for Collect fences (`getSectionInfo` + `vault.modify`). |
+| `SessionSectionService` | Re-parse fence, confirm Act, call `FeatureHost.submitSessionSectionTurn`. |
+| `SessionSectionConfirmModal` | Full-prompt Act confirm (plain text, no markdown render of the prompt). |
+| `SessionSectionDiagnostics` | Bounded ring buffer for click/send outcomes (no `console.*`). |
+
+## Boundaries
+
+- Call `FeatureHost.submitSessionSectionTurn` only for **Act** clicks. Collect write-back stays vault-only and never starts a chat turn.
+- Collect forms may call `FeatureHost.focusSessionSectionChat` to open and focus the bound sidebar conversation. That path must not submit a turn.
+- Act buttons stay disabled after click until the adjacent reset control is used. Used-state is in-memory per note/section/action so Collect remounts keep the button spent.
+- Collect flushes on blur and widget destroy, not every keystroke (writes remount the processor).
+- Multi-leaf: last `vault.modify` wins; no cross-leaf debounce.
+- Must not import `InputController`, `TabManager`, `DeanPlugin`, or `src/app/`.
+- Schema/codec ownership stays in `src/core/session-sections/`.
+- Invalid fences render an error callout with no buttons.
+
+## Verification
+
+- Unit tests under `tests/unit/features/session-sections/`.
+- Processor must not activate in chat (`sourcePath === ''`) or inside Dean UI containers.

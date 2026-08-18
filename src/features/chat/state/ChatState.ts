@@ -5,6 +5,7 @@ import type {
   ChatStateData,
   PendingToolCall,
   QueuedMessage,
+  QueuedProgrammaticTurn,
   TabAttention,
   ThinkingBlockState,
   TodoItem,
@@ -21,6 +22,7 @@ function createInitialState(): ChatStateData {
     isSwitchingConversation: false,
     isRewinding: false,
     hasPendingConversationSave: false,
+    queuedProgrammaticTurn: null,
     currentConversationId: null,
     queuedMessage: null,
     currentContentEl: null,
@@ -185,6 +187,14 @@ export class ChatState {
 
   set queuedMessage(value: QueuedMessage | null) {
     this.state.queuedMessage = value;
+  }
+
+  get queuedProgrammaticTurn(): QueuedProgrammaticTurn | null {
+    return this.state.queuedProgrammaticTurn;
+  }
+
+  set queuedProgrammaticTurn(value: QueuedProgrammaticTurn | null) {
+    this.state.queuedProgrammaticTurn = value;
   }
 
   // ============================================
@@ -475,6 +485,7 @@ export class ChatState {
     this.resetStreamingState();
     this.clearMaps();
     this.state.queuedMessage = null;
+    this.state.queuedProgrammaticTurn = null;
     this.usage = null;
     this.currentTodos = null;
     this.clearAttention();

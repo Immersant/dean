@@ -107,6 +107,10 @@ function normalizeEnableFilePane(value: unknown): boolean {
     : DEFAULT_DEAN_SETTINGS.enableFilePane;
 }
 
+function normalizeEnableEditorSessionSections(value: unknown): boolean {
+  return typeof value === 'boolean' ? value : false;
+}
+
 function normalizeDualPaneSide(value: unknown): DualPaneSide {
   return typeof value === 'string'
     && (DUAL_PANE_SIDES as readonly string[]).includes(value)
@@ -129,6 +133,16 @@ function shouldPersistDualPaneNormalization(
   ) || (
     'dualPaneSide' in stored
     && stored.dualPaneSide !== dualPaneSide
+  );
+}
+
+function shouldPersistEditorSessionSectionsNormalization(
+  stored: Record<string, unknown>,
+  enableEditorSessionSections: boolean,
+): boolean {
+  return (
+    'enableEditorSessionSections' in stored
+    && stored.enableEditorSessionSections !== enableEditorSessionSections
   );
 }
 
@@ -389,6 +403,9 @@ export class DeanSettingsStorage {
     const enableDualPane = normalizeEnableDualPane(stored.enableDualPane);
     const enableFilePane = normalizeEnableFilePane(stored.enableFilePane);
     const dualPaneSide = normalizeDualPaneSide(stored.dualPaneSide);
+    const enableEditorSessionSections = normalizeEnableEditorSessionSections(
+      stored.enableEditorSessionSections,
+    );
     const legacyProviderSettings = {
       ...stored,
       hiddenProviderCommands,
@@ -409,6 +426,7 @@ export class DeanSettingsStorage {
       enableDualPane,
       enableFilePane,
       dualPaneSide,
+      enableEditorSessionSections,
       lastSelectedChatModel,
     };
 
@@ -445,6 +463,10 @@ export class DeanSettingsStorage {
         enableDualPane,
         enableFilePane,
         dualPaneSide,
+      )
+      || shouldPersistEditorSessionSectionsNormalization(
+        stored,
+        enableEditorSessionSections,
       )
       || JSON.stringify(envSnippets) !== JSON.stringify(stored.envSnippets ?? [])
       || (

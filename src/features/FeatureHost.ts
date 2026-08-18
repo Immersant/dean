@@ -4,6 +4,11 @@ import type { SharedAppStorage } from '../core/bootstrap/storage';
 import type { ProviderHost } from '../core/providers/ProviderHost';
 import type { ProviderId } from '../core/providers/types';
 import type {
+  SessionSectionFocusResult,
+  SessionSectionTurnRequest,
+  SessionSectionTurnResult,
+} from '../core/session-sections/SessionSectionTurn';
+import type {
   Conversation,
   ConversationMeta,
   DeanSettings,
@@ -88,4 +93,22 @@ export interface FeatureHost {
   findConversationAcrossViews(
     conversationId: string,
   ): { view: FeatureViewHost; tabId: TabId } | null;
+
+  /**
+   * Only feature-facing entry for Act session-section clicks.
+   * Resolves conversation, opens a retained tab, then sends via InputController.
+   */
+  submitSessionSectionTurn(
+    conversationId: string,
+    request: SessionSectionTurnRequest,
+  ): Promise<SessionSectionTurnResult>;
+
+  /**
+   * Open or reveal the Dean sidebar and focus the bound conversation composer.
+   * Does not submit a turn.
+   */
+  focusSessionSectionChat(conversationId: string): Promise<SessionSectionFocusResult>;
+
+  /** Refresh open markdown previews after enableEditorSessionSections toggles. */
+  refreshEditorSessionSectionPreviews(): void;
 }

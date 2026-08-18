@@ -85,6 +85,10 @@ describe('types.ts', () => {
       expect(DEFAULT_SETTINGS.enableFilePane).toBe(true);
       expect(DEFAULT_SETTINGS.dualPaneSide).toBe('right');
     });
+
+    it('should disable editor session sections by default', () => {
+      expect(DEFAULT_SETTINGS.enableEditorSessionSections).toBe(false);
+    });
   });
 
   describe('DeanSettings type', () => {
@@ -124,6 +128,7 @@ describe('types.ts', () => {
         expandFileEditsByDefault: false,
         chatViewPlacement: 'right-sidebar',
         enableDualPane: true,
+        enableEditorSessionSections: false,
         enableFilePane: true,
         dualPaneSide: 'right',
         hiddenProviderCommands: {
@@ -182,6 +187,7 @@ describe('types.ts', () => {
         expandFileEditsByDefault: false,
         chatViewPlacement: 'right-sidebar',
         enableDualPane: true,
+        enableEditorSessionSections: false,
         enableFilePane: true,
         dualPaneSide: 'right',
         hiddenProviderCommands: {
@@ -241,6 +247,7 @@ describe('types.ts', () => {
         expandFileEditsByDefault: true,
         chatViewPlacement: 'right-sidebar',
         enableDualPane: false,
+        enableEditorSessionSections: false,
         enableFilePane: false,
         dualPaneSide: 'left',
         hiddenProviderCommands: {

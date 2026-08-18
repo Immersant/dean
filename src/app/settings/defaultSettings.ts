@@ -56,6 +56,7 @@ export const DEFAULT_DEAN_SETTINGS: DeanSettings = {
   enableDualPane: true,
   enableFilePane: true,
   dualPaneSide: 'right',
+  enableEditorSessionSections: false,
   sessionManagerOrganization: 'list',
   sessionManagerSort: 'last-updated',
   pinnedLinkedNotePaths: [],

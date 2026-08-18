@@ -1,0 +1,424 @@
+/* Editor session sections (dean-session fences in vault notes) */
+
+.dean-session-section {
+  margin: 0.5em 0;
+  padding: 10px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  /* Interactive embeds must receive pointer events under CM Live Preview. */
+  pointer-events: auto;
+  user-select: text;
+}
+
+/* Language wrapper Obsidian adds for registerMarkdownCodeBlockProcessor */
+.block-language-dean-session,
+.cm-preview-code-block.block-language-dean-session,
+.markdown-source-view.mod-cm6 .cm-embed-block:has(.dean-session-section) {
+  pointer-events: auto;
+  user-select: text;
+}
+
+.dean-session-section--interactive,
+.dean-session-section--interactive input,
+.dean-session-section--interactive textarea,
+.dean-session-section--interactive button,
+.dean-session-section--interactive label {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.dean-session-section--interactive input[type="text"],
+.dean-session-section--interactive textarea {
+  cursor: text;
+}
+
+.dean-session-section--stale {
+  border-color: var(--text-warning);
+}
+
+.dean-session-section--invalid {
+  border-color: var(--text-error);
+  background: var(--background-primary);
+}
+
+.dean-session-section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.dean-session-section-title {
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.dean-session-section-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dean-session-section-badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.dean-session-section-badge--stale {
+  background: color-mix(in srgb, var(--text-warning) 25%, transparent);
+  color: var(--text-warning);
+}
+
+.dean-session-section-open-chat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 2px 6px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.dean-session-section-open-chat:hover,
+.dean-session-section-open-chat:focus-visible {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-normal);
+}
+
+.dean-session-section-open-chat:disabled,
+.dean-session-section-open-chat:disabled:hover,
+.dean-session-section-open-chat:disabled:focus-visible {
+  color: var(--text-faint);
+  cursor: default;
+}
+
+.dean-session-section-open-chat-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.dean-session-section-open-chat-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.dean-session-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.dean-session-section-action-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.dean-session-section-action {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--interactive-normal);
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+.dean-session-section-action:hover {
+  background: var(--interactive-hover);
+}
+
+.dean-session-section-action:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.dean-session-section-action:disabled:hover,
+.dean-session-section-action:disabled:focus-visible {
+  background: var(--interactive-normal);
+  color: var(--text-normal);
+}
+
+.dean-session-section-action-reset {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.dean-session-section-action-row--used .dean-session-section-action-reset {
+  display: inline-flex;
+}
+
+.dean-session-section-action-reset:hover,
+.dean-session-section-action-reset:focus-visible {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-normal);
+}
+
+.dean-session-section-action-reset:disabled,
+.dean-session-section-action-reset:disabled:hover,
+.dean-session-section-action-reset:disabled:focus-visible {
+  color: var(--text-faint);
+  cursor: default;
+}
+
+.dean-session-section-action-reset svg {
+  width: 14px;
+  height: 14px;
+}
+
+.dean-session-section-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dean-session-section-question-prompt {
+  font-size: 13px;
+  color: var(--text-normal);
+  margin-bottom: 4px;
+}
+
+.dean-session-section-question-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0 0 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.dean-session-section-question-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--text-normal);
+}
+
+.dean-session-section-question-option input {
+  margin-top: 2px;
+}
+
+.dean-session-section-question-input {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 12px;
+  font-family: var(--font-text);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.dean-session-section-question-answer {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.dean-session-section-collect-note {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.dean-session-section-invalid-title {
+  font-weight: 600;
+  color: var(--text-error);
+  margin-bottom: 4px;
+}
+
+.dean-session-section-invalid-message {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  white-space: pre-wrap;
+}
+
+.dean-session-section-inactive {
+  margin: 0;
+  padding: 10px 12px;
+  overflow: auto;
+  background: var(--background-primary-alt);
+  border-radius: 4px;
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+/* Chat history origin chip (Act turns) */
+
+.dean-session-section-message-chip {
+  display: flex;
+  margin: 0 0 6px;
+  max-width: 100%;
+}
+
+.dean-session-section-message-chip-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+button.dean-session-section-message-chip-main {
+  font: inherit;
+  text-align: left;
+}
+
+button.dean-session-section-message-chip-main:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--background-modifier-border-hover, var(--background-modifier-border));
+}
+
+.dean-session-section-message-chip-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+.dean-session-section-message-chip-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+.dean-session-section-message-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-normal);
+  font-weight: 500;
+}
+
+.dean-session-section-message-chip-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-faint);
+}
+
+.dean-session-section-message-chip-path::before {
+  content: '·';
+  margin-right: 6px;
+  color: var(--text-faint);
+}
+
+/* Confirm modal */
+
+.dean-session-section-confirm-modal .dean-session-section-confirm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.dean-session-section-confirm-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 13px;
+}
+
+.dean-session-section-confirm-label {
+  color: var(--text-muted);
+  min-width: 6em;
+}
+
+.dean-session-section-confirm-value {
+  color: var(--text-normal);
+  word-break: break-word;
+}
+
+.dean-session-section-confirm-badge {
+  margin-left: 6px;
+  font-size: 11px;
+  padding: 0 5px;
+  border-radius: 3px;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.dean-session-section-confirm-badge--stale {
+  color: var(--text-warning);
+}
+
+.dean-session-section-confirm-prompt-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.dean-session-section-confirm-prompt {
+  max-height: 240px;
+  overflow: auto;
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-normal);
+}
+
+.dean-session-section-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dean-session-section-confirm-cancel,
+.dean-session-section-confirm-send {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+}
+
+.dean-session-section-confirm-send {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}

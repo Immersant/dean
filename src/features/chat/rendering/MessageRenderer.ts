@@ -34,6 +34,7 @@ import {
 import type { FeatureHost } from '../../FeatureHost';
 import { findRewindContext } from '../rewind';
 import { formatConversationDirectoryTitle } from '../utils/conversationDirectoryTitle';
+import { renderSessionSectionMessageChip } from './sessionSectionMessageChip';
 import { renderCitationGroup as renderCitationBlock } from './CitationRenderer';
 import {
   prepareDisplayOnlyCodeFences,
@@ -183,6 +184,7 @@ export class MessageRenderer {
     const contentEl = msgEl.createDiv({ cls: 'dean-message-content', attr: { dir: 'auto' } });
 
     if (msg.role === 'user') {
+      this.renderSessionSectionOriginChip(contentEl, msg);
       const textToShow = this.getUserMessageTextToShow(msg);
       if (textToShow) {
         const textEl = contentEl.createDiv({ cls: 'dean-text-block' });
@@ -216,6 +218,8 @@ export class MessageRenderer {
     }
 
     contentEl.empty();
+
+    this.renderSessionSectionOriginChip(contentEl, msg);
 
     const textToShow = this.getUserMessageTextToShow(msg);
     if (textToShow) {
@@ -317,6 +321,7 @@ export class MessageRenderer {
     const contentEl = msgEl.createDiv({ cls: 'dean-message-content', attr: { dir: 'auto' } });
 
     if (msg.role === 'user') {
+      this.renderSessionSectionOriginChip(contentEl, msg);
       const textToShow = this.getUserMessageTextToShow(msg);
       if (textToShow) {
         const textEl = contentEl.createDiv({ cls: 'dean-text-block' });
@@ -926,6 +931,25 @@ export class MessageRenderer {
     const existing = msgEl.querySelector<HTMLElement>('.dean-user-msg-actions');
     if (existing) return existing;
     return msgEl.createDiv({ cls: 'dean-user-msg-actions' });
+  }
+
+  /**
+   * Origin chip for Act turns that left a sessionSection snapshot on the ledger.
+   * Click opens the host note; does not rewrite conversation.currentNote.
+   */
+  private renderSessionSectionOriginChip(
+    contentEl: HTMLElement,
+    msg: ChatMessage,
+  ): void {
+    const section = msg.executionInput?.context?.sessionSection;
+    if (!section) {
+      return;
+    }
+    renderSessionSectionMessageChip(contentEl, section, {
+      onOpenNote: (notePath) => {
+        void this.app.workspace.openLinkText(notePath, '', false);
+      },
+    });
   }
 
   private addUserCopyButton(msgEl: HTMLElement, content: string): void {

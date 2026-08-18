@@ -324,6 +324,74 @@ describe('MessageRenderer', () => {
     expect(renderContentSpy).toHaveBeenCalledWith(expect.anything(), 'user input only');
   });
 
+  it('renders a session-section origin chip from executionInput context', () => {
+    const messagesEl = createMockEl();
+    const openLinkText = jest.fn();
+    const { renderer } = createRenderer(messagesEl);
+    (renderer as any).app = { workspace: { openLinkText } };
+    jest.spyOn(renderer, 'renderContent').mockResolvedValue(undefined);
+
+    const msg: ChatMessage = {
+      id: 'u-section',
+      role: 'user',
+      content: 'Continue from the questionnaire answers in this note.',
+      displayContent: 'Section: Review',
+      timestamp: Date.now(),
+      executionInput: {
+        schemaVersion: 1,
+        canonicalText: 'Continue from the questionnaire answers in this note.',
+        context: {
+          sessionSection: {
+            sectionId: 'sec_collect',
+            notePath: 'Notes/Spec.md',
+            conversationId: 'conv-1',
+            kind: 'collect',
+            actionId: 'done',
+            actionLabel: 'Review',
+            title: 'Design feedback',
+          },
+        },
+      },
+    };
+
+    renderer.renderStoredMessage(msg);
+
+    const msgEl = messagesEl.children[0];
+    const contentEl = msgEl.children[0];
+    const chip = contentEl.children.find(
+      (child: any) => child.hasClass?.('dean-session-section-message-chip'),
+    );
+    expect(chip).toBeTruthy();
+    expect(chip.getAttribute('data-section-id')).toBe('sec_collect');
+    expect(chip.getAttribute('data-note-path')).toBe('Notes/Spec.md');
+
+    const main = chip.children.find(
+      (child: any) => child.hasClass?.('dean-session-section-message-chip-main'),
+    );
+    main.dispatchEvent('click', { preventDefault: () => {}, stopPropagation: () => {} });
+    expect(openLinkText).toHaveBeenCalledWith('Notes/Spec.md', '', false);
+  });
+
+  it('does not render a session-section chip for ordinary user turns', () => {
+    const messagesEl = createMockEl();
+    const { renderer } = createRenderer(messagesEl);
+    jest.spyOn(renderer, 'renderContent').mockResolvedValue(undefined);
+
+    renderer.renderStoredMessage({
+      id: 'u1',
+      role: 'user',
+      content: 'hello',
+      displayContent: 'hello',
+      timestamp: Date.now(),
+    });
+
+    const contentEl = messagesEl.children[0].children[0];
+    const chip = contentEl.children.find(
+      (child: any) => child.hasClass?.('dean-session-section-message-chip'),
+    );
+    expect(chip).toBeUndefined();
+  });
+
   it('renders extracted user display content when stored message has hidden XML context', () => {
     const messagesEl = createMockEl();
     const { renderer } = createRenderer(messagesEl);
