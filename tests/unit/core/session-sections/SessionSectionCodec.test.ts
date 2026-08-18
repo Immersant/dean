@@ -126,6 +126,7 @@ describe('SessionSectionCodec', () => {
   it.each([
     ['binding', { ...STANDALONE_COLLECT, conversationId: 'conv-1', epoch: 0 }],
     ['actions', { ...STANDALONE_COLLECT, actions: [{ id: 'go', label: 'Go', prompt: 'Go' }] }],
+    ['empty actions', { ...STANDALONE_COLLECT, actions: [] }],
     ['act kind', { ...STANDALONE_COLLECT, kind: 'act' }],
     ['false flag', { ...COLLECT_SECTION, startNewChat: false }],
   ])('rejects ambiguous standalone combination: %s', (_label, value) => {

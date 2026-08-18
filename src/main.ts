@@ -1569,13 +1569,23 @@ export default class DeanPlugin extends Plugin {
       return { status: 'blocked', reason: 'invalid-request' };
     }
 
-    const view = await this.ensureViewOpen();
+    let view: DeanView | null;
+    try {
+      view = await this.ensureViewOpen();
+    } catch {
+      view = null;
+    }
     if (!view) {
       new Notice(t('settings.sessionSections.blocked.viewUnavailable'));
       return { status: 'blocked', reason: 'view-unavailable' };
     }
 
-    const result = await view.openNewChatDraft(request.content);
+    let result: SessionSectionDraftResult;
+    try {
+      result = await view.openNewChatDraft(request.content);
+    } catch {
+      result = { status: 'blocked', reason: 'tab-not-ready' };
+    }
     if (result.status === 'blocked') {
       new Notice(t(
         result.reason === 'composer-unavailable'

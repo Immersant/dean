@@ -281,7 +281,7 @@ export function validateSessionSection(raw: unknown): SessionSection {
         'standalone collect sections must omit conversationId and epoch',
       );
     }
-    if (raw.actions !== undefined && actions.length > 0) {
+    if (raw.actions !== undefined) {
       throw new SessionSectionValidationError('standalone collect sections must omit actions');
     }
     return {

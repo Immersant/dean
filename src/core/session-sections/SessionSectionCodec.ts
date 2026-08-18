@@ -157,7 +157,13 @@ function formatScalar(value: unknown): string {
  * Serialize a SessionSection to a fence body. Re-validates before stringify.
  */
 export function serializeSessionSectionYaml(section: SessionSection): string {
-  const validated = validateSessionSection(section);
+  const validationInput = isStandaloneCollectSessionSection(section)
+    ? {
+        ...section,
+        actions: undefined,
+      }
+    : section;
+  const validated = validateSessionSection(validationInput);
   const payload: Record<string, unknown> = {
     schemaVersion: validated.schemaVersion,
     id: validated.id,

@@ -20,13 +20,19 @@ import { activateSessionSectionAction } from './SessionSectionService';
 import { openStandaloneCollectDraft } from './StandaloneCollectDraftService';
 
 const usedActions = new Set<string>();
+const openingStandaloneCollectDrafts = new Set<string>();
 
 function usedActionKey(notePath: string, sectionId: string, actionId: string): string {
   return `${notePath}\0${sectionId}\0${actionId}`;
 }
 
+function standaloneCollectDraftKey(notePath: string, sectionId: string): string {
+  return `${notePath}\0${sectionId}`;
+}
+
 export function clearUsedSessionSectionActions(): void {
   usedActions.clear();
+  openingStandaloneCollectDrafts.clear();
 }
 
 export interface RenderSessionSectionWidgetOptions {
@@ -141,6 +147,7 @@ function renderStartNewChatButton(
   },
 ): void {
   const { host, notePath, section, collect } = options;
+  const openingKey = standaloneCollectDraftKey(notePath, section.id);
   const actionsEl = containerEl.createDiv({ cls: 'dean-session-section-actions' });
   const button = actionsEl.createEl('button', {
     cls: 'dean-session-section-start-chat',
@@ -152,20 +159,22 @@ function renderStartNewChatButton(
   enableInteractiveControl(button);
   if (!collect) {
     button.setAttribute('disabled', 'true');
+  } else if (openingStandaloneCollectDrafts.has(openingKey)) {
+    button.setAttribute('disabled', 'true');
+    button.setAttribute('aria-busy', 'true');
   }
   containerEl.createDiv({
     cls: 'dean-session-section-collect-note',
     text: t('settings.sessionSections.newChat.hint'),
   });
 
-  let opening = false;
   button.addEventListener('click', (event) => {
     event.preventDefault?.();
     event.stopPropagation?.();
-    if (!collect || opening || button.hasAttribute('disabled')) {
+    if (!collect || openingStandaloneCollectDrafts.has(openingKey) || button.hasAttribute('disabled')) {
       return;
     }
-    opening = true;
+    openingStandaloneCollectDrafts.add(openingKey);
     button.setAttribute('disabled', 'true');
     button.setAttribute('aria-busy', 'true');
     void (async () => {
@@ -180,12 +189,10 @@ function renderStartNewChatButton(
           new Notice(t('settings.sessionSections.blocked.writeBackFailed'));
         }
       } finally {
-        opening = false;
-        try {
+        openingStandaloneCollectDrafts.delete(openingKey);
+        if (button.isConnected) {
           button.removeAttribute('aria-busy');
           button.removeAttribute('disabled');
-        } catch {
-          // Widget may have remounted.
         }
       }
     })();

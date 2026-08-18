@@ -217,6 +217,25 @@ describe('SessionSectionWidget Collect', () => {
     await opening.promise;
   });
 
+  it('keeps Start new chat locked across write-back remounts while opening', async () => {
+    const opening = deferred<{ status: 'opened' }>();
+    jest.mocked(openStandaloneCollectDraft).mockReturnValue(opening.promise);
+    const firstEl = renderStandaloneWidget();
+    const firstButton = findByClass(firstEl, 'dean-session-section-start-chat');
+    firstButton.click();
+
+    const remountedEl = renderStandaloneWidget();
+    const remountedButton = findByClass(remountedEl, 'dean-session-section-start-chat');
+    expect(remountedButton.hasAttribute('disabled')).toBe(true);
+    expect(remountedButton.getAttribute('aria-busy')).toBe('true');
+
+    remountedButton.click();
+    expect(openStandaloneCollectDraft).toHaveBeenCalledTimes(1);
+
+    opening.resolve({ status: 'opened' });
+    await opening.promise;
+  });
+
   it('keeps bound Open chat and Act actions on their existing paths', async () => {
     const host = {
       app: { vault: {} },

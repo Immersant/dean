@@ -3168,6 +3168,18 @@ describe('DeanPlugin', () => {
         sourceNotePath: 'Notes/Discovery.md',
       })).resolves.toEqual({ status: 'blocked', reason: 'invalid-request' });
     });
+
+    it('fails closed when opening the chat view rejects', async () => {
+      plugin.settings = { enableEditorSessionSections: true } as any;
+      (plugin as unknown as { ensureViewOpen: jest.Mock }).ensureViewOpen = jest.fn()
+        .mockRejectedValue(new Error('view activation failed'));
+
+      await expect(plugin.openSessionSectionDraft({
+        content: '# Discovery',
+        sourceNotePath: 'Notes/Discovery.md',
+      })).resolves.toEqual({ status: 'blocked', reason: 'view-unavailable' });
+      expect(Notice).toHaveBeenCalledWith(expect.any(String));
+    });
   });
 
   describe('updateConversation', () => {
