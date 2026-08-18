@@ -49,6 +49,10 @@ import type {
 import { DEFAULT_CHAT_PROVIDER_ID } from './core/providers/types';
 import { decodeSectionEpoch } from './core/session-sections/decodeSectionEpoch';
 import type {
+  SessionSectionDraftRequest,
+  SessionSectionDraftResult,
+} from './core/session-sections/SessionSectionDraft';
+import type {
   SessionSectionFocusResult,
   SessionSectionTurnRequest,
   SessionSectionTurnResult,
@@ -1548,6 +1552,36 @@ export default class DeanPlugin extends Plugin {
     if (result.status === 'blocked') {
       // InputController already surfaces Notices for its blocked reasons.
       return result;
+    }
+    return result;
+  }
+
+  async openSessionSectionDraft(
+    request: SessionSectionDraftRequest,
+  ): Promise<SessionSectionDraftResult> {
+    if (!this.settings.enableEditorSessionSections) {
+      new Notice(t('settings.sessionSections.blocked.flagOff'));
+      return { status: 'blocked', reason: 'flag-off' };
+    }
+
+    if (!request?.content?.trim() || !request.sourceNotePath?.trim()) {
+      new Notice(t('settings.sessionSections.blocked.invalidRequest'));
+      return { status: 'blocked', reason: 'invalid-request' };
+    }
+
+    const view = await this.ensureViewOpen();
+    if (!view) {
+      new Notice(t('settings.sessionSections.blocked.viewUnavailable'));
+      return { status: 'blocked', reason: 'view-unavailable' };
+    }
+
+    const result = await view.openNewChatDraft(request.content);
+    if (result.status === 'blocked') {
+      new Notice(t(
+        result.reason === 'composer-unavailable'
+          ? 'settings.sessionSections.blocked.composerUnavailable'
+          : 'settings.sessionSections.blocked.tabNotReady',
+      ));
     }
     return result;
   }

@@ -33,6 +33,11 @@ export {
   formatSessionSectionContext,
 } from './SessionSectionContext';
 export {
+  type SessionSectionDraftBlockReason,
+  type SessionSectionDraftRequest,
+  type SessionSectionDraftResult,
+} from './SessionSectionDraft';
+export {
   buildDeanSystemPromptAppendices,
   SESSION_SECTION_AUTHORING_APPENDIX,
 } from './sessionSectionPrompt';

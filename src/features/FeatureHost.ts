@@ -4,10 +4,12 @@ import type { SharedAppStorage } from '../core/bootstrap/storage';
 import type { ProviderHost } from '../core/providers/ProviderHost';
 import type { ProviderId } from '../core/providers/types';
 import type {
+  SessionSectionDraftRequest,
+  SessionSectionDraftResult,
   SessionSectionFocusResult,
   SessionSectionTurnRequest,
   SessionSectionTurnResult,
-} from '../core/session-sections/SessionSectionTurn';
+} from '../core/session-sections';
 import type {
   Conversation,
   ConversationMeta,
@@ -31,6 +33,7 @@ export interface FeatureTabManagerHost {
 export interface FeatureViewHost extends TabManagerViewHost {
   getActiveTab(): AssembledTabRuntime | null;
   getTabManager(): FeatureTabManagerHost | null;
+  openNewChatDraft(content: string): Promise<SessionSectionDraftResult>;
   notifyConversationListChanged(): void;
   refreshModelSelector(providerId?: ProviderId): void;
   refreshTabControls(): void;
@@ -108,6 +111,14 @@ export interface FeatureHost {
    * Does not submit a turn.
    */
   focusSessionSectionChat(conversationId: string): Promise<SessionSectionFocusResult>;
+
+  /**
+   * Open a fresh unbound chat draft with editable content.
+   * Does not resolve conversations, attach files, or submit a turn.
+   */
+  openSessionSectionDraft(
+    request: SessionSectionDraftRequest,
+  ): Promise<SessionSectionDraftResult>;
 
   /** Refresh open markdown previews after enableEditorSessionSections toggles. */
   refreshEditorSessionSectionPreviews(): void;
