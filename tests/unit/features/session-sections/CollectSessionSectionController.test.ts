@@ -1,6 +1,6 @@
 import { createMockEl } from '@test/helpers/MockElement';
 
-import { type SessionSection,validateSessionSection } from '@/core/session-sections';
+import { type SessionSection, validateSessionSection } from '@/core/session-sections';
 import { CollectSessionSectionController } from '@/features/session-sections/CollectSessionSectionController';
 import { clearSessionSectionDiagnostics } from '@/features/session-sections/SessionSectionDiagnostics';
 
