@@ -2,7 +2,7 @@ import type { App, MarkdownPostProcessorContext } from 'obsidian';
 import { MarkdownRenderChild } from 'obsidian';
 
 import type {
-  SessionSection,
+  CollectSessionSection,
   SessionSectionAnswers,
   SessionSectionQuestion,
 } from '../../core/session-sections';
@@ -16,7 +16,7 @@ export interface CollectSessionSectionControllerOptions {
   readonly el: HTMLElement;
   readonly ctx: MarkdownPostProcessorContext;
   readonly notePath: string;
-  readonly section: SessionSection;
+  readonly section: CollectSessionSection;
   readonly originalSource: string;
   readonly onAnswersChange?: (answers: SessionSectionAnswers) => void;
 }
@@ -29,7 +29,7 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
   private readonly app: App;
   private readonly ctx: MarkdownPostProcessorContext;
   private readonly notePath: string;
-  private readonly baseSection: SessionSection;
+  private readonly baseSection: CollectSessionSection;
   private readonly originalSource: string;
   private readonly onAnswersChange?: (answers: SessionSectionAnswers) => void;
   private answers: SessionSectionAnswers;
@@ -58,7 +58,7 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
     return cloneAnswers(this.answers);
   }
 
-  getSectionWithAnswers(): SessionSection {
+  getSectionWithAnswers(): CollectSessionSection {
     return {
       ...this.baseSection,
       answers: cloneAnswers(this.answers),

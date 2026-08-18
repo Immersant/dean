@@ -1,7 +1,10 @@
 import { parseYaml, stringifyYaml } from 'obsidian';
 
 import type { SessionSection } from './SessionSection';
-import { SESSION_SECTION_LIMITS } from './SessionSection';
+import {
+  isStandaloneCollectSessionSection,
+  SESSION_SECTION_LIMITS,
+} from './SessionSection';
 import {
   SessionSectionValidationError,
   validateSessionSection,
@@ -158,13 +161,17 @@ export function serializeSessionSectionYaml(section: SessionSection): string {
   const payload: Record<string, unknown> = {
     schemaVersion: validated.schemaVersion,
     id: validated.id,
-    conversationId: validated.conversationId,
-    epoch: validated.epoch,
     kind: validated.kind,
     title: validated.title,
     status: validated.status,
     createdAt: validated.createdAt,
   };
+  if (isStandaloneCollectSessionSection(validated)) {
+    payload.startNewChat = true;
+  } else {
+    payload.conversationId = validated.conversationId;
+    payload.epoch = validated.epoch;
+  }
   if (validated.actions.length > 0) {
     payload.actions = validated.actions.map(action => ({
       id: action.id,

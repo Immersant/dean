@@ -2,6 +2,7 @@ import type { App, MarkdownPostProcessorContext, TFile } from 'obsidian';
 import { TFile as ObsidianTFile } from 'obsidian';
 
 import {
+  isBoundSessionSection,
   parseSessionSectionYaml,
   serializeSessionSectionYaml,
   SESSION_SECTION_FENCE_LANGUAGE,
@@ -57,7 +58,7 @@ export async function writeSessionSectionToNote(
       level: 'error',
       code: 'writeback-read-failed',
       message,
-      conversationId: section.conversationId,
+      ...sectionDiagnosticBinding(section),
       sectionId: section.id,
     });
     return { status: 'failed', error: message };
@@ -74,7 +75,7 @@ export async function writeSessionSectionToNote(
       level: 'error',
       code: 'writeback-serialize-invalid',
       message,
-      conversationId: section.conversationId,
+      ...sectionDiagnosticBinding(section),
       sectionId: section.id,
     });
     return { status: 'failed', error: message };
@@ -86,7 +87,7 @@ export async function writeSessionSectionToNote(
       level: 'warn',
       code: 'writeback-no-range',
       message: 'Could not locate full fence range for write-back',
-      conversationId: section.conversationId,
+      ...sectionDiagnosticBinding(section),
       sectionId: section.id,
     });
     return { status: 'skipped', reason: 'no-range' };
@@ -108,7 +109,7 @@ export async function writeSessionSectionToNote(
       level: 'error',
       code: 'writeback-verify-failed',
       message: 'write would glue fence markers; aborted',
-      conversationId: section.conversationId,
+      ...sectionDiagnosticBinding(section),
       sectionId: section.id,
     });
     return { status: 'failed', error: 'write would glue fence markers; aborted' };
@@ -120,7 +121,7 @@ export async function writeSessionSectionToNote(
       level: 'error',
       code: 'writeback-verify-failed',
       message: 'post-write fence missing',
-      conversationId: section.conversationId,
+      ...sectionDiagnosticBinding(section),
       sectionId: section.id,
     });
     return { status: 'failed', error: 'post-write fence missing' };
@@ -133,7 +134,7 @@ export async function writeSessionSectionToNote(
       level: 'error',
       code: 'writeback-verify-failed',
       message,
-      conversationId: section.conversationId,
+      ...sectionDiagnosticBinding(section),
       sectionId: section.id,
     });
     return { status: 'failed', error: message };
@@ -145,7 +146,7 @@ export async function writeSessionSectionToNote(
       level: 'info',
       code: 'writeback-written',
       message: 'Collect answers flushed (full-fence)',
-      conversationId: section.conversationId,
+      ...sectionDiagnosticBinding(section),
       sectionId: section.id,
     });
     return { status: 'written' };
@@ -155,11 +156,17 @@ export async function writeSessionSectionToNote(
       level: 'error',
       code: 'writeback-failed',
       message,
-      conversationId: section.conversationId,
+      ...sectionDiagnosticBinding(section),
       sectionId: section.id,
     });
     return { status: 'failed', error: message };
   }
+}
+
+function sectionDiagnosticBinding(section: SessionSection): { conversationId?: string } {
+  return isBoundSessionSection(section)
+    ? { conversationId: section.conversationId }
+    : {};
 }
 
 export function buildFenceBlock(body: string, lineEnding: '\n' | '\r\n'): string {

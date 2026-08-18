@@ -1,5 +1,7 @@
 import {
+  isBoundSessionSection,
   parseSessionSectionYaml,
+  type BoundSessionSection,
   type SessionSection,
   type SessionSectionAction,
   type SessionSectionTurnRequest,
@@ -35,6 +37,17 @@ export async function activateSessionSectionAction(
       level: 'error',
       code: 'parse-failed',
       message,
+      actionId,
+    });
+    return { status: 'blocked', reason: 'invalid-request' };
+  }
+
+  if (!isBoundSessionSection(section)) {
+    recordSessionSectionDiagnostic({
+      level: 'error',
+      code: 'standalone-action-blocked',
+      message: 'Standalone Collect sections cannot activate actions',
+      sectionId: section.id,
       actionId,
     });
     return { status: 'blocked', reason: 'invalid-request' };
@@ -94,7 +107,7 @@ export async function activateSessionSectionAction(
 }
 
 export function buildSessionSectionTurnRequest(
-  section: SessionSection,
+  section: BoundSessionSection,
   action: SessionSectionAction,
   notePath: string,
 ): SessionSectionTurnRequest {

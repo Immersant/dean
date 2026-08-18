@@ -6,7 +6,7 @@ import type {
   SessionSectionAnswers,
   SessionSectionQuestion,
 } from '../../core/session-sections';
-import { serializeSessionSectionYaml } from '../../core/session-sections';
+import { isBoundSessionSection, serializeSessionSectionYaml } from '../../core/session-sections';
 import { t } from '../../i18n/i18n';
 import type { FeatureHost } from '../FeatureHost';
 import { CollectSessionSectionController } from './CollectSessionSectionController';
@@ -50,7 +50,9 @@ export function renderSessionSectionWidget(
     containerEl.addClass('dean-session-section--stale');
   }
   containerEl.setAttribute('data-section-id', section.id);
-  containerEl.setAttribute('data-conversation-id', section.conversationId);
+  if (isBoundSessionSection(section)) {
+    containerEl.setAttribute('data-conversation-id', section.conversationId);
+  }
   containerEl.setAttribute('data-kind', section.kind);
 
   const header = containerEl.createDiv({ cls: 'dean-session-section-header' });
@@ -72,7 +74,7 @@ export function renderSessionSectionWidget(
     });
   }
 
-  if (section.kind === 'collect' && section.questions.length > 0) {
+  if (section.kind === 'collect' && isBoundSessionSection(section) && section.questions.length > 0) {
     renderOpenChatButton(header, host, section.conversationId);
   }
 
@@ -98,7 +100,7 @@ export function renderSessionSectionWidget(
     });
   }
 
-  if (section.actions.length > 0) {
+  if (isBoundSessionSection(section) && section.actions.length > 0) {
     const actionsEl = containerEl.createDiv({ cls: 'dean-session-section-actions' });
     for (const action of section.actions) {
       renderActionButton(actionsEl, {

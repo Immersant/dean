@@ -1,6 +1,6 @@
 import { createMockEl } from '@test/helpers/MockElement';
 
-import { type SessionSection,validateSessionSection } from '@/core/session-sections';
+import { type BoundCollectSessionSection, validateSessionSection } from '@/core/session-sections';
 import { CollectSessionSectionController } from '@/features/session-sections/CollectSessionSectionController';
 import { clearSessionSectionDiagnostics } from '@/features/session-sections/SessionSectionDiagnostics';
 
@@ -14,7 +14,7 @@ jest.mock('@/features/session-sections/SessionSectionWriteBack', () => {
 
 import { writeSessionSectionToNote } from '@/features/session-sections/SessionSectionWriteBack';
 
-const SECTION: SessionSection = validateSessionSection({
+const SECTION = validateSessionSection({
   schemaVersion: 1,
   id: 'sec_collect',
   conversationId: 'conv-1',
@@ -44,7 +44,7 @@ const SECTION: SessionSection = validateSessionSection({
     notes: '',
   },
   actions: [],
-});
+}) as BoundCollectSessionSection;
 
 const BODY = 'schemaVersion: 1\nid: sec_collect\n';
 

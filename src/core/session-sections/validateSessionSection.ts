@@ -5,6 +5,7 @@ import {
   SESSION_SECTION_LIMITS,
   SESSION_SECTION_LOCAL_ID_PATTERN,
   SESSION_SECTION_SCHEMA_VERSION,
+  type BoundSessionSection,
   type SessionSection,
   type SessionSectionAction,
   type SessionSectionAnswers,
@@ -217,12 +218,11 @@ export function validateSessionSection(raw: unknown): SessionSection {
     );
   }
 
-  const conversationId = typeof raw.conversationId === 'string' ? raw.conversationId : '';
-  if (!isValidSessionMetadataId(conversationId)) {
-    throw new SessionSectionValidationError('conversationId is not a valid session metadata id');
-  }
-
+  const id = requireLocalId(raw.id, 'id');
   const kind = parseKind(raw.kind);
+  const title = requireNonEmptyString(raw.title, 'title', SESSION_SECTION_LIMITS.titleChars);
+  const status = parseStatus(raw.status);
+  const createdAt = parseCreatedAt(raw.createdAt);
   const actionsRaw = raw.actions === undefined ? [] : raw.actions;
   if (!Array.isArray(actionsRaw)) {
     throw new SessionSectionValidationError('actions must be an array');
@@ -252,6 +252,7 @@ export function validateSessionSection(raw: unknown): SessionSection {
 
   const actions = actionsRaw.map((action, index) => parseAction(action, index));
   const questions = questionsRaw.map((question, index) => parseQuestion(question, index));
+  const answers = parseAnswers(raw.answers);
   const actionIds = new Set<string>();
   for (const action of actions) {
     if (actionIds.has(action.id)) {
@@ -267,17 +268,53 @@ export function validateSessionSection(raw: unknown): SessionSection {
     questionIds.add(question.id);
   }
 
-  return {
+  if (raw.startNewChat !== undefined && raw.startNewChat !== true) {
+    throw new SessionSectionValidationError('startNewChat must be true when present');
+  }
+
+  if (raw.startNewChat === true) {
+    if (kind !== 'collect') {
+      throw new SessionSectionValidationError('startNewChat is only allowed for collect sections');
+    }
+    if (raw.conversationId !== undefined || raw.epoch !== undefined) {
+      throw new SessionSectionValidationError(
+        'standalone collect sections must omit conversationId and epoch',
+      );
+    }
+    if (raw.actions !== undefined && actions.length > 0) {
+      throw new SessionSectionValidationError('standalone collect sections must omit actions');
+    }
+    return {
+      schemaVersion: SESSION_SECTION_SCHEMA_VERSION,
+      id,
+      kind: 'collect',
+      title,
+      status,
+      createdAt,
+      startNewChat: true,
+      actions: [],
+      questions,
+      answers,
+    };
+  }
+
+  const conversationId = typeof raw.conversationId === 'string' ? raw.conversationId : '';
+  if (!isValidSessionMetadataId(conversationId)) {
+    throw new SessionSectionValidationError('conversationId is not a valid session metadata id');
+  }
+
+  const section: BoundSessionSection = {
     schemaVersion: SESSION_SECTION_SCHEMA_VERSION,
-    id: requireLocalId(raw.id, 'id'),
+    id,
     conversationId,
     epoch: decodeSectionEpoch(raw.epoch),
     kind,
-    title: requireNonEmptyString(raw.title, 'title', SESSION_SECTION_LIMITS.titleChars),
-    status: parseStatus(raw.status),
-    createdAt: parseCreatedAt(raw.createdAt),
+    title,
+    status,
+    createdAt,
     actions,
     questions,
-    answers: parseAnswers(raw.answers),
+    answers,
   };
+  return section;
 }

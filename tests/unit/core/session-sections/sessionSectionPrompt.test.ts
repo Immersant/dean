@@ -32,4 +32,10 @@ describe('buildDeanSystemPromptAppendices', () => {
       { kind: 'provider-default' },
     )).toEqual([SESSION_SECTION_AUTHORING_APPENDIX]);
   });
+
+  it('documents standalone new-chat Collect forms without invented conversation ids', () => {
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('startNewChat: true');
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('omit `conversationId` and `epoch`');
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('Never invent a conversation id');
+  });
 });

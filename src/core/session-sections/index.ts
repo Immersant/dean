@@ -5,6 +5,12 @@ export {
   SESSION_SECTION_LIMITS,
   SESSION_SECTION_LOCAL_ID_PATTERN,
   SESSION_SECTION_SCHEMA_VERSION,
+  isBoundSessionSection,
+  isStandaloneCollectSessionSection,
+  type BoundActSessionSection,
+  type BoundCollectSessionSection,
+  type BoundSessionSection,
+  type CollectSessionSection,
   type SessionSection,
   type SessionSectionAction,
   type SessionSectionAnswers,
@@ -13,6 +19,7 @@ export {
   type SessionSectionQuestionOption,
   type SessionSectionQuestionType,
   type SessionSectionStatus,
+  type StandaloneCollectSessionSection,
 } from './SessionSection';
 export {
   parseSessionSectionYaml,

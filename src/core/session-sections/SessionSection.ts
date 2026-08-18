@@ -46,16 +46,52 @@ export interface SessionSectionQuestion {
 
 export type SessionSectionAnswers = Record<string, string | string[]>;
 
-export interface SessionSection {
+interface SessionSectionBase {
   readonly schemaVersion: typeof SESSION_SECTION_SCHEMA_VERSION;
   readonly id: string;
-  readonly conversationId: string;
-  readonly epoch: number;
-  readonly kind: SessionSectionKind;
   readonly title: string;
   readonly status: SessionSectionStatus;
   readonly createdAt: number;
-  readonly actions: readonly SessionSectionAction[];
   readonly questions: readonly SessionSectionQuestion[];
   readonly answers: SessionSectionAnswers;
+}
+
+export interface BoundActSessionSection extends SessionSectionBase {
+  readonly kind: 'act';
+  readonly conversationId: string;
+  readonly epoch: number;
+  readonly actions: readonly SessionSectionAction[];
+  readonly startNewChat?: never;
+}
+
+export interface BoundCollectSessionSection extends SessionSectionBase {
+  readonly kind: 'collect';
+  readonly conversationId: string;
+  readonly epoch: number;
+  readonly actions: readonly SessionSectionAction[];
+  readonly startNewChat?: never;
+}
+
+export interface StandaloneCollectSessionSection extends SessionSectionBase {
+  readonly kind: 'collect';
+  readonly startNewChat: true;
+  readonly actions: readonly [];
+  readonly conversationId?: never;
+  readonly epoch?: never;
+}
+
+export type BoundSessionSection = BoundActSessionSection | BoundCollectSessionSection;
+export type CollectSessionSection = BoundCollectSessionSection | StandaloneCollectSessionSection;
+export type SessionSection = BoundSessionSection | StandaloneCollectSessionSection;
+
+export function isStandaloneCollectSessionSection(
+  section: SessionSection,
+): section is StandaloneCollectSessionSection {
+  return section.kind === 'collect' && section.startNewChat === true;
+}
+
+export function isBoundSessionSection(
+  section: SessionSection,
+): section is BoundSessionSection {
+  return !isStandaloneCollectSessionSection(section);
 }

@@ -1,4 +1,4 @@
-import { parseSessionSectionYaml } from '@/core/session-sections';
+import { isBoundSessionSection, parseSessionSectionYaml } from '@/core/session-sections';
 import type { FeatureHost } from '@/features/FeatureHost';
 import { clearSessionSectionDiagnostics } from '@/features/session-sections/SessionSectionDiagnostics';
 import {
@@ -35,6 +35,9 @@ describe('SessionSectionService', () => {
 
   it('buildSessionSectionTurnRequest uses prompt as canonical and short display label', () => {
     const section = parseSessionSectionYaml(VALID_ACT);
+    if (!isBoundSessionSection(section)) {
+      throw new Error('expected bound section fixture');
+    }
     const action = section.actions[0];
     const request = buildSessionSectionTurnRequest(section, action, 'Notes/Spec.md');
 

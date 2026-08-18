@@ -62,6 +62,20 @@ const COLLECT_SECTION: SessionSection = {
   },
 };
 
+const STANDALONE_COLLECT = {
+  schemaVersion: 1,
+  id: 'standalone_discovery',
+  kind: 'collect',
+  title: 'Discovery questions',
+  status: 'open',
+  createdAt: 1710000100000,
+  startNewChat: true,
+  questions: [
+    { id: 'goal', prompt: 'What should we build?', type: 'markdown' },
+  ],
+  answers: { goal: 'A reviewable workflow.' },
+} as const;
+
 describe('SessionSectionCodec', () => {
   it('parses an act section', () => {
     const section = parseSessionSectionYaml(ACT_YAML);
@@ -94,6 +108,33 @@ describe('SessionSectionCodec', () => {
     expect(serialized).toContain('approach');
     expect(serialized).toContain('done');
     expect(serialized).toContain('tabs');
+  });
+
+  it('accepts and round-trips standalone Collect sections without binding fields', () => {
+    const section = validateSessionSection(STANDALONE_COLLECT);
+    expect(section).toMatchObject({ kind: 'collect', startNewChat: true, actions: [] });
+    expect('conversationId' in section).toBe(false);
+    expect('epoch' in section).toBe(false);
+
+    const serialized = serializeSessionSectionYaml(section);
+    expect(serialized).toContain('startNewChat: true');
+    expect(serialized).not.toContain('conversationId:');
+    expect(serialized).not.toContain('epoch:');
+    expect(parseSessionSectionYaml(serialized)).toEqual(section);
+  });
+
+  it.each([
+    ['binding', { ...STANDALONE_COLLECT, conversationId: 'conv-1', epoch: 0 }],
+    ['actions', { ...STANDALONE_COLLECT, actions: [{ id: 'go', label: 'Go', prompt: 'Go' }] }],
+    ['act kind', { ...STANDALONE_COLLECT, kind: 'act' }],
+    ['false flag', { ...COLLECT_SECTION, startNewChat: false }],
+  ])('rejects ambiguous standalone combination: %s', (_label, value) => {
+    expect(() => validateSessionSection(value)).toThrow();
+  });
+
+  it('still accepts existing bound Act and Collect sections', () => {
+    expect(parseSessionSectionYaml(ACT_YAML).conversationId).toBeTruthy();
+    expect(validateSessionSection(COLLECT_SECTION).conversationId).toBeTruthy();
   });
 
   it('accepts provider session UUIDs as conversationId', () => {
