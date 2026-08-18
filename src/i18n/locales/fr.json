@@ -299,6 +299,8 @@
         "epochMismatch": "This section is stale after rewind. Ask the agent to write a new one.",
         "viewUnavailable": "Could not open the Dean chat view.",
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
+        "composerUnavailable": "Impossible d’ouvrir un nouveau brouillon de discussion.",
+        "writeBackFailed": "Impossible d’enregistrer les réponses du formulaire. La nouvelle discussion n’a pas été ouverte.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },
@@ -314,6 +316,15 @@
       "openChat": {
         "label": "Ouvrir le chat",
         "aria": "Ouvrir et activer le chat Dean dans la barre latérale"
+      },
+      "newChat": {
+        "label": "Démarrer un nouveau chat",
+        "aria": "Démarrer un nouveau brouillon de discussion Dean depuis ce formulaire",
+        "hint": "Les réponses sont enregistrées dans cette note. Démarrez une nouvelle discussion pour les relire dans un brouillon modifiable."
+      },
+      "newChatDraft": {
+        "sourceNote": "Note source : {path}",
+        "notAnswered": "Sans réponse"
       },
       "badge": {
         "act": "Actions",

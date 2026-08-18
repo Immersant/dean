@@ -299,6 +299,8 @@
         "epochMismatch": "This section is stale after rewind. Ask the agent to write a new one.",
         "viewUnavailable": "Could not open the Dean chat view.",
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
+        "composerUnavailable": "新しいチャットの下書きを開けませんでした。",
+        "writeBackFailed": "フォームの回答を保存できなかったため、新しいチャットは開かれませんでした。",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },
@@ -314,6 +316,15 @@
       "openChat": {
         "label": "チャットを開く",
         "aria": "サイドバーの Dean チャットを開いてフォーカスする"
+      },
+      "newChat": {
+        "label": "新しいチャットを開始",
+        "aria": "このフォームから新しい Dean チャットの下書きを開始",
+        "hint": "回答はこのノートに保存されます。新しいチャットを開始して、編集可能な下書きで確認してください。"
+      },
+      "newChatDraft": {
+        "sourceNote": "元のノート: {path}",
+        "notAnswered": "未回答"
       },
       "badge": {
         "act": "Actions",

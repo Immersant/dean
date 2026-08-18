@@ -300,6 +300,7 @@
         "viewUnavailable": "Could not open the Dean chat view.",
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
         "composerUnavailable": "Could not open a new chat draft.",
+        "writeBackFailed": "Could not save the form answers. The new chat was not opened.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },
@@ -315,6 +316,11 @@
       "openChat": {
         "label": "Open chat",
         "aria": "Open and focus the Dean chat sidebar"
+      },
+      "newChat": {
+        "label": "Start new chat",
+        "aria": "Start a new Dean chat draft from this form",
+        "hint": "Answers save into this note. Start a new chat to review them in an editable draft."
       },
       "newChatDraft": {
         "sourceNote": "Source note: {path}",

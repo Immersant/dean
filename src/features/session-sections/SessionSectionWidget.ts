@@ -1,17 +1,23 @@
 import type { MarkdownPostProcessorContext } from 'obsidian';
-import { setIcon } from 'obsidian';
+import { Notice, setIcon } from 'obsidian';
 
 import type {
   SessionSection,
   SessionSectionAnswers,
   SessionSectionQuestion,
+  StandaloneCollectSessionSection,
 } from '../../core/session-sections';
-import { isBoundSessionSection, serializeSessionSectionYaml } from '../../core/session-sections';
+import {
+  isBoundSessionSection,
+  isStandaloneCollectSessionSection,
+  serializeSessionSectionYaml,
+} from '../../core/session-sections';
 import { t } from '../../i18n/i18n';
 import type { FeatureHost } from '../FeatureHost';
 import { CollectSessionSectionController } from './CollectSessionSectionController';
 import { recordSessionSectionDiagnostic } from './SessionSectionDiagnostics';
 import { activateSessionSectionAction } from './SessionSectionService';
+import { openStandaloneCollectDraft } from './StandaloneCollectDraftService';
 
 const usedActions = new Set<string>();
 
@@ -100,6 +106,15 @@ export function renderSessionSectionWidget(
     });
   }
 
+  if (isStandaloneCollectSessionSection(section)) {
+    renderStartNewChatButton(containerEl, {
+      host,
+      notePath,
+      section,
+      collect,
+    });
+  }
+
   if (isBoundSessionSection(section) && section.actions.length > 0) {
     const actionsEl = containerEl.createDiv({ cls: 'dean-session-section-actions' });
     for (const action of section.actions) {
@@ -114,6 +129,67 @@ export function renderSessionSectionWidget(
       });
     }
   }
+}
+
+function renderStartNewChatButton(
+  containerEl: HTMLElement,
+  options: {
+    readonly host: FeatureHost;
+    readonly notePath: string;
+    readonly section: StandaloneCollectSessionSection;
+    readonly collect: CollectSessionSectionController | null;
+  },
+): void {
+  const { host, notePath, section, collect } = options;
+  const actionsEl = containerEl.createDiv({ cls: 'dean-session-section-actions' });
+  const button = actionsEl.createEl('button', {
+    cls: 'dean-session-section-start-chat',
+    text: t('settings.sessionSections.newChat.label'),
+  });
+  button.setAttribute('type', 'button');
+  button.setAttribute('aria-label', t('settings.sessionSections.newChat.aria'));
+  button.setAttribute('title', t('settings.sessionSections.newChat.aria'));
+  enableInteractiveControl(button);
+  if (!collect) {
+    button.setAttribute('disabled', 'true');
+  }
+  containerEl.createDiv({
+    cls: 'dean-session-section-collect-note',
+    text: t('settings.sessionSections.newChat.hint'),
+  });
+
+  let opening = false;
+  button.addEventListener('click', (event) => {
+    event.preventDefault?.();
+    event.stopPropagation?.();
+    if (!collect || opening || button.hasAttribute('disabled')) {
+      return;
+    }
+    opening = true;
+    button.setAttribute('disabled', 'true');
+    button.setAttribute('aria-busy', 'true');
+    void (async () => {
+      try {
+        const result = await openStandaloneCollectDraft({
+          host,
+          section,
+          notePath,
+          collect,
+        });
+        if (result.status === 'blocked' && result.reason === 'writeback-failed') {
+          new Notice(t('settings.sessionSections.blocked.writeBackFailed'));
+        }
+      } finally {
+        opening = false;
+        try {
+          button.removeAttribute('aria-busy');
+          button.removeAttribute('disabled');
+        } catch {
+          // Widget may have remounted.
+        }
+      }
+    })();
+  });
 }
 
 function renderOpenChatButton(

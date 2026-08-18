@@ -299,6 +299,8 @@
         "epochMismatch": "This section is stale after rewind. Ask the agent to write a new one.",
         "viewUnavailable": "Could not open the Dean chat view.",
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
+        "composerUnavailable": "Ein neuer Chatentwurf konnte nicht geöffnet werden.",
+        "writeBackFailed": "Die Formularantworten konnten nicht gespeichert werden. Der neue Chat wurde nicht geöffnet.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },
@@ -314,6 +316,15 @@
       "openChat": {
         "label": "Chat öffnen",
         "aria": "Dean-Chat in der Seitenleiste öffnen und fokussieren"
+      },
+      "newChat": {
+        "label": "Neuen Chat starten",
+        "aria": "Einen neuen Dean-Chatentwurf aus diesem Formular starten",
+        "hint": "Antworten werden in dieser Notiz gespeichert. Starten Sie einen neuen Chat, um sie in einem bearbeitbaren Entwurf zu prüfen."
+      },
+      "newChatDraft": {
+        "sourceNote": "Quellnotiz: {path}",
+        "notAnswered": "Nicht beantwortet"
       },
       "badge": {
         "act": "Actions",

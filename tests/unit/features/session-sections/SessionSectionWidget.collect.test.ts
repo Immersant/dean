@@ -1,7 +1,8 @@
 import { createMockEl } from '@test/helpers/MockElement';
 
 import {
-  type SessionSection,
+  type BoundCollectSessionSection,
+  type StandaloneCollectSessionSection,
   validateSessionSection,
 } from '@/core/session-sections';
 import type { FeatureHost } from '@/features/FeatureHost';
@@ -22,13 +23,29 @@ jest.mock('@/features/session-sections/SessionSectionWriteBack', () => {
   };
 });
 
+jest.mock('@/features/session-sections/StandaloneCollectDraftService', () => ({
+  openStandaloneCollectDraft: jest.fn().mockResolvedValue({ status: 'opened' }),
+}));
+
 import { activateSessionSectionAction } from '@/features/session-sections/SessionSectionService';
 import {
   enableInteractiveEmbed,
 } from '@/features/session-sections/SessionSectionWidget';
 import { writeSessionSectionToNote } from '@/features/session-sections/SessionSectionWriteBack';
+import { openStandaloneCollectDraft } from '@/features/session-sections/StandaloneCollectDraftService';
 
-const SECTION: SessionSection = validateSessionSection({
+function deferred<T>(): {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+} {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>(resolver => {
+    resolve = resolver;
+  });
+  return { promise, resolve };
+}
+
+const SECTION = validateSessionSection({
   schemaVersion: 1,
   id: 'sec_collect',
   conversationId: 'conv-1',
@@ -64,9 +81,25 @@ const SECTION: SessionSection = validateSessionSection({
       prompt: 'Continue from the questionnaire answers in this note.',
     },
   ],
-});
+}) as BoundCollectSessionSection;
 
 const BODY = 'schemaVersion: 1\nid: sec_collect\n';
+
+const STANDALONE_SECTION = validateSessionSection({
+  schemaVersion: 1,
+  id: 'standalone_collect',
+  kind: 'collect',
+  title: 'Discovery',
+  status: 'open',
+  createdAt: 1710000100000,
+  startNewChat: true,
+  questions: [
+    { id: 'goal', prompt: 'What should we build?', type: 'markdown' },
+  ],
+  answers: { goal: '' },
+}) as StandaloneCollectSessionSection;
+
+const STANDALONE_BODY = 'schemaVersion: 1\nid: standalone_collect\nstartNewChat: true\n';
 
 function findInputs(el: any, type: string): any[] {
   const results: any[] = [];
@@ -97,10 +130,116 @@ function findButton(el: any): any | null {
   return findByClass(el, 'dean-session-section-action');
 }
 
+function createCtx(): any {
+  return {
+    addChild: jest.fn((child: { load?: () => void }) => {
+      child.load?.();
+      return child;
+    }),
+    getSectionInfo: () => null,
+  };
+}
+
+function renderStandaloneWidget(options: {
+  host?: FeatureHost;
+  ctx?: any;
+} = {}): HTMLElement {
+  const el = createMockEl() as unknown as HTMLElement;
+  const host = options.host ?? ({
+    app: { vault: {} },
+    focusSessionSectionChat: jest.fn(),
+    openSessionSectionDraft: jest.fn(),
+    submitSessionSectionTurn: jest.fn(),
+  } as unknown as FeatureHost);
+  renderSessionSectionWidget({
+    host,
+    containerEl: el,
+    source: STANDALONE_BODY,
+    notePath: 'Notes/Discovery.md',
+    section: STANDALONE_SECTION,
+    ctx: Object.prototype.hasOwnProperty.call(options, 'ctx') ? options.ctx : createCtx(),
+  });
+  return el;
+}
+
+function renderBoundCollectWidget(host: FeatureHost): HTMLElement {
+  const el = createMockEl() as unknown as HTMLElement;
+  renderSessionSectionWidget({
+    host,
+    containerEl: el,
+    source: BODY,
+    notePath: 'Notes/Spec.md',
+    section: SECTION,
+    ctx: createCtx(),
+  });
+  return el;
+}
+
 describe('SessionSectionWidget Collect', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     clearUsedSessionSectionActions();
+  });
+
+  it('renders Start new chat instead of Open chat for standalone Collect', () => {
+    const el = createMockEl() as unknown as HTMLElement;
+    const host = {
+      app: { vault: {} },
+      openSessionSectionDraft: jest.fn(),
+    } as unknown as FeatureHost;
+    const ctx = createCtx();
+
+    renderSessionSectionWidget({
+      host,
+      containerEl: el,
+      source: STANDALONE_BODY,
+      notePath: 'Notes/Discovery.md',
+      section: STANDALONE_SECTION,
+      ctx,
+    });
+
+    expect(findByClass(el, 'dean-session-section-start-chat')).not.toBeNull();
+    expect(findByClass(el, 'dean-session-section-open-chat')).toBeNull();
+    expect(el.getAttribute('data-conversation-id')).toBeNull();
+  });
+
+  it('disables duplicate Start new chat clicks while opening', async () => {
+    const opening = deferred<{ status: 'opened' }>();
+    jest.mocked(openStandaloneCollectDraft).mockReturnValue(opening.promise);
+    const el = renderStandaloneWidget();
+    const button = findByClass(el, 'dean-session-section-start-chat');
+    button.click();
+    button.click();
+    expect(openStandaloneCollectDraft).toHaveBeenCalledTimes(1);
+    expect(button.hasAttribute('disabled')).toBe(true);
+    expect(button.getAttribute('aria-busy')).toBe('true');
+    opening.resolve({ status: 'opened' });
+    await opening.promise;
+  });
+
+  it('keeps bound Open chat and Act actions on their existing paths', async () => {
+    const host = {
+      app: { vault: {} },
+      focusSessionSectionChat: jest.fn().mockResolvedValue({ status: 'focused' }),
+      openSessionSectionDraft: jest.fn(),
+      submitSessionSectionTurn: jest.fn(),
+    } as unknown as FeatureHost;
+    const el = renderBoundCollectWidget(host);
+    findByClass(el, 'dean-session-section-open-chat').click();
+    for (let i = 0; i < 20 && jest.mocked(host.focusSessionSectionChat).mock.calls.length === 0; i++) {
+      await Promise.resolve();
+    }
+
+    expect(host.focusSessionSectionChat).toHaveBeenCalledWith('conv-1');
+    expect(host.openSessionSectionDraft).not.toHaveBeenCalled();
+    expect(host.submitSessionSectionTurn).not.toHaveBeenCalled();
+  });
+
+  it('disables Start new chat when answer write-back cannot be durable', () => {
+    const el = renderStandaloneWidget({ ctx: undefined });
+    const button = findByClass(el, 'dean-session-section-start-chat');
+    expect(button).not.toBeNull();
+    expect(button.hasAttribute('disabled')).toBe(true);
   });
 
   it('renders interactive Collect controls and Act buttons', () => {

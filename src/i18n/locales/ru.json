@@ -299,6 +299,8 @@
         "epochMismatch": "This section is stale after rewind. Ask the agent to write a new one.",
         "viewUnavailable": "Could not open the Dean chat view.",
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
+        "composerUnavailable": "Не удалось открыть новый черновик чата.",
+        "writeBackFailed": "Не удалось сохранить ответы формы. Новый чат не был открыт.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },
@@ -314,6 +316,15 @@
       "openChat": {
         "label": "Открыть чат",
         "aria": "Открыть и сфокусировать чат Dean на боковой панели"
+      },
+      "newChat": {
+        "label": "Начать новый чат",
+        "aria": "Начать новый черновик чата Dean из этой формы",
+        "hint": "Ответы сохраняются в этой заметке. Начните новый чат, чтобы проверить их в редактируемом черновике."
+      },
+      "newChatDraft": {
+        "sourceNote": "Исходная заметка: {path}",
+        "notAnswered": "Нет ответа"
       },
       "badge": {
         "act": "Actions",

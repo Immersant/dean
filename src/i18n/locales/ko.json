@@ -299,6 +299,8 @@
         "epochMismatch": "This section is stale after rewind. Ask the agent to write a new one.",
         "viewUnavailable": "Could not open the Dean chat view.",
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
+        "composerUnavailable": "새 채팅 초안을 열 수 없습니다.",
+        "writeBackFailed": "양식 답변을 저장할 수 없어 새 채팅을 열지 않았습니다.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },
@@ -314,6 +316,15 @@
       "openChat": {
         "label": "채팅 열기",
         "aria": "사이드바 Dean 채팅을 열고 포커스하기"
+      },
+      "newChat": {
+        "label": "새 채팅 시작",
+        "aria": "이 양식에서 새 Dean 채팅 초안 시작",
+        "hint": "답변은 이 노트에 저장됩니다. 새 채팅을 시작하여 편집 가능한 초안에서 검토하세요."
+      },
+      "newChatDraft": {
+        "sourceNote": "원본 노트: {path}",
+        "notAnswered": "답변 없음"
       },
       "badge": {
         "act": "Actions",

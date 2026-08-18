@@ -190,6 +190,36 @@
   height: 14px;
 }
 
+.dean-session-section-start-chat {
+  padding: 4px 10px;
+  border: 1px solid var(--interactive-accent);
+  border-radius: 4px;
+  background: var(--interactive-accent);
+  box-shadow: none;
+  color: var(--text-on-accent);
+  cursor: pointer;
+}
+
+.dean-session-section-start-chat:hover,
+.dean-session-section-start-chat:focus-visible,
+.dean-session-section-start-chat:active {
+  border-color: var(--interactive-accent-hover, var(--interactive-accent));
+  background: var(--interactive-accent-hover, var(--interactive-accent));
+  box-shadow: none;
+  color: var(--text-on-accent);
+}
+
+.dean-session-section-start-chat:disabled,
+.dean-session-section-start-chat:disabled:hover,
+.dean-session-section-start-chat:disabled:focus-visible,
+.dean-session-section-start-chat:disabled:active {
+  border-color: var(--background-modifier-border);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-faint);
+  cursor: default;
+}
+
 .dean-session-section-questions {
   display: flex;
   flex-direction: column;

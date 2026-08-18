@@ -299,6 +299,8 @@
         "epochMismatch": "This section is stale after rewind. Ask the agent to write a new one.",
         "viewUnavailable": "Could not open the Dean chat view.",
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
+        "composerUnavailable": "无法打开新的聊天草稿。",
+        "writeBackFailed": "无法保存表单答案，因此未打开新聊天。",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },
@@ -314,6 +316,15 @@
       "openChat": {
         "label": "打开聊天",
         "aria": "打开并聚焦侧边栏中的 Dean 聊天"
+      },
+      "newChat": {
+        "label": "开始新聊天",
+        "aria": "从此表单开始新的 Dean 聊天草稿",
+        "hint": "答案会保存到此笔记中。开始新聊天以在可编辑草稿中查看答案。"
+      },
+      "newChatDraft": {
+        "sourceNote": "源笔记：{path}",
+        "notAnswered": "未回答"
       },
       "badge": {
         "act": "Actions",

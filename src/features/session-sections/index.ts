@@ -51,3 +51,8 @@ export {
   writeSessionSectionToNote,
 } from './SessionSectionWriteBack';
 export { formatStandaloneCollectDraft } from './StandaloneCollectDraft';
+export {
+  openStandaloneCollectDraft,
+  type OpenStandaloneCollectDraftOptions,
+  type StandaloneCollectDraftOpenResult,
+} from './StandaloneCollectDraftService';
