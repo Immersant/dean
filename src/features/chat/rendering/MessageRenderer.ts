@@ -34,12 +34,12 @@ import {
 import type { FeatureHost } from '../../FeatureHost';
 import { findRewindContext } from '../rewind';
 import { formatConversationDirectoryTitle } from '../utils/conversationDirectoryTitle';
-import { renderSessionSectionMessageChip } from './sessionSectionMessageChip';
 import { renderCitationGroup as renderCitationBlock } from './CitationRenderer';
 import {
   prepareDisplayOnlyCodeFences,
   restoreDisplayOnlyCodeFences,
 } from './DisplayOnlyCodeFences';
+import { renderSessionSectionMessageChip } from './sessionSectionMessageChip';
 import { resolveSubagentAdapter } from './subagentAdapterResolution';
 import {
   renderStoredAsyncSubagent,

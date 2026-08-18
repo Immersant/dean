@@ -10,8 +10,8 @@ import {
 import { ProviderRegistry } from '../../core/providers/ProviderRegistry';
 import { ProviderSettingsCoordinator } from '../../core/providers/ProviderSettingsCoordinator';
 import { type AppTabManagerState, DEFAULT_CHAT_PROVIDER_ID, type ProviderId } from '../../core/providers/types';
-import { type ConversationMeta, VIEW_TYPE_DEAN } from '../../core/types';
 import type { SessionSectionDraftResult } from '../../core/session-sections';
+import { type ConversationMeta, VIEW_TYPE_DEAN } from '../../core/types';
 import {
   cancelScheduledAnimationFrame,
   scheduleAnimationFrame,

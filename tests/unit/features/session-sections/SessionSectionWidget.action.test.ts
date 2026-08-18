@@ -1,6 +1,5 @@
-import { setIcon } from 'obsidian';
-
 import { createMockEl } from '@test/helpers/MockElement';
+import { setIcon } from 'obsidian';
 
 import {
   type SessionSection,

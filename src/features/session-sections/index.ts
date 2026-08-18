@@ -1,7 +1,7 @@
 export {
   CollectSessionSectionController,
-  type CollectSessionSectionFlushResult,
   type CollectSessionSectionControllerOptions,
+  type CollectSessionSectionFlushResult,
   isSelectableQuestion,
 } from './CollectSessionSectionController';
 export { refreshSessionSectionPreviews } from './refreshSessionSectionPreviews';
@@ -42,10 +42,10 @@ export {
   computeAnswersDigest,
   detectLineEnding,
   expandToFullFence,
-  findFenceBySectionId,
-  resolveFenceRange,
   type FenceRange,
   type FenceRangeKind,
+  findFenceBySectionId,
+  resolveFenceRange,
   type SessionSectionWriteBackOptions,
   type SessionSectionWriteBackResult,
   writeSessionSectionToNote,

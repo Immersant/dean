@@ -356,9 +356,10 @@ describe('SessionSectionWidget Collect', () => {
     for (const call of pointerCalls) {
       // Capture would be true as the third argument and would block Act button clicks.
       expect(call[2]).not.toBe(true);
-      if (call[2] && typeof call[2] === 'object') {
-        expect((call[2] as { capture?: boolean }).capture).not.toBe(true);
-      }
+      const usesCapture = !!call[2]
+        && typeof call[2] === 'object'
+        && (call[2] as { capture?: boolean }).capture === true;
+      expect(usesCapture).toBe(false);
     }
   });
 

@@ -1,11 +1,11 @@
 import { isValidSessionMetadataId } from '../bootstrap/SessionStorage';
 import { decodeSectionEpoch } from './decodeSectionEpoch';
 import {
+  type BoundSessionSection,
   SESSION_SECTION_FORBIDDEN_KEYS,
   SESSION_SECTION_LIMITS,
   SESSION_SECTION_LOCAL_ID_PATTERN,
   SESSION_SECTION_SCHEMA_VERSION,
-  type BoundSessionSection,
   type SessionSection,
   type SessionSectionAction,
   type SessionSectionAnswers,

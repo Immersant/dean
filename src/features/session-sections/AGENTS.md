@@ -9,6 +9,7 @@ Obsidian editor widgets for durable `dean-session` fences: Act buttons and Colle
 | `renderSessionSectionBlock` | Markdown code-block processor entry; gating (flag, path, Dean containers). |
 | `SessionSectionWidget` | DOM for one fence (title, Act buttons, Collect form controls). |
 | `CollectSessionSectionController` | In-memory Collect answers; flush on blur/destroy. |
+| `StandaloneCollectDraftService` | Snapshot standalone Collect answers, require durable write-back, and request a fresh unsent draft. |
 | `SessionSectionWriteBack` | Sole vault writer for Collect fences (`getSectionInfo` + `vault.modify`). |
 | `SessionSectionService` | Re-parse fence, confirm Act, call `FeatureHost.submitSessionSectionTurn`. |
 | `SessionSectionConfirmModal` | Full-prompt Act confirm (plain text, no markdown render of the prompt). |
@@ -18,6 +19,9 @@ Obsidian editor widgets for durable `dean-session` fences: Act buttons and Colle
 
 - Call `FeatureHost.submitSessionSectionTurn` only for **Act** clicks. Collect write-back stays vault-only and never starts a chat turn.
 - Collect forms may call `FeatureHost.focusSessionSectionChat` to open and focus the bound sidebar conversation. That path must not submit a turn.
+- Standalone Collect forms use `startNewChat: true` and have no conversation binding or Act actions.
+- `FeatureHost.openSessionSectionDraft` may open only an unsent fresh draft; it must not resolve a conversation or initialize provider execution.
+- Bound Collect `Open chat`, bound Act actions, and standalone `Start new chat` are separate paths and must not fall back to one another.
 - Act buttons stay disabled after click until the adjacent reset control is used. Used-state is in-memory per note/section/action so Collect remounts keep the button spent.
 - Collect flushes on blur and widget destroy, not every keystroke (writes remount the processor).
 - Multi-leaf: last `vault.modify` wins; no cross-leaf debounce.

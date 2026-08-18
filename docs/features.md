@@ -94,6 +94,29 @@ The **Inline edit** command runs against the active Markdown view.
 
 The edit itself is an auxiliary provider execution (`InlineEditService` in `src/core/auxiliary/`). It uses the same backends as chat but a separate session, a dedicated prompt (`src/core/prompt/inlineEdit.ts`), a **read-only** tool policy, and `PASSIVE_AUXILIARY_INTERACTION_PORT` (no approval or ask-user UI). The composer can mention vault files and attach the same external-context directories as the active tab.
 
+## Editor session sections
+
+Editor session sections are opt-in through **Enable editor session sections** in settings. They are fenced `dean-session` YAML blocks that agents can leave in vault notes for durable actions or forms.
+
+Bound Act sections submit a prepared prompt after user confirmation. Bound Collect sections save answers back into the note and can focus their existing conversation with **Open chat**.
+
+Standalone Collect sections declare `startNewChat: true`, omit `conversationId`, `epoch`, and actions, then open an unsent editable draft in a fresh Dean chat using the current default provider and model. The source note path appears in the draft text only; Dean does not automatically attach the note as execution context.
+
+```dean-session
+schemaVersion: 1
+id: discovery
+kind: collect
+title: Discovery questions
+status: open
+createdAt: 1786992000000
+startNewChat: true
+questions:
+  - id: goal
+    prompt: What should we build?
+    type: markdown
+answers: {}
+```
+
 ## Settings
 
 `DeanSettingTab` (`src/features/settings/DeanSettings.ts`) is the Obsidian settings tab. Tabs are `general` plus one tab per registered provider id.

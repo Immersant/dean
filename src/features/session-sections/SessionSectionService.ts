@@ -1,7 +1,7 @@
 import {
+  type BoundSessionSection,
   isBoundSessionSection,
   parseSessionSectionYaml,
-  type BoundSessionSection,
   type SessionSection,
   type SessionSectionAction,
   type SessionSectionTurnRequest,
