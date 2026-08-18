@@ -1,5 +1,6 @@
 export {
   CollectSessionSectionController,
+  type CollectSessionSectionFlushResult,
   type CollectSessionSectionControllerOptions,
   isSelectableQuestion,
 } from './CollectSessionSectionController';
@@ -49,3 +50,4 @@ export {
   type SessionSectionWriteBackResult,
   writeSessionSectionToNote,
 } from './SessionSectionWriteBack';
+export { formatStandaloneCollectDraft } from './StandaloneCollectDraft';

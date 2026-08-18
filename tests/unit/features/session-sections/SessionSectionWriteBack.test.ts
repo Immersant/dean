@@ -58,6 +58,21 @@ actions:
     prompt: Do the thing.
 `.trim();
 
+const STANDALONE_COLLECT_BODY = `
+schemaVersion: 1
+id: standalone_collect
+kind: collect
+title: Discovery
+status: open
+createdAt: 1710000100000
+startNewChat: true
+questions:
+  - id: goal
+    prompt: What should we build?
+    type: markdown
+answers: {}
+`.trim();
+
 /** Answers attached in-memory so fixtures stay within the mock YAML parser's depth. */
 function collectWithAnswers(answers: Record<string, string | string[]>) {
   const base = parseSessionSectionYaml(COLLECT_BODY);
@@ -339,6 +354,47 @@ describe('SessionSectionWriteBack', () => {
     const body = next.slice(range.start, range.end).slice(open.length).replace(/\n```\s*$/, '\n');
     const again = parseSessionSectionYaml(body);
     expect(again.answers.features).toEqual(['a', 'b']);
+  });
+
+  it('round-trips standalone collect answers without binding fields', async () => {
+    const section = parseSessionSectionYaml(STANDALONE_COLLECT_BODY);
+    const updated = {
+      ...section,
+      answers: { goal: 'A fresh draft.' },
+    };
+    const fileContent = noteWithFence(STANDALONE_COLLECT_BODY);
+    const file = { path: 'Notes/Discovery.md', extension: 'md' };
+    const modify = jest.fn().mockResolvedValue(undefined);
+    const app = {
+      vault: {
+        getAbstractFileByPath: () => file,
+        read: jest.fn().mockResolvedValue(fileContent),
+        modify,
+      },
+    } as any;
+
+    const result = await writeSessionSectionToNote({
+      app,
+      notePath: 'Notes/Discovery.md',
+      el: createMockEl() as unknown as HTMLElement,
+      ctx: { getSectionInfo: () => null } as any,
+      section: updated,
+      originalSource: STANDALONE_COLLECT_BODY,
+    });
+
+    expect(result).toEqual({ status: 'written' });
+    const next = modify.mock.calls[0][1] as string;
+    const range = findFenceBySectionId(next, 'standalone_collect')!;
+    const open = '```' + SESSION_SECTION_FENCE_LANGUAGE + '\n';
+    const body = next.slice(range.start, range.end).slice(open.length).replace(/\n```\s*$/, '\n');
+    const parsed = parseSessionSectionYaml(body);
+    expect(parsed).toMatchObject({
+      kind: 'collect',
+      startNewChat: true,
+      answers: { goal: 'A fresh draft.' },
+    });
+    expect('conversationId' in parsed).toBe(false);
+    expect('epoch' in parsed).toBe(false);
   });
 
   it('writeSessionSectionToNote skips when content is unchanged', async () => {

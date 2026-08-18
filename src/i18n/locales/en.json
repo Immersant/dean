@@ -315,6 +315,10 @@
         "label": "Open chat",
         "aria": "Open and focus the Dean chat sidebar"
       },
+      "newChatDraft": {
+        "sourceNote": "Source note: {path}",
+        "notAnswered": "Not answered"
+      },
       "badge": {
         "act": "Actions",
         "collect": "Questionnaire",

@@ -8,8 +8,15 @@ import type {
 } from '../../core/session-sections';
 import {
   computeAnswersDigest,
+  type SessionSectionWriteBackResult,
   writeSessionSectionToNote,
 } from './SessionSectionWriteBack';
+
+export type CollectSessionSectionFlushResult =
+  | { readonly status: 'ready' }
+  | { readonly status: 'blocked'; readonly error: string };
+
+const READY_FLUSH: CollectSessionSectionFlushResult = { status: 'ready' };
 
 export interface CollectSessionSectionControllerOptions {
   readonly app: App;
@@ -34,7 +41,7 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
   private readonly onAnswersChange?: (answers: SessionSectionAnswers) => void;
   private answers: SessionSectionAnswers;
   private lastWrittenDigest: string | null;
-  private flushTail: Promise<void> = Promise.resolve();
+  private flushTail: Promise<CollectSessionSectionFlushResult> = Promise.resolve(READY_FLUSH);
   private disposed = false;
   private flushTimer: number | null = null;
 
@@ -117,9 +124,9 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
   }
 
   /** Flush answers to the vault. Safe to call often; skips unchanged content. */
-  flush(): Promise<void> {
+  flush(): Promise<CollectSessionSectionFlushResult> {
     if (this.disposed) {
-      return Promise.resolve();
+      return Promise.resolve(READY_FLUSH);
     }
     if (this.flushTimer !== null) {
       window.clearTimeout(this.flushTimer);
@@ -138,7 +145,7 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
     this.disposed = true;
   }
 
-  private enqueueFlush(): Promise<void> {
+  private enqueueFlush(): Promise<CollectSessionSectionFlushResult> {
     const section = this.getSectionWithAnswers();
     const digest = computeAnswersDigest(this.notePath, section.id, section.answers);
     if (digest === this.lastWrittenDigest) {
@@ -147,7 +154,7 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
 
     const answersSnapshot = this.getAnswers();
     this.flushTail = this.flushTail
-      .catch(() => undefined)
+      .catch(() => READY_FLUSH)
       .then(async () => {
         const latestDigest = computeAnswersDigest(
           this.notePath,
@@ -155,7 +162,7 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
           answersSnapshot,
         );
         if (latestDigest === this.lastWrittenDigest) {
-          return;
+          return READY_FLUSH;
         }
         const result = await writeSessionSectionToNote({
           app: this.app,
@@ -168,9 +175,11 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
           },
           originalSource: this.originalSource,
         });
-        if (result.status === 'written' || result.status === 'skipped') {
+        const flushResult = mapWriteBackResultToFlush(result);
+        if (flushResult.status === 'ready') {
           this.lastWrittenDigest = latestDigest;
         }
+        return flushResult;
       });
     return this.flushTail;
   }
@@ -186,4 +195,19 @@ function cloneAnswers(answers: SessionSectionAnswers): SessionSectionAnswers {
     next[key] = Array.isArray(value) ? [...value] : value;
   }
   return next;
+}
+
+function mapWriteBackResultToFlush(
+  result: SessionSectionWriteBackResult,
+): CollectSessionSectionFlushResult {
+  if (result.status === 'written') {
+    return READY_FLUSH;
+  }
+  if (result.status === 'skipped' && result.reason === 'unchanged') {
+    return READY_FLUSH;
+  }
+  if (result.status === 'skipped') {
+    return { status: 'blocked', error: `write-back skipped: ${result.reason}` };
+  }
+  return { status: 'blocked', error: result.error };
 }

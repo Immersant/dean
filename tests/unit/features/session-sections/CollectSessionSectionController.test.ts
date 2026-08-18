@@ -107,6 +107,44 @@ describe('CollectSessionSectionController', () => {
     );
   });
 
+  it('reports ready only after a successful or unchanged flush', async () => {
+    jest.mocked(writeSessionSectionToNote).mockResolvedValueOnce({ status: 'written' });
+    const section = SECTION;
+    const el = createMockEl() as unknown as HTMLElement;
+    const controller = new CollectSessionSectionController({
+      app: { vault: {} } as any,
+      el,
+      ctx: { addChild: jest.fn(), getSectionInfo: () => null } as any,
+      notePath: 'Notes/Spec.md',
+      section,
+      originalSource: BODY,
+    });
+
+    controller.setAnswer('notes', 'ready');
+    await expect(controller.flush()).resolves.toEqual({ status: 'ready' });
+  });
+
+  it.each([
+    [{ status: 'skipped', reason: 'no-file' }],
+    [{ status: 'skipped', reason: 'no-range' }],
+    [{ status: 'failed', error: 'disk full' }],
+  ])('blocks draft creation when write-back is not durable', async (writeResult) => {
+    jest.mocked(writeSessionSectionToNote).mockResolvedValueOnce(writeResult as never);
+    const section = SECTION;
+    const el = createMockEl() as unknown as HTMLElement;
+    const controller = new CollectSessionSectionController({
+      app: { vault: {} } as any,
+      el,
+      ctx: { addChild: jest.fn(), getSectionInfo: () => null } as any,
+      notePath: 'Notes/Spec.md',
+      section,
+      originalSource: BODY,
+    });
+
+    controller.setAnswer('notes', 'unsaved');
+    await expect(controller.flush()).resolves.toMatchObject({ status: 'blocked' });
+  });
+
   it('onunload flushes pending answers', async () => {
     const section = SECTION;
     const el = createMockEl() as unknown as HTMLElement;
