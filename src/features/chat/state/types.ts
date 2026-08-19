@@ -1,8 +1,10 @@
 import type { EditorView } from '@codemirror/view';
 
+import type { SessionSectionTurnRequest } from '../../../core/session-sections/SessionSectionTurn';
 import type { TodoItem } from '../../../core/tools/todo';
 import type {
   ChatMessage,
+  ExecutionInputSessionSectionSnapshot,
   ImageAttachment,
   SubagentInfo,
   ToolCallInfo,
@@ -22,6 +24,8 @@ export interface ChatTurnRequest {
   browserSelection?: BrowserSelectionContext | null;
   canvasSelection?: CanvasSelectionContext | null;
   externalContextPaths?: string[];
+  /** Act click origin. Composer sends leave this unset. */
+  sessionSection?: ExecutionInputSessionSectionSnapshot;
 }
 
 /** Queued message waiting to be sent after current streaming completes. */
@@ -34,6 +38,12 @@ export interface QueuedMessage {
   /** Provider-neutral turn snapshot captured at enqueue time. */
   turnRequest?: ChatTurnRequest;
 }
+
+/**
+ * Queued Act/session-section turn. Never merge with composer `queuedMessage`.
+ * Last click wins when replaced while streaming.
+ */
+export type QueuedProgrammaticTurn = SessionSectionTurnRequest;
 
 /** Pending tool call waiting to be rendered (buffered until input is complete). */
 export interface PendingToolCall {
@@ -77,6 +87,11 @@ export interface ChatStateData {
   isRewinding: boolean;
   /** Local tab state is ahead of persisted conversation metadata. */
   hasPendingConversationSave: boolean;
+  /**
+   * Programmatic Act turn waiting for the active stream to finish.
+   * Independent from composer `queuedMessage` — never merge the two.
+   */
+  queuedProgrammaticTurn: QueuedProgrammaticTurn | null;
 
   // Conversation identity
   currentConversationId: string | null;

@@ -168,6 +168,16 @@ describe('DeanSettingTab display settings', () => {
     expect(mockRenderedSettingNames).not.toContain(t('settings.enableFilePane.name'));
   });
 
+  it('renders enable editor session sections on the general display section', () => {
+    const { tab, plugin } = createTab(true);
+    plugin.refreshEditorSessionSectionPreviews = jest.fn();
+    (tab as any).renderGeneralTab(createContainer());
+
+    expect(mockRenderedSettingNames).toContain(t('settings.enableEditorSessionSections.name'));
+    expect(mockRenderedSettingNames.indexOf(t('settings.enableDualPane.name')))
+      .toBeLessThan(mockRenderedSettingNames.indexOf(t('settings.enableEditorSessionSections.name')));
+  });
+
   it('updates the file pane setting and refreshes open dual-pane views', async () => {
     const { tab, plugin } = createTab(true);
     const refreshDualPaneLayout = jest.fn();

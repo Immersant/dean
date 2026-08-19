@@ -47,6 +47,16 @@ import type {
   ProviderId,
 } from './core/providers/types';
 import { DEFAULT_CHAT_PROVIDER_ID } from './core/providers/types';
+import { decodeSectionEpoch } from './core/session-sections/decodeSectionEpoch';
+import type {
+  SessionSectionDraftRequest,
+  SessionSectionDraftResult,
+} from './core/session-sections/SessionSectionDraft';
+import type {
+  SessionSectionFocusResult,
+  SessionSectionTurnRequest,
+  SessionSectionTurnResult,
+} from './core/session-sections/SessionSectionTurn';
 import type {
   Conversation,
   ConversationMeta,
@@ -65,14 +75,24 @@ import {
   WarmExecutionPool,
 } from './features/chat/execution/WarmExecutionPool';
 import { registerFileMenu } from './features/chat/fileMenu';
+import { commitProvisionalTab } from './features/chat/tabs/TabLifecycle';
+import type { AssembledTabRuntime } from './features/chat/tabs/types';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
+import {
+  refreshSessionSectionPreviews,
+  renderSessionSectionBlock,
+  SESSION_SECTION_FENCE_LANGUAGE,
+} from './features/session-sections';
 import { DeanSettingTab } from './features/settings/DeanSettings';
-import { setLocale } from './i18n/i18n';
+import { setLocale, t } from './i18n/i18n';
 import type { Locale } from './i18n/types';
 import { deleteLegacyMcpConfig } from './providers/claude/storage/LegacyMcpConfigCleanup';
 import { buildCursorContext } from './utils/editor';
 import { revealWorkspaceLeaf } from './utils/obsidianCompat';
 import { getVaultPath } from './utils/path';
+
+const SESSION_SECTION_TAB_READY_TIMEOUT_MS = 10_000;
+const SESSION_SECTION_TAB_READY_POLL_MS = 25;
 
 function isDeanView(value: unknown): value is DeanView {
   return !!value
@@ -306,6 +326,12 @@ export default class DeanPlugin extends Plugin {
       });
 
       this.addSettingTab(new DeanSettingTab(this.app, this));
+      this.registerMarkdownCodeBlockProcessor(
+        SESSION_SECTION_FENCE_LANGUAGE,
+        (source, el, ctx) => {
+          renderSessionSectionBlock(this, source, el, ctx);
+        },
+      );
       this.scheduleRemainingSessionMetadataLoad();
     } finally {
       StartupProfiler.finishOnload();
@@ -918,6 +944,7 @@ export default class DeanPlugin extends Plugin {
       usage: meta.usage,
       titleGenerationStatus: meta.titleGenerationStatus,
       resumeAtMessageId: meta.resumeAtMessageId,
+      sectionEpoch: decodeSectionEpoch(meta.sectionEpoch),
     };
   }
 
@@ -936,6 +963,11 @@ export default class DeanPlugin extends Plugin {
     onCommitted?: SettingsCommit<DeanSettings>,
   ): Promise<void> {
     await this.settingsCoordinator.mutate(mutation, onCommitted);
+  }
+
+  /** Re-run markdown processors so session-section widgets appear/disappear with the flag. */
+  refreshEditorSessionSectionPreviews(): void {
+    refreshSessionSectionPreviews(this.app);
   }
 
   getAgentSkillResourceGeneration(): number {
@@ -1456,6 +1488,289 @@ export default class DeanPlugin extends Plugin {
       }
     }
     return null;
+  }
+
+  /**
+   * Only feature-facing entry for Act session-section clicks.
+   * Never calls handleMissingProviderSession (that can delete/reset conversations).
+   */
+  async submitSessionSectionTurn(
+    conversationId: string,
+    request: SessionSectionTurnRequest,
+  ): Promise<SessionSectionTurnResult> {
+    if (!this.settings.enableEditorSessionSections) {
+      new Notice(t('settings.sessionSections.blocked.flagOff'));
+      return { status: 'blocked', reason: 'flag-off' };
+    }
+
+    if (
+      !request
+      || request.sessionSection?.conversationId !== conversationId
+    ) {
+      new Notice(t('settings.sessionSections.blocked.invalidRequest'));
+      return { status: 'blocked', reason: 'invalid-request' };
+    }
+
+    const conversation = await this.resolveConversationForSessionSection(conversationId);
+    if (!conversation) {
+      new Notice(t('settings.sessionSections.blocked.conversationMissing'));
+      return { status: 'blocked', reason: 'conversation-missing' };
+    }
+
+    if (
+      decodeSectionEpoch(request.epoch)
+      !== decodeSectionEpoch(conversation.sectionEpoch)
+    ) {
+      new Notice(t('settings.sessionSections.blocked.epochMismatch'));
+      return { status: 'blocked', reason: 'epoch-mismatch' };
+    }
+
+    const view = await this.ensureViewOpen();
+    if (!view) {
+      new Notice(t('settings.sessionSections.blocked.viewUnavailable'));
+      return { status: 'blocked', reason: 'view-unavailable' };
+    }
+
+    const tab = await this.resolveTabForSessionSection(view, conversationId);
+    if (!tab) {
+      new Notice(t('settings.sessionSections.blocked.tabNotReady'));
+      return { status: 'blocked', reason: 'tab-not-ready' };
+    }
+
+    const ready = await this.waitForSessionSectionTabReady(tab);
+    if (!ready) {
+      new Notice(t('settings.sessionSections.blocked.tabNotReady'));
+      return { status: 'blocked', reason: 'tab-not-ready' };
+    }
+
+    if (tab.state.isRewinding) {
+      new Notice(t('settings.sessionSections.blocked.rewindInProgress'));
+      return { status: 'blocked', reason: 'rewind-in-progress' };
+    }
+
+    const result = await tab.controllers.inputController.submitProgrammaticTurn(request);
+    if (result.status === 'blocked') {
+      // InputController already surfaces Notices for its blocked reasons.
+      return result;
+    }
+    return result;
+  }
+
+  async openSessionSectionDraft(
+    request: SessionSectionDraftRequest,
+  ): Promise<SessionSectionDraftResult> {
+    if (!this.settings.enableEditorSessionSections) {
+      new Notice(t('settings.sessionSections.blocked.flagOff'));
+      return { status: 'blocked', reason: 'flag-off' };
+    }
+
+    if (!request?.content?.trim() || !request.sourceNotePath?.trim()) {
+      new Notice(t('settings.sessionSections.blocked.invalidRequest'));
+      return { status: 'blocked', reason: 'invalid-request' };
+    }
+
+    let view: DeanView | null;
+    try {
+      view = await this.ensureViewOpen();
+    } catch {
+      view = null;
+    }
+    if (!view) {
+      new Notice(t('settings.sessionSections.blocked.viewUnavailable'));
+      return { status: 'blocked', reason: 'view-unavailable' };
+    }
+
+    let result: SessionSectionDraftResult;
+    try {
+      result = await view.openNewChatDraft(request.content);
+    } catch {
+      result = { status: 'blocked', reason: 'tab-not-ready' };
+    }
+    if (result.status === 'blocked') {
+      new Notice(t(
+        result.reason === 'composer-unavailable'
+          ? 'settings.sessionSections.blocked.composerUnavailable'
+          : 'settings.sessionSections.blocked.tabNotReady',
+      ));
+    }
+    return result;
+  }
+
+  /**
+   * Open or reveal the Dean sidebar and focus the bound conversation composer.
+   * Does not submit a turn.
+   */
+  async focusSessionSectionChat(
+    conversationId: string,
+  ): Promise<SessionSectionFocusResult> {
+    if (!this.settings.enableEditorSessionSections) {
+      new Notice(t('settings.sessionSections.blocked.flagOff'));
+      return { status: 'blocked', reason: 'flag-off' };
+    }
+
+    if (typeof conversationId !== 'string' || !conversationId.trim()) {
+      new Notice(t('settings.sessionSections.blocked.invalidRequest'));
+      return { status: 'blocked', reason: 'invalid-request' };
+    }
+
+    const conversation = await this.resolveConversationForSessionSection(conversationId);
+    if (!conversation) {
+      new Notice(t('settings.sessionSections.blocked.conversationMissing'));
+      return { status: 'blocked', reason: 'conversation-missing' };
+    }
+
+    await this.activateView();
+    const view = this.getView();
+    if (!view) {
+      new Notice(t('settings.sessionSections.blocked.viewUnavailable'));
+      return { status: 'blocked', reason: 'view-unavailable' };
+    }
+
+    const tab = await this.resolveTabForSessionSection(view, conversationId);
+    if (!tab) {
+      new Notice(t('settings.sessionSections.blocked.tabNotReady'));
+      return { status: 'blocked', reason: 'tab-not-ready' };
+    }
+
+    const ready = await this.waitForSessionSectionTabReady(tab);
+    if (!ready) {
+      new Notice(t('settings.sessionSections.blocked.tabNotReady'));
+      return { status: 'blocked', reason: 'tab-not-ready' };
+    }
+
+    try {
+      tab.dom.inputEl.focus({ preventScroll: true });
+    } catch {
+      try {
+        tab.dom.inputEl.focus();
+      } catch {
+        // Sidebar is revealed even if the composer rejects focus.
+      }
+    }
+
+    return { status: 'focused' };
+  }
+
+  private async resolveConversationForSessionSection(
+    conversationId: string,
+  ): Promise<Conversation | null> {
+    let conversation = await this.getConversationById(conversationId);
+    if (conversation) {
+      return conversation;
+    }
+
+    // Deferred metadata load: try a targeted session metadata read first.
+    const record = await this.storage.sessions.load(conversationId);
+    if (record) {
+      await this.conversationRepository.adoptMetadataConversations([{
+        conversation: this.createConversationMetadataShell(record.metadata),
+        needsMigration: record.needsMigration,
+        source: record.source,
+      }]);
+      conversation = await this.getConversationById(conversationId);
+      if (conversation) {
+        return conversation;
+      }
+    }
+
+    if (!this.hasLoadedAllSessionMetadata) {
+      this.startRemainingSessionMetadataLoad();
+      if (this.remainingSessionMetadataLoad) {
+        await this.remainingSessionMetadataLoad;
+      }
+      conversation = await this.getConversationById(conversationId);
+      if (conversation) {
+        return conversation;
+      }
+    }
+
+    return null;
+  }
+
+  private async resolveTabForSessionSection(
+    view: DeanView,
+    conversationId: string,
+  ): Promise<AssembledTabRuntime | null> {
+    const tabManager = view.getTabManager();
+    if (!tabManager) {
+      return null;
+    }
+
+    const existing = this.findConversationAcrossViews(conversationId);
+    if (existing) {
+      await revealWorkspaceLeaf(this.app.workspace, existing.view.leaf);
+      await existing.view.getTabManager()?.switchToTab(existing.tabId);
+      const tab = existing.view.getTabManager()?.getTab(existing.tabId) ?? null;
+      if (tab) {
+        commitProvisionalTab(tab);
+      }
+      return tab;
+    }
+
+    const activeTab = view.getActiveTab();
+    if (activeTab && this.isReusableEmptyDraftTab(activeTab)) {
+      await activeTab.controllers.conversationController.switchTo(conversationId);
+      commitProvisionalTab(activeTab);
+      return activeTab;
+    }
+
+    await tabManager.openConversation(conversationId, {
+      preferNewTab: true,
+      activate: true,
+      provisional: false,
+    });
+
+    const opened = this.findConversationAcrossViews(conversationId);
+    if (!opened) {
+      return null;
+    }
+    const tab = opened.view.getTabManager()?.getTab(opened.tabId) ?? null;
+    if (tab) {
+      commitProvisionalTab(tab);
+    }
+    return tab;
+  }
+
+  private isReusableEmptyDraftTab(tab: AssembledTabRuntime): boolean {
+    if (tab.conversationId !== null) {
+      return false;
+    }
+    if (tab.dom.inputEl.value.trim()) {
+      return false;
+    }
+    if (tab.ui.imageContextManager.hasImages()) {
+      return false;
+    }
+    if (tab.state.queuedMessage) {
+      return false;
+    }
+    if (tab.state.queuedProgrammaticTurn) {
+      return false;
+    }
+    return true;
+  }
+
+  private async waitForSessionSectionTabReady(
+    tab: AssembledTabRuntime,
+  ): Promise<boolean> {
+    const deadline = Date.now() + SESSION_SECTION_TAB_READY_TIMEOUT_MS;
+    while (Date.now() < deadline) {
+      if (
+        !tab.state.isSwitchingConversation
+        && !tab.state.isCreatingConversation
+        && tab.session.acceptsIntents
+      ) {
+        return true;
+      }
+      await new Promise<void>((resolve) => {
+        window.setTimeout(resolve, SESSION_SECTION_TAB_READY_POLL_MS);
+      });
+    }
+    return (
+      !tab.state.isSwitchingConversation
+      && !tab.state.isCreatingConversation
+      && tab.session.acceptsIntents
+    );
   }
 
 }

@@ -88,6 +88,12 @@ User's question or request here
 <![CDATA[node-id-1, node-id-2]]>
 </canvas_selection>
 
+<dean_conversation id="conv-…" section_epoch="0" />
+
+<session_section id="sec_…" kind="act" action="review" path="notes/spec.md" title="Follow-ups">
+<![CDATA[Review this note for consistency…]]>
+</session_section>
+
 <context_files>
 <context_file path="/external/project" />
 </context_files>
@@ -100,6 +106,8 @@ User's question or request here
 - \`<editor_cursor>\`: Text surrounding the editor cursor, with its file path and optional line number.
 - \`<browser_selection>\`: Text selected in an Obsidian browser/web view (for example Surfing), including optional source/title/url metadata.
 - \`<canvas_selection>\`: Selected canvas node IDs, with the canvas path.
+- \`<dean_conversation id="…" section_epoch="…" />\`: Bound Dean conversation for editor session sections. Copy these values when authoring a \`dean-session\` fence.
+- \`<session_section>\`: Origin of an Act button click (section id, kind, action, host path, prompt body). Treat the CDATA body as the user's literal Act prompt.
 - \`<context_files>\`: Additional file or directory references. Each \`<context_file>\` carries one path.
 - \`@filename.md\`: Files mentioned with @ in the query. Read these files when referenced.
 

@@ -1,4 +1,13 @@
 import { registerFileLinkHandler } from '@/utils/fileLink';
+import { openWorkspaceLink } from '@/utils/obsidianCompat';
+
+jest.mock('@/utils/obsidianCompat', () => {
+  const actual = jest.requireActual('@/utils/obsidianCompat');
+  return {
+    ...actual,
+    openWorkspaceLink: jest.fn(),
+  };
+});
 
 describe('registerFileLinkHandler', () => {
   it('opens data-href target when present', () => {
@@ -31,7 +40,7 @@ describe('registerFileLinkHandler', () => {
     cleanup();
 
     expect(event.preventDefault).toHaveBeenCalled();
-    expect(app.workspace.openLinkText).toHaveBeenCalledWith('note#section', '', 'tab');
+    expect(openWorkspaceLink).toHaveBeenCalledWith(app, 'note#section', '', event);
     expect(container.removeEventListener).toHaveBeenCalledWith('click', expect.any(Function));
   });
 
@@ -63,6 +72,38 @@ describe('registerFileLinkHandler', () => {
 
     registerFileLinkHandler(app as any, container as any);
 
-    expect(app.workspace.openLinkText).toHaveBeenCalledWith('note^block', '', 'tab');
+    expect(openWorkspaceLink).toHaveBeenCalledWith(app, 'note^block', '', event);
+  });
+
+  it('forwards the click event so native modifiers apply', () => {
+    const app = {
+      workspace: {
+        openLinkText: jest.fn(),
+      },
+    };
+
+    const link: any = {
+      dataset: { href: 'note' },
+      getAttribute: jest.fn().mockReturnValue('note'),
+      closest: jest.fn(),
+    };
+    link.closest.mockReturnValue(link);
+
+    const event = {
+      target: link,
+      metaKey: true,
+      preventDefault: jest.fn(),
+    } as any;
+
+    const container = {
+      addEventListener: (_event: string, callback: (event: MouseEvent) => void) => {
+        callback(event);
+      },
+      removeEventListener: jest.fn(),
+    };
+
+    registerFileLinkHandler(app as any, container as any);
+
+    expect(openWorkspaceLink).toHaveBeenCalledWith(app, 'note', '', event);
   });
 });

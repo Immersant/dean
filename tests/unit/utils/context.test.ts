@@ -2,6 +2,7 @@ import {
   appendContextFiles,
   appendCurrentNote,
   appendCurrentNoteContent,
+  appendProviderExecutionContext,
   extractContentBeforeXmlContext,
   extractUserDisplayContent,
   extractUserQuery,
@@ -139,6 +140,16 @@ describe('XML_CONTEXT_PATTERN', () => {
 
   it('matches browser_selection tag', () => {
     const text = 'Query\n\n<browser_selection source="surfing-view">\nselected web content\n</browser_selection>';
+    expect(XML_CONTEXT_PATTERN.test(text)).toBe(true);
+  });
+
+  it('matches dean_conversation tag', () => {
+    const text = 'Query\n\n<dean_conversation id="conv-1" section_epoch="0" />';
+    expect(XML_CONTEXT_PATTERN.test(text)).toBe(true);
+  });
+
+  it('matches session_section tag', () => {
+    const text = 'Query\n\n<session_section id="sec_1" kind="act" path="note.md">\nbody\n</session_section>';
     expect(XML_CONTEXT_PATTERN.test(text)).toBe(true);
   });
 
@@ -300,11 +311,45 @@ describe('extractUserQuery', () => {
       expect(extractUserQuery(prompt)).toBe('Query end');
     });
 
+    it('strips dean_conversation and session_section tags', () => {
+      const prompt = (
+        'Query <dean_conversation id="conv-1" section_epoch="2" /> '
+        + '<session_section id="sec_1" kind="act" path="n.md"><![CDATA[do it]]></session_section> end'
+      );
+      expect(extractUserQuery(prompt)).toBe('Query end');
+    });
+
     it('strips multiple tag types', () => {
       const prompt = '<linked_note>a.md</linked_note>Query<context_files>b.md</context_files>';
       expect(extractUserQuery(prompt)).toBe('Query');
     });
   });
+
+describe('appendProviderExecutionContext', () => {
+  it('appends note then conversation binding then session section in order', () => {
+    const result = appendProviderExecutionContext('Hello', {
+      currentNote: { path: 'notes/spec.md' },
+      conversationBinding: {
+        conversationId: 'conv-1',
+        sectionEpoch: 3,
+      },
+      sessionSection: {
+        sectionId: 'sec_1',
+        notePath: 'notes/spec.md',
+        conversationId: 'conv-1',
+        kind: 'act',
+        actionId: 'review',
+        title: 'Follow-ups',
+        prompt: 'Review this note.',
+      },
+    });
+    expect(result.indexOf('<linked_note')).toBeLessThan(result.indexOf('<dean_conversation'));
+    expect(result.indexOf('<dean_conversation')).toBeLessThan(result.indexOf('<session_section'));
+    expect(result).toContain('section_epoch="3"');
+    expect(result).toContain('action="review"');
+    expect(result).toContain('Review this note.');
+  });
+});
 
   describe('edge cases', () => {
     it('returns empty string for empty input', () => {

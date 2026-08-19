@@ -316,6 +316,20 @@ export class DeanSettingTab extends PluginSettingTab {
           })
       );
 
+    new Setting(container)
+      .setName(t('settings.enableEditorSessionSections.name'))
+      .setDesc(t('settings.enableEditorSessionSections.desc'))
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.enableEditorSessionSections ?? false)
+          .onChange(async (value) => {
+            await this.plugin.mutateSettings((settings) => {
+              settings.enableEditorSessionSections = value;
+            });
+            this.plugin.refreshEditorSessionSectionPreviews();
+          })
+      );
+
     if (this.plugin.settings.enableDualPane ?? true) {
       new Setting(container)
         .setName(t('settings.dualPaneSide.name'))

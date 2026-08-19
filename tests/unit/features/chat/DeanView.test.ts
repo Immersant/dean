@@ -184,6 +184,92 @@ describe('DeanView tab controls', () => {
     expect(inputEl.focus).toHaveBeenCalledTimes(1);
   });
 
+  describe('standalone Collect drafts', () => {
+    it('creates a fresh unbound tab, fills its composer, and does not send', async () => {
+      const inputEl = createMockEl('textarea') as unknown as HTMLTextAreaElement;
+      const inputHandler = jest.fn();
+      inputEl.addEventListener('input', inputHandler);
+      inputEl.focus = jest.fn();
+      const sendMessage = jest.fn();
+      const addFile = jest.fn();
+      const ensureExecutionInitialized = jest.fn();
+      const tab = {
+        id: 'draft-tab',
+        conversationId: null,
+        dom: { inputEl },
+        controllers: { inputController: { sendMessage } },
+        session: { userOwnershipRevision: 0 },
+        ui: { fileContextManager: { addFile } },
+      };
+      const view = Object.create(DeanView.prototype) as any;
+      view.tabManager = {
+        createTab: jest.fn().mockResolvedValue(tab),
+        discardTab: jest.fn(),
+      };
+      view.updateTabBarVisibility = jest.fn();
+      view.ensureExecutionInitialized = ensureExecutionInitialized;
+
+      await expect(view.openNewChatDraft('Draft body')).resolves.toEqual({ status: 'opened' });
+
+      expect(view.tabManager.createTab).toHaveBeenCalledWith();
+      expect(inputEl.value).toBe('Draft body');
+      expect(inputHandler).toHaveBeenCalledTimes(1);
+      expect(inputEl.focus).toHaveBeenCalledTimes(1);
+      expect(sendMessage).not.toHaveBeenCalled();
+      expect(ensureExecutionInitialized).not.toHaveBeenCalled();
+      expect(addFile).not.toHaveBeenCalled();
+      expect(view.tabManager.discardTab).not.toHaveBeenCalled();
+    });
+
+    it('does not reuse or overwrite an existing unbound draft', async () => {
+      const existing = { conversationId: null, dom: { inputEl: { value: 'Keep me' } } };
+      const targetInput = createMockEl('textarea') as unknown as HTMLTextAreaElement;
+      const target = {
+        id: 'fresh-tab',
+        conversationId: null,
+        dom: { inputEl: targetInput },
+        session: { userOwnershipRevision: 0 },
+      };
+      const view = Object.create(DeanView.prototype) as any;
+      view.tabManager = {
+        getActiveTab: jest.fn().mockReturnValue(existing),
+        createTab: jest.fn().mockResolvedValue(target),
+        discardTab: jest.fn(),
+      };
+      view.updateTabBarVisibility = jest.fn();
+
+      await view.openNewChatDraft('New draft');
+
+      expect(existing.dom.inputEl.value).toBe('Keep me');
+      expect(view.tabManager.createTab).toHaveBeenCalledTimes(1);
+      expect(targetInput.value).toBe('New draft');
+    });
+
+    it('discards a newly created untouched tab when composer population fails', async () => {
+      const inputEl = createMockEl('textarea') as unknown as HTMLTextAreaElement;
+      inputEl.dispatchEvent = jest.fn(() => { throw new Error('dispatch failed'); }) as never;
+      const tab = {
+        id: 'failed-tab',
+        conversationId: null,
+        dom: { inputEl },
+        session: { userOwnershipRevision: 0 },
+      };
+      const discardTab = jest.fn().mockResolvedValue(true);
+      const view = Object.create(DeanView.prototype) as any;
+      view.tabManager = {
+        createTab: jest.fn().mockResolvedValue(tab),
+        discardTab,
+      };
+      view.updateTabBarVisibility = jest.fn();
+
+      await expect(view.openNewChatDraft('Draft')).resolves.toEqual({
+        status: 'blocked',
+        reason: 'composer-unavailable',
+      });
+      expect(discardTab).toHaveBeenCalledWith('failed-tab');
+    });
+  });
+
   it('reveals an open linked note and creates a provisional note chat', async () => {
     const note = Object.assign(new TFile(), {
       basename: 'Plan',

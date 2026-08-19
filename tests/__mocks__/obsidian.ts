@@ -14,6 +14,7 @@ export class Plugin {
   addSettingTab = jest.fn();
   registerView = jest.fn();
   registerEvent = jest.fn();
+  registerMarkdownCodeBlockProcessor = jest.fn();
   loadData = jest.fn().mockResolvedValue({});
   saveData = jest.fn().mockResolvedValue(undefined);
 }
@@ -97,6 +98,28 @@ export class Scope {
 export const Platform = {
   isMacOS: true,
 };
+
+export class Keymap {
+  static isModEvent(evt?: { metaKey?: boolean; ctrlKey?: boolean; altKey?: boolean; shiftKey?: boolean; button?: number } | null): boolean | 'tab' | 'split' | 'window' {
+    if (!evt) {
+      return false;
+    }
+    if (evt.button === 1) {
+      return 'tab';
+    }
+    const mod = Boolean(evt.metaKey || evt.ctrlKey);
+    if (!mod) {
+      return false;
+    }
+    if (evt.altKey && evt.shiftKey) {
+      return 'window';
+    }
+    if (evt.altKey) {
+      return 'split';
+    }
+    return 'tab';
+  }
+}
 
 export class App {
   vault: any = {
@@ -206,6 +229,54 @@ export class Modal {
   close = jest.fn();
   onOpen = jest.fn();
   onClose = jest.fn();
+}
+
+export class Component {
+  private children: Component[] = [];
+
+  addChild<T extends Component>(component: T): T {
+    this.children.push(component);
+    component.load();
+    return component;
+  }
+
+  removeChild<T extends Component>(component: T): T {
+    const index = this.children.indexOf(component);
+    if (index >= 0) {
+      this.children.splice(index, 1);
+      component.unload();
+    }
+    return component;
+  }
+
+  load(): void {}
+  unload(): void {
+    for (const child of this.children.splice(0)) {
+      child.unload();
+    }
+  }
+
+  onload(): void {}
+  onunload(): void {}
+}
+
+/** Minimal MarkdownRenderChild for processor lifecycle (Collect flush on destroy). */
+export class MarkdownRenderChild extends Component {
+  containerEl: HTMLElement;
+
+  constructor(containerEl: HTMLElement) {
+    super();
+    this.containerEl = containerEl;
+  }
+
+  load(): void {
+    this.onload();
+  }
+
+  unload(): void {
+    this.onunload();
+    super.unload();
+  }
 }
 
 class MockMenuItem {
@@ -333,7 +404,7 @@ export function parseYaml(content: string): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   const lines = content.split(/\r?\n/);
   let currentArrayKey: string | null = null;
-  let currentArray: string[] = [];
+  let currentArray: unknown[] = [];
   let blockScalarKey: string | null = null;
   let blockScalarStyle: 'literal' | 'folded' | null = null;
   let blockScalarLines: string[] = [];
@@ -391,12 +462,183 @@ export function parseYaml(content: string): Record<string, unknown> {
       }
     }
 
-    // Handle YAML list items (- value)
+    // Handle YAML list items (- value) including flow-style objects and nested maps
     if (currentArrayKey && trimmed.startsWith('- ')) {
-      currentArray.push(unquoteYaml(trimmed.slice(2).trim()));
+      const itemBody = trimmed.slice(2).trim();
+      const firstFieldMatch = itemBody.match(/^([^:{}[\]]+):\s*(.*)$/);
+      // Block-style nested mapping: `- id: review` or bare `-` followed by indented keys
+      if (!itemBody || firstFieldMatch) {
+        const nested: Record<string, unknown> = {};
+        let j = i + 1;
+        if (firstFieldMatch) {
+          const firstKey = firstFieldMatch[1].trim();
+          const firstRaw = firstFieldMatch[2].trim();
+          if (firstRaw.match(/^([|>])([+-])?$/)) {
+            const style = firstRaw.startsWith('|') ? 'literal' : 'folded';
+            const scalarLines: string[] = [];
+            let scalarIndent: number | null = null;
+            while (j < lines.length) {
+              const scalarLine = lines[j];
+              const scalarTrimmed = scalarLine.trim();
+              if (!scalarTrimmed) {
+                scalarLines.push('');
+                j += 1;
+                continue;
+              }
+              const scalarLeading = scalarLine.match(/^(\s*)/)?.[1].length ?? 0;
+              if (scalarIndent === null) {
+                if (scalarLeading === 0) break;
+                scalarIndent = scalarLeading;
+              }
+              if (scalarLeading < scalarIndent) break;
+              scalarLines.push(scalarLine.slice(scalarIndent));
+              j += 1;
+            }
+            nested[firstKey] = style === 'literal'
+              ? scalarLines.join('\n')
+              : scalarLines.join('\n').replace(/(?<!\n)\n(?!\n)/g, ' ').trim();
+          } else {
+            nested[firstKey] = firstRaw ? parseYamlValue(firstRaw) : '';
+          }
+        }
+        while (j < lines.length) {
+          const nestedLine = lines[j];
+          const nestedTrimmed = nestedLine.trim();
+          if (!nestedTrimmed) {
+            j += 1;
+            continue;
+          }
+          const nestedIndent = nestedLine.match(/^(\s*)/)?.[1].length ?? 0;
+          if (nestedIndent === 0 || nestedTrimmed.startsWith('- ')) {
+            break;
+          }
+          const nestedMatch = nestedTrimmed.match(/^([^:]+):\s*(.*)$/);
+          if (!nestedMatch) {
+            break;
+          }
+          const nestedKey = nestedMatch[1].trim();
+          const nestedRaw = nestedMatch[2].trim();
+          if (nestedRaw.match(/^([|>])([+-])?$/)) {
+            const style = nestedRaw.startsWith('|') ? 'literal' : 'folded';
+            const scalarLines: string[] = [];
+            let scalarIndent: number | null = null;
+            j += 1;
+            while (j < lines.length) {
+              const scalarLine = lines[j];
+              const scalarTrimmed = scalarLine.trim();
+              if (!scalarTrimmed) {
+                scalarLines.push('');
+                j += 1;
+                continue;
+              }
+              const scalarLeading = scalarLine.match(/^(\s*)/)?.[1].length ?? 0;
+              if (scalarIndent === null) {
+                if (scalarLeading === 0) break;
+                scalarIndent = scalarLeading;
+              }
+              if (scalarLeading < scalarIndent) break;
+              scalarLines.push(scalarLine.slice(scalarIndent));
+              j += 1;
+            }
+            nested[nestedKey] = style === 'literal'
+              ? scalarLines.join('\n')
+              : scalarLines.join('\n').replace(/(?<!\n)\n(?!\n)/g, ' ').trim();
+            continue;
+          }
+          if (!nestedRaw) {
+            let look = j + 1;
+            while (look < lines.length && !lines[look].trim()) {
+              look += 1;
+            }
+            const lookTrimmed = look < lines.length ? lines[look].trim() : '';
+            if (lookTrimmed && !lookTrimmed.startsWith('- ')) {
+              const nestedObject: Record<string, unknown> = {};
+              j += 1;
+              while (j < lines.length) {
+                const mapLine = lines[j];
+                const mapTrimmed = mapLine.trim();
+                if (!mapTrimmed) {
+                  j += 1;
+                  continue;
+                }
+                const mapIndent = mapLine.match(/^(\s*)/)?.[1].length ?? 0;
+                if (mapIndent <= nestedIndent || mapTrimmed.startsWith('- ')) {
+                  break;
+                }
+                const mapMatch = mapTrimmed.match(/^([^:]+):\s*(.*)$/);
+                if (!mapMatch) {
+                  break;
+                }
+                nestedObject[mapMatch[1].trim()] = mapMatch[2].trim()
+                  ? parseYamlValue(mapMatch[2].trim())
+                  : '';
+                j += 1;
+              }
+              nested[nestedKey] = nestedObject;
+              continue;
+            }
+            // Nested array (e.g. options:) under a list item
+            const nestedArray: unknown[] = [];
+            j += 1;
+            while (j < lines.length) {
+              const optionLine = lines[j];
+              const optionTrimmed = optionLine.trim();
+              if (!optionTrimmed) {
+                j += 1;
+                continue;
+              }
+              const optionIndent = optionLine.match(/^(\s*)/)?.[1].length ?? 0;
+              if (optionIndent <= nestedIndent || !optionTrimmed.startsWith('- ')) {
+                break;
+              }
+              const optionBody = optionTrimmed.slice(2).trim();
+              const optionField = optionBody.match(/^([^:{}[\]]+):\s*(.*)$/);
+              if (optionField) {
+                const optionObj: Record<string, unknown> = {
+                  [optionField[1].trim()]: optionField[2].trim()
+                    ? parseYamlValue(optionField[2].trim())
+                    : '',
+                };
+                j += 1;
+                while (j < lines.length) {
+                  const restLine = lines[j];
+                  const restTrimmed = restLine.trim();
+                  if (!restTrimmed) {
+                    j += 1;
+                    continue;
+                  }
+                  const restIndent = restLine.match(/^(\s*)/)?.[1].length ?? 0;
+                  if (restIndent === 0 || restTrimmed.startsWith('- ')) {
+                    break;
+                  }
+                  const restMatch = restTrimmed.match(/^([^:]+):\s*(.*)$/);
+                  if (!restMatch) break;
+                  optionObj[restMatch[1].trim()] = restMatch[2].trim()
+                    ? parseYamlValue(restMatch[2].trim())
+                    : '';
+                  j += 1;
+                }
+                nestedArray.push(optionObj);
+                continue;
+              }
+              nestedArray.push(parseYamlValue(optionBody));
+              j += 1;
+            }
+            nested[nestedKey] = nestedArray;
+            continue;
+          }
+          nested[nestedKey] = parseYamlValue(nestedRaw);
+          j += 1;
+        }
+        currentArray.push(nested);
+        i = j - 1;
+        continue;
+      }
+      currentArray.push(parseYamlValue(itemBody));
       continue;
     }
 
+    // Nested key under a block-style list item already consumed above.
     // Not a list item — flush any pending array
     if (currentArrayKey && trimmed !== '') {
       flushArray();
@@ -422,9 +664,88 @@ export function parseYaml(content: string): Record<string, unknown> {
     }
 
     if (!rawValue) {
-      // Could be start of a YAML list or a null value — peek ahead
-      currentArrayKey = key;
-      currentArray = [];
+      // Peek ahead: list vs nested mapping vs null
+      let peek = i + 1;
+      while (peek < lines.length && !lines[peek].trim()) {
+        peek += 1;
+      }
+      if (peek < lines.length) {
+        const peekTrimmed = lines[peek].trim();
+        const peekIndent = lines[peek].match(/^(\s*)/)?.[1].length ?? 0;
+        if (peekTrimmed.startsWith('- ')) {
+          currentArrayKey = key;
+          currentArray = [];
+          continue;
+        }
+        if (peekIndent > 0) {
+          const nested: Record<string, unknown> = {};
+          let j = peek;
+          const baseIndent = peekIndent;
+          while (j < lines.length) {
+            const nestedLine = lines[j];
+            const nestedTrimmed = nestedLine.trim();
+            if (!nestedTrimmed) {
+              j += 1;
+              continue;
+            }
+            const nestedIndent = nestedLine.match(/^(\s*)/)?.[1].length ?? 0;
+            if (nestedIndent < baseIndent) {
+              break;
+            }
+            // Nested sequence under a mapping key (e.g. answers.features: then - a).
+            if (nestedTrimmed.startsWith('- ') && nestedIndent > baseIndent) {
+              j += 1;
+              continue;
+            }
+            const nestedMatch = nestedTrimmed.match(/^([^:]+):\s*(.*)$/);
+            if (!nestedMatch) {
+              break;
+            }
+            const nestedKey = nestedMatch[1].trim();
+            const nestedRaw = nestedMatch[2].trim();
+            if (!nestedRaw) {
+              // Peek for a nested list under this key.
+              let listPeek = j + 1;
+              while (listPeek < lines.length && !lines[listPeek].trim()) {
+                listPeek += 1;
+              }
+              if (
+                listPeek < lines.length
+                && lines[listPeek].trim().startsWith('- ')
+                && (lines[listPeek].match(/^(\s*)/)?.[1].length ?? 0) > nestedIndent
+              ) {
+                const nestedArray: unknown[] = [];
+                j = listPeek;
+                while (j < lines.length) {
+                  const optionLine = lines[j];
+                  const optionTrimmed = optionLine.trim();
+                  if (!optionTrimmed) {
+                    j += 1;
+                    continue;
+                  }
+                  const optionIndent = optionLine.match(/^(\s*)/)?.[1].length ?? 0;
+                  if (optionIndent <= nestedIndent || !optionTrimmed.startsWith('- ')) {
+                    break;
+                  }
+                  nestedArray.push(parseYamlValue(optionTrimmed.slice(2).trim()));
+                  j += 1;
+                }
+                nested[nestedKey] = nestedArray;
+                continue;
+              }
+              nested[nestedKey] = '';
+              j += 1;
+              continue;
+            }
+            nested[nestedKey] = parseYamlValue(nestedRaw);
+            j += 1;
+          }
+          result[key] = nested;
+          i = j - 1;
+          continue;
+        }
+      }
+      result[key] = null;
       continue;
     }
 
