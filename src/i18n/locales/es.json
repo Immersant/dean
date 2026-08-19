@@ -301,6 +301,7 @@
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
         "composerUnavailable": "No se pudo abrir un nuevo borrador de chat.",
         "writeBackFailed": "No se pudieron guardar las respuestas del formulario. No se abrió el chat nuevo.",
+        "writeBackFailedAction": "No se pudieron guardar las respuestas del formulario. No se envió la acción.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },

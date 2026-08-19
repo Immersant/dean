@@ -4,11 +4,13 @@ import {
   parseSessionSectionYaml,
   type SessionSection,
   type SessionSectionAction,
+  type SessionSectionAnswers,
   type SessionSectionTurnRequest,
   type SessionSectionTurnResult,
 } from '../../core/session-sections';
 import { t } from '../../i18n/i18n';
 import type { FeatureHost } from '../FeatureHost';
+import { resolveNoteSessionSectionForm } from './resolveNoteSessionSectionForm';
 import { confirmSessionSectionAction } from './SessionSectionConfirmModal';
 import { recordSessionSectionDiagnostic } from './SessionSectionDiagnostics';
 
@@ -66,6 +68,21 @@ export async function activateSessionSectionAction(
     return { status: 'blocked', reason: 'invalid-request' };
   }
 
+  const form = section.formId
+    ? await resolveNoteSessionSectionForm(host, notePath, section.formId)
+    : null;
+  if (form && form.ok === false) {
+    recordSessionSectionDiagnostic({
+      level: 'error',
+      code: `form-${form.code}`,
+      message: form.message,
+      conversationId: section.conversationId,
+      sectionId: section.id,
+      actionId,
+    });
+    return { status: 'blocked', reason: 'invalid-request' };
+  }
+
   const conversation = host.getConversationSync(section.conversationId)
     ?? await host.getConversationById(section.conversationId);
   const conversationTitle = conversation?.title?.trim()
@@ -91,7 +108,18 @@ export async function activateSessionSectionAction(
     return { status: 'cancelled' };
   }
 
-  const request = buildSessionSectionTurnRequest(section, action, notePath);
+  const request = buildSessionSectionTurnRequest(
+    section,
+    action,
+    notePath,
+    form && form.ok
+      ? {
+          answers: form.answers,
+          formId: form.formId,
+          memberSectionIds: form.memberSectionIds,
+        }
+      : undefined,
+  );
   const result = await host.submitSessionSectionTurn(section.conversationId, request);
   recordSessionSectionDiagnostic({
     level: result.status === 'blocked' ? 'warn' : 'info',
@@ -106,11 +134,19 @@ export async function activateSessionSectionAction(
   return result;
 }
 
+export interface SessionSectionFormTurnOverlay {
+  readonly answers: SessionSectionAnswers;
+  readonly formId: string;
+  readonly memberSectionIds: readonly string[];
+}
+
 export function buildSessionSectionTurnRequest(
   section: BoundSessionSection,
   action: SessionSectionAction,
   notePath: string,
+  form?: SessionSectionFormTurnOverlay,
 ): SessionSectionTurnRequest {
+  const answers = form?.answers ?? section.answers;
   return {
     displayContent: t('settings.sessionSections.displayLabel', { label: action.label }),
     canonicalText: action.prompt,
@@ -125,9 +161,12 @@ export function buildSessionSectionTurnRequest(
       actionLabel: action.label,
       title: section.title,
       prompt: action.prompt,
-      ...(Object.keys(section.answers).length > 0
-        ? { answers: { ...section.answers } }
+      ...(Object.keys(answers).length > 0 ? { answers: { ...answers } } : {}),
+      ...(form
+        ? { formId: form.formId, memberSectionIds: [...form.memberSectionIds] }
         : {}),
     },
   };
 }
+
+

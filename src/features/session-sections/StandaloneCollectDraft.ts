@@ -1,11 +1,17 @@
 import type {
+  SessionSectionAnswers,
   SessionSectionQuestion,
-  StandaloneCollectSessionSection,
 } from '../../core/session-sections';
 import { t } from '../../i18n/i18n';
 
+export interface StandaloneCollectDraftView {
+  readonly title: string;
+  readonly questions: readonly SessionSectionQuestion[];
+  readonly answers: SessionSectionAnswers;
+}
+
 export function formatStandaloneCollectDraft(
-  section: StandaloneCollectSessionSection,
+  section: StandaloneCollectDraftView,
   notePath: string,
 ): string {
   const lines = [

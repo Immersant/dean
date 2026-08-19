@@ -14,6 +14,7 @@ export class Plugin {
   addSettingTab = jest.fn();
   registerView = jest.fn();
   registerEvent = jest.fn();
+  registerMarkdownCodeBlockProcessor = jest.fn();
   loadData = jest.fn().mockResolvedValue({});
   saveData = jest.fn().mockResolvedValue(undefined);
 }
@@ -97,6 +98,28 @@ export class Scope {
 export const Platform = {
   isMacOS: true,
 };
+
+export class Keymap {
+  static isModEvent(evt?: { metaKey?: boolean; ctrlKey?: boolean; altKey?: boolean; shiftKey?: boolean; button?: number } | null): boolean | 'tab' | 'split' | 'window' {
+    if (!evt) {
+      return false;
+    }
+    if (evt.button === 1) {
+      return 'tab';
+    }
+    const mod = Boolean(evt.metaKey || evt.ctrlKey);
+    if (!mod) {
+      return false;
+    }
+    if (evt.altKey && evt.shiftKey) {
+      return 'window';
+    }
+    if (evt.altKey) {
+      return 'split';
+    }
+    return 'tab';
+  }
+}
 
 export class App {
   vault: any = {
@@ -523,6 +546,37 @@ export function parseYaml(content: string): Record<string, unknown> {
             continue;
           }
           if (!nestedRaw) {
+            let look = j + 1;
+            while (look < lines.length && !lines[look].trim()) {
+              look += 1;
+            }
+            const lookTrimmed = look < lines.length ? lines[look].trim() : '';
+            if (lookTrimmed && !lookTrimmed.startsWith('- ')) {
+              const nestedObject: Record<string, unknown> = {};
+              j += 1;
+              while (j < lines.length) {
+                const mapLine = lines[j];
+                const mapTrimmed = mapLine.trim();
+                if (!mapTrimmed) {
+                  j += 1;
+                  continue;
+                }
+                const mapIndent = mapLine.match(/^(\s*)/)?.[1].length ?? 0;
+                if (mapIndent <= nestedIndent || mapTrimmed.startsWith('- ')) {
+                  break;
+                }
+                const mapMatch = mapTrimmed.match(/^([^:]+):\s*(.*)$/);
+                if (!mapMatch) {
+                  break;
+                }
+                nestedObject[mapMatch[1].trim()] = mapMatch[2].trim()
+                  ? parseYamlValue(mapMatch[2].trim())
+                  : '';
+                j += 1;
+              }
+              nested[nestedKey] = nestedObject;
+              continue;
+            }
             // Nested array (e.g. options:) under a list item
             const nestedArray: unknown[] = [];
             j += 1;
@@ -534,7 +588,7 @@ export function parseYaml(content: string): Record<string, unknown> {
                 continue;
               }
               const optionIndent = optionLine.match(/^(\s*)/)?.[1].length ?? 0;
-              if (optionIndent === 0 || !optionTrimmed.startsWith('- ')) {
+              if (optionIndent <= nestedIndent || !optionTrimmed.startsWith('- ')) {
                 break;
               }
               const optionBody = optionTrimmed.slice(2).trim();

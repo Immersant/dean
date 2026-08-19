@@ -2,6 +2,8 @@ import { createMockEl } from '@test/helpers/MockElement';
 
 import {
   type BoundCollectSessionSection,
+  serializeSessionSectionYaml,
+  SESSION_SECTION_FENCE_LANGUAGE,
   type StandaloneCollectSessionSection,
   validateSessionSection,
 } from '@/core/session-sections';
@@ -27,6 +29,7 @@ jest.mock('@/features/session-sections/StandaloneCollectDraftService', () => ({
   openStandaloneCollectDraft: jest.fn().mockResolvedValue({ status: 'opened' }),
 }));
 
+import * as CollectRegistry from '@/features/session-sections/CollectSessionSectionRegistry';
 import { activateSessionSectionAction } from '@/features/session-sections/SessionSectionService';
 import {
   enableInteractiveEmbed,
@@ -92,14 +95,14 @@ const STANDALONE_SECTION = validateSessionSection({
   title: 'Discovery',
   status: 'open',
   createdAt: 1710000100000,
-  startNewChat: true,
+  startNewChat: 'Start new chat',
   questions: [
     { id: 'goal', prompt: 'What should we build?', type: 'markdown' },
   ],
   answers: { goal: '' },
 }) as StandaloneCollectSessionSection;
 
-const STANDALONE_BODY = 'schemaVersion: 1\nid: standalone_collect\nstartNewChat: true\n';
+const STANDALONE_BODY = 'schemaVersion: 1\nid: standalone_collect\nstartNewChat: Start new chat\n';
 
 function findInputs(el: any, type: string): any[] {
   const results: any[] = [];
@@ -179,6 +182,7 @@ describe('SessionSectionWidget Collect', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     clearUsedSessionSectionActions();
+    CollectRegistry.clearCollectSessionSectionRegistry();
   });
 
   it('renders Start new chat instead of Open chat for standalone Collect', () => {
@@ -198,9 +202,104 @@ describe('SessionSectionWidget Collect', () => {
       ctx,
     });
 
-    expect(findByClass(el, 'dean-session-section-start-chat')).not.toBeNull();
+    const startChat = findByClass(el, 'dean-session-section-start-chat');
+    expect(startChat).not.toBeNull();
+    expect(startChat.textContent).toBe('Start new chat');
     expect(findByClass(el, 'dean-session-section-open-chat')).toBeNull();
     expect(el.getAttribute('data-conversation-id')).toBeNull();
+  });
+
+  it('uses the authored startNewChat string as the button label', () => {
+    const section = validateSessionSection({
+      schemaVersion: 1,
+      id: 'standalone_collect',
+      kind: 'collect',
+      title: 'Discovery',
+      status: 'open',
+      createdAt: 1710000100000,
+      startNewChat: 'Create the remix',
+      questions: STANDALONE_SECTION.questions,
+      answers: {},
+    }) as StandaloneCollectSessionSection;
+    const el = createMockEl() as unknown as HTMLElement;
+    renderSessionSectionWidget({
+      host: {
+        app: { vault: {} },
+        openSessionSectionDraft: jest.fn(),
+      } as unknown as FeatureHost,
+      containerEl: el,
+      source: serializeSessionSectionYaml(section),
+      notePath: 'Notes/Discovery.md',
+      section,
+      ctx: createCtx(),
+    });
+    expect(findByClass(el, 'dean-session-section-start-chat')?.textContent).toBe('Create the remix');
+  });
+
+  it('renders Start new chat only on the last formId member', () => {
+    const first = validateSessionSection({
+      schemaVersion: 1,
+      id: 'sec_first',
+      formId: 'form_split',
+      kind: 'collect',
+      title: 'Intent',
+      status: 'open',
+      createdAt: 1710000100000,
+      startNewChat: 'Start new chat',
+      questions: STANDALONE_SECTION.questions,
+      answers: STANDALONE_SECTION.answers,
+    }) as StandaloneCollectSessionSection;
+    const last = validateSessionSection({
+      schemaVersion: 1,
+      id: 'sec_last',
+      formId: 'form_split',
+      kind: 'collect',
+      title: 'Wrap-up',
+      status: 'open',
+      createdAt: 1710000100001,
+      startNewChat: 'Start new chat',
+      questions: STANDALONE_SECTION.questions,
+      answers: STANDALONE_SECTION.answers,
+    }) as StandaloneCollectSessionSection;
+    const noteContent = [
+      '```' + SESSION_SECTION_FENCE_LANGUAGE,
+      serializeSessionSectionYaml(first).trimEnd(),
+      '```',
+      '',
+      'Editor prose.',
+      '',
+      '```' + SESSION_SECTION_FENCE_LANGUAGE,
+      serializeSessionSectionYaml(last).trimEnd(),
+      '```',
+    ].join('\n');
+    const host = {
+      app: { vault: {} },
+      openSessionSectionDraft: jest.fn(),
+    } as unknown as FeatureHost;
+
+    const firstEl = createMockEl() as unknown as HTMLElement;
+    renderSessionSectionWidget({
+      host,
+      containerEl: firstEl,
+      source: serializeSessionSectionYaml(first),
+      notePath: 'Notes/Split.md',
+      section: first,
+      ctx: createCtx(),
+      noteContent,
+    });
+    const lastEl = createMockEl() as unknown as HTMLElement;
+    renderSessionSectionWidget({
+      host,
+      containerEl: lastEl,
+      source: serializeSessionSectionYaml(last),
+      notePath: 'Notes/Split.md',
+      section: last,
+      ctx: createCtx(),
+      noteContent,
+    });
+
+    expect(findByClass(firstEl, 'dean-session-section-start-chat')).toBeNull();
+    expect(findByClass(lastEl, 'dean-session-section-start-chat')).not.toBeNull();
   });
 
   it('disables duplicate Start new chat clicks while opening', async () => {
@@ -210,6 +309,9 @@ describe('SessionSectionWidget Collect', () => {
     const button = findByClass(el, 'dean-session-section-start-chat');
     button.click();
     button.click();
+    for (let i = 0; i < 20 && jest.mocked(openStandaloneCollectDraft).mock.calls.length === 0; i++) {
+      await Promise.resolve();
+    }
     expect(openStandaloneCollectDraft).toHaveBeenCalledTimes(1);
     expect(button.hasAttribute('disabled')).toBe(true);
     expect(button.getAttribute('aria-busy')).toBe('true');
@@ -230,6 +332,9 @@ describe('SessionSectionWidget Collect', () => {
     expect(remountedButton.getAttribute('aria-busy')).toBe('true');
 
     remountedButton.click();
+    for (let i = 0; i < 20 && jest.mocked(openStandaloneCollectDraft).mock.calls.length === 0; i++) {
+      await Promise.resolve();
+    }
     expect(openStandaloneCollectDraft).toHaveBeenCalledTimes(1);
 
     opening.resolve({ status: 'opened' });
@@ -288,7 +393,45 @@ describe('SessionSectionWidget Collect', () => {
     expect(findByClass(el, 'dean-session-section-open-chat-label')?.textContent).toContain('Open chat');
   });
 
+  it('applies author cssClass and style maps to the Collect widget', () => {
+    const styled = validateSessionSection({
+      ...SECTION,
+      cssClass: 'board-card two-up',
+      style: { display: 'grid', gap: '10px' },
+      questions: [
+        {
+          ...SECTION.questions[0],
+          cssClass: 'test-question choice-row',
+          style: { 'flex-direction': 'row' },
+        },
+        SECTION.questions[1],
+      ],
+    }) as BoundCollectSessionSection;
+    const el = createMockEl() as unknown as HTMLElement;
+    renderSessionSectionWidget({
+      host: {
+        app: { vault: {} },
+        submitSessionSectionTurn: jest.fn(),
+        focusSessionSectionChat: jest.fn(),
+      } as unknown as FeatureHost,
+      containerEl: el,
+      source: BODY,
+      notePath: 'Notes/Spec.md',
+      section: styled,
+      ctx: createCtx(),
+    });
+
+    expect(el.classList.contains('board-card')).toBe(true);
+    expect(el.classList.contains('two-up')).toBe(true);
+    expect((el.style as unknown as Record<string, string>).display).toBe('grid');
+    expect((el.style as unknown as Record<string, string>).gap).toBe('10px');
+    const question = findByClass(el, 'choice-row');
+    expect(question).toBeTruthy();
+    expect((question.style as Record<string, string>)['flex-direction']).toBe('row');
+  });
+
   it('Open chat focuses the sidebar conversation without submitting a turn', async () => {
+    const flushSpy = jest.spyOn(CollectRegistry, 'flushCollectSessionSections');
     const el = createMockEl() as unknown as HTMLElement;
     const host = {
       app: { vault: {} },
@@ -317,6 +460,7 @@ describe('SessionSectionWidget Collect', () => {
     expect(host.focusSessionSectionChat).toHaveBeenCalledWith('conv-1');
     expect(host.submitSessionSectionTurn).not.toHaveBeenCalled();
     expect(activateSessionSectionAction).not.toHaveBeenCalled();
+    expect(flushSpy).not.toHaveBeenCalled();
   });
 
   it('flushes Collect answers on radio change without chat submit', async () => {

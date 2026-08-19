@@ -65,7 +65,7 @@ kind: collect
 title: Discovery
 status: open
 createdAt: 1710000100000
-startNewChat: true
+startNewChat: Start new chat
 questions:
   - id: goal
     prompt: What should we build?
@@ -390,7 +390,7 @@ describe('SessionSectionWriteBack', () => {
     const parsed = parseSessionSectionYaml(body);
     expect(parsed).toMatchObject({
       kind: 'collect',
-      startNewChat: true,
+      startNewChat: 'Start new chat',
       answers: { goal: 'A fresh draft.' },
     });
     expect('conversationId' in parsed).toBe(false);

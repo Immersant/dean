@@ -75,6 +75,8 @@ export interface ExecutionInputSessionSectionSnapshot {
   title?: string;
   prompt?: string;
   answers?: ExecutionInputSessionSectionAnswers;
+  formId?: string;
+  memberSectionIds?: readonly string[];
 }
 
 /** Conversation id + section epoch stamped on turns when editor session sections are enabled. */

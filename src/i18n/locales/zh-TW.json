@@ -301,6 +301,7 @@
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
         "composerUnavailable": "無法開啟新的聊天草稿。",
         "writeBackFailed": "無法儲存表單答案，因此未開啟新聊天。",
+        "writeBackFailedAction": "無法儲存表單答案，因此未傳送該操作。",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },

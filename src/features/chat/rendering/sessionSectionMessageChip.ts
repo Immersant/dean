@@ -4,7 +4,7 @@ import type { ExecutionInputSessionSectionSnapshot } from '../../../core/types';
 import { t } from '../../../i18n/i18n';
 
 export interface SessionSectionMessageChipOptions {
-  readonly onOpenNote?: (notePath: string) => void;
+  readonly onOpenNote?: (notePath: string, event?: MouseEvent) => void;
 }
 
 /**
@@ -60,7 +60,7 @@ export function renderSessionSectionMessageChip(
     main.addEventListener('click', (event) => {
       event.preventDefault?.();
       event.stopPropagation?.();
-      options.onOpenNote?.(section.notePath);
+      options.onOpenNote?.(section.notePath, event);
     });
   }
 

@@ -69,7 +69,7 @@ const STANDALONE_COLLECT = {
   title: 'Discovery questions',
   status: 'open',
   createdAt: 1710000100000,
-  startNewChat: true,
+  startNewChat: 'Start new chat',
   questions: [
     { id: 'goal', prompt: 'What should we build?', type: 'markdown' },
   ],
@@ -112,12 +112,12 @@ describe('SessionSectionCodec', () => {
 
   it('accepts and round-trips standalone Collect sections without binding fields', () => {
     const section = validateSessionSection(STANDALONE_COLLECT);
-    expect(section).toMatchObject({ kind: 'collect', startNewChat: true, actions: [] });
+    expect(section).toMatchObject({ kind: 'collect', startNewChat: 'Start new chat', actions: [] });
     expect('conversationId' in section).toBe(false);
     expect('epoch' in section).toBe(false);
 
     const serialized = serializeSessionSectionYaml(section);
-    expect(serialized).toContain('startNewChat: true');
+    expect(serialized).toContain('Start new chat');
     expect(serialized).not.toContain('conversationId:');
     expect(serialized).not.toContain('epoch:');
     expect(parseSessionSectionYaml(serialized)).toEqual(section);
@@ -129,8 +129,50 @@ describe('SessionSectionCodec', () => {
     ['empty actions', { ...STANDALONE_COLLECT, actions: [] }],
     ['act kind', { ...STANDALONE_COLLECT, kind: 'act' }],
     ['false flag', { ...COLLECT_SECTION, startNewChat: false }],
+    ['boolean true', { ...STANDALONE_COLLECT, startNewChat: true }],
+    ['empty label', { ...STANDALONE_COLLECT, startNewChat: '' }],
   ])('rejects ambiguous standalone combination: %s', (_label, value) => {
     expect(() => validateSessionSection(value)).toThrow();
+  });
+
+  it('accepts and round-trips formId on bound act, bound collect, and standalone collect', () => {
+    const act = parseSessionSectionYaml(`${ACT_YAML}\nformId: form_feedback\n`);
+    expect(act.formId).toBe('form_feedback');
+    expect(parseSessionSectionYaml(serializeSessionSectionYaml(act))).toEqual(act);
+
+    const collect = validateSessionSection({
+      ...COLLECT_SECTION,
+      formId: 'form_feedback',
+    });
+    expect(collect.formId).toBe('form_feedback');
+    expect(parseSessionSectionYaml(serializeSessionSectionYaml(collect))).toEqual(collect);
+
+    const standalone = validateSessionSection({
+      ...STANDALONE_COLLECT,
+      formId: 'form_intake',
+    });
+    expect(standalone.formId).toBe('form_intake');
+    const serializedStandalone = serializeSessionSectionYaml(standalone);
+    expect(serializedStandalone).toContain('formId:');
+    expect(serializedStandalone).toContain('Start new chat');
+    expect(parseSessionSectionYaml(serializedStandalone)).toEqual(standalone);
+  });
+
+  it('omits formId from serialization when absent', () => {
+    const serialized = serializeSessionSectionYaml(COLLECT_SECTION);
+    expect(serialized).not.toContain('formId');
+    expect(validateSessionSection(COLLECT_SECTION).formId).toBeUndefined();
+  });
+
+  it.each([
+    ['empty', ''],
+    ['unsafe path', '../escape'],
+    ['spaces', 'form id'],
+  ])('rejects invalid formId: %s', (_label, formId) => {
+    expect(() => validateSessionSection({
+      ...COLLECT_SECTION,
+      formId,
+    })).toThrow(/formId/);
   });
 
   it('still accepts existing bound Act and Collect sections', () => {
@@ -185,5 +227,55 @@ describe('SessionSectionCodec', () => {
     expect(() => parseSessionSectionYaml(
       ACT_YAML.replace('conv-1710000000000-ab12cd34e', '../escape'),
     )).toThrow(/conversationId/);
+  });
+
+  it('round-trips open cssClass and style maps without a named layout allowlist', () => {
+    const section = validateSessionSection({
+      ...COLLECT_SECTION,
+      cssClass: 'board-card two-up',
+      style: {
+        display: 'grid',
+        'grid-template-columns': '1fr 1fr',
+        gap: '12px',
+      },
+      questions: [
+        {
+          ...COLLECT_SECTION.questions[0],
+          cssClass: 'choice-row',
+          style: { 'flex-direction': 'row' },
+        },
+        COLLECT_SECTION.questions[1],
+      ],
+      actions: [
+        {
+          ...COLLECT_SECTION.actions[0],
+          cssClass: 'primary-action',
+          style: { 'align-self': 'end' },
+        },
+      ],
+    });
+
+    expect(section.cssClass).toBe('board-card two-up');
+    expect(section.style).toEqual({
+      display: 'grid',
+      'grid-template-columns': '1fr 1fr',
+      gap: '12px',
+    });
+    expect(section.questions[0].cssClass).toBe('choice-row');
+    expect(section.actions[0].style).toEqual({ 'align-self': 'end' });
+
+    const again = parseSessionSectionYaml(serializeSessionSectionYaml(section));
+    expect(again).toEqual(section);
+  });
+
+  it('rejects unsafe style values and dean- reserved cssClass tokens', () => {
+    expect(() => validateSessionSection({
+      ...COLLECT_SECTION,
+      style: { background: 'url(https://evil.example/x)' },
+    })).toThrow(/style/);
+    expect(() => validateSessionSection({
+      ...COLLECT_SECTION,
+      cssClass: 'dean-session-section--stale',
+    })).toThrow(/cssClass/);
   });
 });

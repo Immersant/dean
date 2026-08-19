@@ -5,6 +5,7 @@ import {
   isStandaloneCollectSessionSection,
   SESSION_SECTION_LIMITS,
 } from './SessionSection';
+import { serializeSessionSectionPresentation } from './SessionSectionPresentation';
 import {
   SessionSectionValidationError,
   validateSessionSection,
@@ -90,12 +91,18 @@ function serializeYamlFallback(payload: Record<string, unknown>): string {
                   const [optKey, optValue] = optionEntries[0];
                   lines.push(`      - ${optKey}: ${formatScalar(optValue)}`);
                   for (const [restKey, restValue] of optionEntries.slice(1)) {
-                    lines.push(`        ${restKey}: ${formatScalar(restValue)}`);
+                    if (restValue !== null && typeof restValue === 'object' && !Array.isArray(restValue)) {
+                      appendYamlMapping(lines, restKey, restValue as Record<string, unknown>, 8);
+                    } else {
+                      lines.push(`        ${restKey}: ${formatScalar(restValue)}`);
+                    }
                   }
                 } else {
                   lines.push(`      - ${formatScalar(option)}`);
                 }
               }
+            } else if (nestedValue !== null && typeof nestedValue === 'object') {
+              appendYamlMapping(lines, nestedKey, nestedValue as Record<string, unknown>, 4);
             } else {
               lines.push(`    ${nestedKey}: ${formatScalar(nestedValue)}`);
             }
@@ -139,6 +146,20 @@ function serializeYamlFallback(payload: Record<string, unknown>): string {
   return lines.join('\n');
 }
 
+function appendYamlMapping(
+  lines: string[],
+  key: string,
+  value: Record<string, unknown>,
+  indent: number,
+): void {
+  const pad = ' '.repeat(indent);
+  const childPad = ' '.repeat(indent + 2);
+  lines.push(`${pad}${key}:`);
+  for (const [nestedKey, nestedValue] of Object.entries(value)) {
+    lines.push(`${childPad}${nestedKey}: ${formatScalar(nestedValue)}`);
+  }
+}
+
 function formatScalar(value: unknown): string {
   if (typeof value === 'string') {
     return JSON.stringify(value);
@@ -172,18 +193,26 @@ export function serializeSessionSectionYaml(section: SessionSection): string {
     status: validated.status,
     createdAt: validated.createdAt,
   };
+  if (validated.formId) {
+    payload.formId = validated.formId;
+  }
   if (isStandaloneCollectSessionSection(validated)) {
-    payload.startNewChat = true;
+    payload.startNewChat = validated.startNewChat;
   } else {
     payload.conversationId = validated.conversationId;
     payload.epoch = validated.epoch;
   }
+  serializeSessionSectionPresentation(payload, validated);
   if (validated.actions.length > 0) {
-    payload.actions = validated.actions.map(action => ({
-      id: action.id,
-      label: action.label,
-      prompt: action.prompt,
-    }));
+    payload.actions = validated.actions.map(action => {
+      const entry: Record<string, unknown> = {
+        id: action.id,
+        label: action.label,
+        prompt: action.prompt,
+      };
+      serializeSessionSectionPresentation(entry, action);
+      return entry;
+    });
   }
   if (validated.questions.length > 0) {
     payload.questions = validated.questions.map(question => {
@@ -192,11 +221,16 @@ export function serializeSessionSectionYaml(section: SessionSection): string {
         prompt: question.prompt,
         type: question.type,
       };
+      serializeSessionSectionPresentation(entry, question);
       if (question.options && question.options.length > 0) {
-        entry.options = question.options.map(option => ({
-          id: option.id,
-          label: option.label,
-        }));
+        entry.options = question.options.map(option => {
+          const optionEntry: Record<string, unknown> = {
+            id: option.id,
+            label: option.label,
+          };
+          serializeSessionSectionPresentation(optionEntry, option);
+          return optionEntry;
+        });
       }
       return entry;
     });

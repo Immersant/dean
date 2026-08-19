@@ -2,6 +2,7 @@ import { createMockEl } from '@test/helpers/MockElement';
 
 import { type BoundCollectSessionSection, validateSessionSection } from '@/core/session-sections';
 import { CollectSessionSectionController } from '@/features/session-sections/CollectSessionSectionController';
+import { clearCollectSessionSectionRegistry } from '@/features/session-sections/CollectSessionSectionRegistry';
 import { clearSessionSectionDiagnostics } from '@/features/session-sections/SessionSectionDiagnostics';
 
 jest.mock('@/features/session-sections/SessionSectionWriteBack', () => {
@@ -51,6 +52,7 @@ const BODY = 'schemaVersion: 1\nid: sec_collect\n';
 describe('CollectSessionSectionController', () => {
   beforeEach(() => {
     clearSessionSectionDiagnostics();
+    clearCollectSessionSectionRegistry();
     jest.clearAllMocks();
     jest.mocked(writeSessionSectionToNote).mockResolvedValue({ status: 'written' });
   });

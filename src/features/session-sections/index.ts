@@ -1,9 +1,27 @@
+export { applySessionSectionPresentation } from './applySessionSectionPresentation';
 export {
   CollectSessionSectionController,
   type CollectSessionSectionControllerOptions,
   type CollectSessionSectionFlushResult,
   isSelectableQuestion,
 } from './CollectSessionSectionController';
+export {
+  clearCollectSessionSectionRegistry,
+  type CollectSessionSectionLiveSnapshot,
+  flushCollectSessionSections,
+  registerCollectSessionSectionController,
+  snapshotCollectSessionSections,
+  unregisterCollectSessionSectionController,
+} from './CollectSessionSectionRegistry';
+export {
+  type DeanSessionFenceSlice,
+  listDeanSessionFences,
+} from './DeanSessionFenceScan';
+export {
+  type ListedNoteSessionSection,
+  listNoteSessionSections,
+  peekSessionSectionFormId,
+} from './listNoteSessionSections';
 export { refreshSessionSectionPreviews } from './refreshSessionSectionPreviews';
 export {
   isInsideDeanContainer,
@@ -11,6 +29,7 @@ export {
   renderSessionSectionBlock,
   SESSION_SECTION_FENCE_LANGUAGE,
 } from './renderSessionSectionBlock';
+export { resolveNoteSessionSectionForm } from './resolveNoteSessionSectionForm';
 export {
   confirmSessionSectionAction,
   SessionSectionConfirmModal,
@@ -50,7 +69,14 @@ export {
   type SessionSectionWriteBackResult,
   writeSessionSectionToNote,
 } from './SessionSectionWriteBack';
-export { formatStandaloneCollectDraft } from './StandaloneCollectDraft';
+export {
+  readOpenMarkdownNote,
+  shouldRenderSessionSectionSubmit,
+} from './shouldRenderSessionSectionSubmit';
+export {
+  formatStandaloneCollectDraft,
+  type StandaloneCollectDraftView,
+} from './StandaloneCollectDraft';
 export {
   openStandaloneCollectDraft,
   type OpenStandaloneCollectDraftOptions,

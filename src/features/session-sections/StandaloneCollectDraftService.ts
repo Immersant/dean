@@ -4,8 +4,12 @@ import type {
 } from '../../core/session-sections';
 import type { FeatureHost } from '../FeatureHost';
 import type { CollectSessionSectionController } from './CollectSessionSectionController';
+import { resolveNoteSessionSectionForm } from './resolveNoteSessionSectionForm';
 import { recordSessionSectionDiagnostic } from './SessionSectionDiagnostics';
-import { formatStandaloneCollectDraft } from './StandaloneCollectDraft';
+import {
+  formatStandaloneCollectDraft,
+  type StandaloneCollectDraftView,
+} from './StandaloneCollectDraft';
 
 export interface OpenStandaloneCollectDraftOptions {
   readonly host: FeatureHost;
@@ -37,8 +41,31 @@ export async function openStandaloneCollectDraft(
     return { status: 'blocked', reason: 'writeback-failed' };
   }
 
+  let draftView: StandaloneCollectDraftView = snapshot;
+  if (options.section.formId) {
+    const form = await resolveNoteSessionSectionForm(
+      options.host,
+      options.notePath,
+      options.section.formId,
+    );
+    if (!form.ok) {
+      recordSessionSectionDiagnostic({
+        level: 'error',
+        code: `form-${form.code}`,
+        message: form.message,
+        sectionId: options.section.id,
+      });
+      return { status: 'blocked', reason: 'invalid-request' };
+    }
+    draftView = {
+      title: form.title,
+      questions: form.questions,
+      answers: form.answers,
+    };
+  }
+
   const result = await options.host.openSessionSectionDraft({
-    content: formatStandaloneCollectDraft(snapshot, options.notePath),
+    content: formatStandaloneCollectDraft(draftView, options.notePath),
     sourceNotePath: options.notePath,
   });
   recordSessionSectionDiagnostic({

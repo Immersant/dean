@@ -301,6 +301,7 @@
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
         "composerUnavailable": "Impossible d’ouvrir un nouveau brouillon de discussion.",
         "writeBackFailed": "Impossible d’enregistrer les réponses du formulaire. La nouvelle discussion n’a pas été ouverte.",
+        "writeBackFailedAction": "Impossible d’enregistrer les réponses du formulaire. L’action n’a pas été envoyée.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },

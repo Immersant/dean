@@ -7,6 +7,10 @@ import type {
   SessionSectionQuestion,
 } from '../../core/session-sections';
 import {
+  registerCollectSessionSectionController,
+  unregisterCollectSessionSectionController,
+} from './CollectSessionSectionRegistry';
+import {
   computeAnswersDigest,
   type SessionSectionWriteBackResult,
   writeSessionSectionToNote,
@@ -59,6 +63,19 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
       options.section.id,
       this.answers,
     );
+    registerCollectSessionSectionController(this);
+  }
+
+  getNotePath(): string {
+    return this.notePath;
+  }
+
+  getSectionId(): string {
+    return this.baseSection.id;
+  }
+
+  getFormId(): string | undefined {
+    return this.baseSection.formId;
   }
 
   getAnswers(): SessionSectionAnswers {
@@ -143,6 +160,7 @@ export class CollectSessionSectionController extends MarkdownRenderChild {
     // Capture answers before dispose; still allow the in-flight write.
     void this.enqueueFlush();
     this.disposed = true;
+    unregisterCollectSessionSectionController(this);
   }
 
   private enqueueFlush(): Promise<CollectSessionSectionFlushResult> {

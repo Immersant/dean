@@ -38,6 +38,25 @@ export {
   type SessionSectionDraftResult,
 } from './SessionSectionDraft';
 export {
+  isLastSessionSectionFormMember,
+  type ResolvedSessionSectionForm,
+  resolveSessionSectionForm,
+  type SessionSectionFormCandidate,
+  type SessionSectionFormError,
+  type SessionSectionFormErrorCode,
+  type SessionSectionFormInput,
+  type SessionSectionFormMode,
+  type SessionSectionFormResolveResult,
+} from './SessionSectionForm';
+export {
+  parseSessionSectionCssClass,
+  parseSessionSectionPresentation,
+  parseSessionSectionStyle,
+  serializeSessionSectionPresentation,
+  type SessionSectionPresentation,
+  type SessionSectionStyle,
+} from './SessionSectionPresentation';
+export {
   buildDeanSystemPromptAppendices,
   SESSION_SECTION_AUTHORING_APPENDIX,
 } from './sessionSectionPrompt';

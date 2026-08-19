@@ -15,13 +15,10 @@ import {
   type SessionSectionQuestionType,
   type SessionSectionStatus,
 } from './SessionSection';
+import { parseSessionSectionPresentation } from './SessionSectionPresentation';
+import { SessionSectionValidationError } from './SessionSectionValidationError';
 
-export class SessionSectionValidationError extends Error {
-  constructor(message: string, options?: ErrorOptions) {
-    super(message, options);
-    this.name = 'SessionSectionValidationError';
-  }
-}
+export { SessionSectionValidationError };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -95,6 +92,7 @@ function parseAction(value: unknown, index: number): SessionSectionAction {
       `actions[${index}].prompt`,
       SESSION_SECTION_LIMITS.promptChars,
     ),
+    ...parseSessionSectionPresentation(value, `actions[${index}]`),
   };
 }
 
@@ -111,6 +109,10 @@ function parseOption(value: unknown, questionIndex: number, optionIndex: number)
       value.label,
       `questions[${questionIndex}].options[${optionIndex}].label`,
       SESSION_SECTION_LIMITS.labelChars,
+    ),
+    ...parseSessionSectionPresentation(
+      value,
+      `questions[${questionIndex}].options[${optionIndex}]`,
     ),
   };
 }
@@ -138,6 +140,7 @@ function parseQuestion(value: unknown, index: number): SessionSectionQuestion {
       SESSION_SECTION_LIMITS.promptChars,
     ),
     type,
+    ...parseSessionSectionPresentation(value, `questions[${index}]`),
   };
 
   if (type === 'single' || type === 'multi') {
@@ -163,6 +166,13 @@ function parseQuestion(value: unknown, index: number): SessionSectionQuestion {
     );
   }
   return question;
+}
+
+function parseFormId(value: unknown): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  return requireLocalId(value, 'formId');
 }
 
 function parseAnswers(value: unknown): SessionSectionAnswers {
@@ -219,6 +229,7 @@ export function validateSessionSection(raw: unknown): SessionSection {
   }
 
   const id = requireLocalId(raw.id, 'id');
+  const formId = parseFormId(raw.formId);
   const kind = parseKind(raw.kind);
   const title = requireNonEmptyString(raw.title, 'title', SESSION_SECTION_LIMITS.titleChars);
   const status = parseStatus(raw.status);
@@ -268,14 +279,15 @@ export function validateSessionSection(raw: unknown): SessionSection {
     questionIds.add(question.id);
   }
 
-  if (raw.startNewChat !== undefined && raw.startNewChat !== true) {
-    throw new SessionSectionValidationError('startNewChat must be true when present');
-  }
-
-  if (raw.startNewChat === true) {
+  if (raw.startNewChat !== undefined) {
     if (kind !== 'collect') {
       throw new SessionSectionValidationError('startNewChat is only allowed for collect sections');
     }
+    const startNewChat = requireNonEmptyString(
+      raw.startNewChat,
+      'startNewChat',
+      SESSION_SECTION_LIMITS.labelChars,
+    );
     if (raw.conversationId !== undefined || raw.epoch !== undefined) {
       throw new SessionSectionValidationError(
         'standalone collect sections must omit conversationId and epoch',
@@ -287,14 +299,16 @@ export function validateSessionSection(raw: unknown): SessionSection {
     return {
       schemaVersion: SESSION_SECTION_SCHEMA_VERSION,
       id,
+      ...(formId ? { formId } : {}),
       kind: 'collect',
       title,
       status,
       createdAt,
-      startNewChat: true,
+      startNewChat,
       actions: [],
       questions,
       answers,
+      ...parseSessionSectionPresentation(raw, 'section'),
     };
   }
 
@@ -306,6 +320,7 @@ export function validateSessionSection(raw: unknown): SessionSection {
   const section: BoundSessionSection = {
     schemaVersion: SESSION_SECTION_SCHEMA_VERSION,
     id,
+    ...(formId ? { formId } : {}),
     conversationId,
     epoch: decodeSectionEpoch(raw.epoch),
     kind,
@@ -315,6 +330,7 @@ export function validateSessionSection(raw: unknown): SessionSection {
     actions,
     questions,
     answers,
+    ...parseSessionSectionPresentation(raw, 'section'),
   };
   return section;
 }

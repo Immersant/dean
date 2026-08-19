@@ -8,6 +8,14 @@ import {
   SESSION_SECTION_FENCE_LANGUAGE,
   type SessionSection,
 } from '../../core/session-sections';
+import {
+  detectLineEnding,
+  extractDeanSessionFenceBody,
+  findDeanSessionFenceEnd,
+  listDeanSessionFences,
+  mapNormalizedRangeToOriginal,
+  mapOriginalOffsetToNormalized,
+} from './DeanSessionFenceScan';
 import { recordSessionSectionDiagnostic } from './SessionSectionDiagnostics';
 
 export type SessionSectionWriteBackResult =
@@ -127,7 +135,7 @@ export async function writeSessionSectionToNote(
     return { status: 'failed', error: 'post-write fence missing' };
   }
   try {
-    parseSessionSectionYaml(extractBodyFromFullFence(next.slice(verifyRange.start, verifyRange.end)));
+    parseSessionSectionYaml(extractDeanSessionFenceBody(next.slice(verifyRange.start, verifyRange.end)));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'post-write body invalid';
     recordSessionSectionDiagnostic({
@@ -185,9 +193,7 @@ export function normalizeBodyForFile(body: string, lineEnding: '\n' | '\r\n'): s
   return normalized.endsWith(lineEnding) ? normalized : `${normalized}${lineEnding}`;
 }
 
-export function detectLineEnding(content: string): '\n' | '\r\n' {
-  return content.includes('\r\n') ? '\r\n' : '\n';
-}
+export { detectLineEnding };
 
 export function classifyFenceSlice(slice: string): FenceRangeKind {
   const trimmed = slice.replace(/^\uFEFF/, '').trimStart();
@@ -218,7 +224,7 @@ export function resolveFenceRange(
   if (fromSectionInfo) {
     const expanded = expandToFullFence(fileContent, fromSectionInfo.start, fromSectionInfo.end, ending);
     if (expanded && fenceBodyHasSectionId(
-      extractBodyFromFullFence(fileContent.slice(expanded.start, expanded.end)),
+      extractDeanSessionFenceBody(fileContent.slice(expanded.start, expanded.end)),
       sectionId,
     )) {
       return expanded;
@@ -237,28 +243,16 @@ export function resolveFenceRange(
 export function findFenceBySectionId(
   fileContent: string,
   sectionId: string,
-  ending: '\n' | '\r\n' = detectLineEnding(fileContent),
+  _ending: '\n' | '\r\n' = detectLineEnding(fileContent),
 ): FenceRange | null {
-  const normalized = fileContent.replace(/\r\n/g, '\n');
-  const open = '```' + SESSION_SECTION_FENCE_LANGUAGE;
-  let searchFrom = 0;
-  while (searchFrom < normalized.length) {
-    const openAt = normalized.indexOf(open + '\n', searchFrom);
-    if (openAt < 0) {
-      break;
-    }
-    const endAt = findFenceEnd(normalized, openAt);
-    if (endAt < 0) {
-      break;
-    }
-    const body = extractBodyFromFullFence(normalized.slice(openAt, endAt));
-    if (fenceBodyHasSectionId(body, sectionId)) {
+  for (const fence of listDeanSessionFences(fileContent)) {
+    if (fenceBodyHasSectionId(fence.body, sectionId)) {
       return {
-        ...mapNormalizedRangeToOriginal(fileContent, openAt, endAt, ending),
+        start: fence.start,
+        end: fence.end,
         kind: 'full-fence',
       };
     }
-    searchFrom = endAt;
   }
   return null;
 }
@@ -273,56 +267,28 @@ export function expandToFullFence(
   hintEnd: number,
   ending: '\n' | '\r\n' = detectLineEnding(fileContent),
 ): FenceRange | null {
-  const normalized = fileContent.replace(/\r\n/g, '\n');
-  const open = '```' + SESSION_SECTION_FENCE_LANGUAGE;
   const mapHintStart = mapOriginalOffsetToNormalized(fileContent, hintStart, ending);
   const mapHintEnd = mapOriginalOffsetToNormalized(fileContent, hintEnd, ending);
 
   // Prefer the fence whose body contains the hint midpoint (stable with body-only hints).
   const mid = Math.floor((mapHintStart + mapHintEnd) / 2);
-  let searchFrom = 0;
   let fallback: FenceRange | null = null;
-  while (searchFrom < normalized.length) {
-    const openAt = normalized.indexOf(open + '\n', searchFrom);
-    if (openAt < 0) {
-      break;
-    }
-    const endAt = findFenceEnd(normalized, openAt);
-    if (endAt < 0) {
-      break;
-    }
+  for (const fence of listDeanSessionFences(fileContent)) {
+    const openAt = mapOriginalOffsetToNormalized(fileContent, fence.start, ending);
+    const endAt = mapOriginalOffsetToNormalized(fileContent, fence.end, ending);
     const range = {
-      ...mapNormalizedRangeToOriginal(fileContent, openAt, endAt, ending),
+      start: fence.start,
+      end: fence.end,
       kind: 'full-fence' as const,
     };
     if (openAt <= mid && mid < endAt) {
       return range;
     }
-    // Also accept overlap with the original hint window.
     if (endAt > mapHintStart && openAt < mapHintEnd) {
       fallback = range;
     }
-    searchFrom = endAt;
   }
   return fallback;
-}
-
-function extractBodyFromFullFence(fenceSlice: string): string {
-  const normalized = fenceSlice.replace(/\r\n/g, '\n');
-  const open = '```' + SESSION_SECTION_FENCE_LANGUAGE + '\n';
-  if (!normalized.startsWith(open)) {
-    // Body-only slice: strip a trailing close fence line if present.
-    return normalized.replace(/\n```\s*$/, '\n');
-  }
-  const withoutOpen = normalized.slice(open.length);
-  const closeAt = withoutOpen.lastIndexOf('\n```');
-  if (closeAt >= 0) {
-    return withoutOpen.slice(0, closeAt + 1);
-  }
-  if (withoutOpen.endsWith('```')) {
-    return withoutOpen.slice(0, -3);
-  }
-  return withoutOpen;
 }
 
 function rangeFromSectionInfo(
@@ -388,7 +354,7 @@ function rangeFromSourceMatch(
   const exactNeedle = open + '\n' + normalizedOriginal;
   const exactIndex = normalized.indexOf(exactNeedle);
   if (exactIndex >= 0) {
-    const endAt = findFenceEnd(normalized, exactIndex);
+    const endAt = findDeanSessionFenceEnd(normalized, exactIndex);
     if (endAt >= 0) {
       return {
         ...mapNormalizedRangeToOriginal(fileContent, exactIndex, endAt, ending),
@@ -424,89 +390,6 @@ export function fenceBodyHasSectionId(body: string, sectionId: string): boolean 
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function findFenceEnd(normalizedContent: string, openAt: number): number {
-  const afterOpen = normalizedContent.indexOf('\n', openAt);
-  if (afterOpen < 0) {
-    return -1;
-  }
-  // Close fence is a line that is exactly ``` (optionally trailing spaces).
-  // A second ```dean-session open without a close is not a valid terminator.
-  let searchFrom = afterOpen + 1;
-  while (searchFrom <= normalizedContent.length) {
-    const lineEnd = normalizedContent.indexOf('\n', searchFrom);
-    const end = lineEnd < 0 ? normalizedContent.length : lineEnd;
-    const line = normalizedContent.slice(searchFrom, end);
-    if (/^```\s*$/.test(line)) {
-      return end; // exclusive end at the newline after ```, or EOF
-    }
-    if (line.startsWith('```')) {
-      return -1;
-    }
-    if (lineEnd < 0) {
-      break;
-    }
-    searchFrom = lineEnd + 1;
-  }
-  return -1;
-}
-
-function mapNormalizedRangeToOriginal(
-  original: string,
-  normalizedStart: number,
-  normalizedEnd: number,
-  ending: '\n' | '\r\n',
-): { start: number; end: number } {
-  if (ending === '\n') {
-    return { start: normalizedStart, end: normalizedEnd };
-  }
-  let originalIndex = 0;
-  let normalizedIndex = 0;
-  let start = -1;
-  let end = -1;
-  while (originalIndex <= original.length && normalizedIndex <= normalizedEnd) {
-    if (normalizedIndex === normalizedStart) {
-      start = originalIndex;
-    }
-    if (normalizedIndex === normalizedEnd) {
-      end = originalIndex;
-      break;
-    }
-    if (original.startsWith('\r\n', originalIndex)) {
-      originalIndex += 2;
-      normalizedIndex += 1;
-    } else {
-      originalIndex += 1;
-      normalizedIndex += 1;
-    }
-  }
-  if (start < 0 || end < 0) {
-    return { start: normalizedStart, end: normalizedEnd };
-  }
-  return { start, end };
-}
-
-function mapOriginalOffsetToNormalized(
-  original: string,
-  originalOffset: number,
-  ending: '\n' | '\r\n',
-): number {
-  if (ending === '\n') {
-    return originalOffset;
-  }
-  let originalIndex = 0;
-  let normalizedIndex = 0;
-  while (originalIndex < originalOffset && originalIndex < original.length) {
-    if (original.startsWith('\r\n', originalIndex)) {
-      originalIndex += 2;
-      normalizedIndex += 1;
-    } else {
-      originalIndex += 1;
-      normalizedIndex += 1;
-    }
-  }
-  return normalizedIndex;
 }
 
 function isMarkdownFile(value: unknown): value is TFile {

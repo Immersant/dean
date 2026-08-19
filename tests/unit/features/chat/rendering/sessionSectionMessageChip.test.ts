@@ -73,6 +73,6 @@ describe('sessionSectionMessageChip', () => {
     expect(pathEl?.textContent).toBe('Onboard Mistral.md');
 
     main.dispatchEvent('click', { preventDefault: () => {}, stopPropagation: () => {} });
-    expect(onOpenNote).toHaveBeenCalledWith('Notes/Onboard Mistral.md');
+    expect(onOpenNote).toHaveBeenCalledWith('Notes/Onboard Mistral.md', expect.any(Object));
   });
 });

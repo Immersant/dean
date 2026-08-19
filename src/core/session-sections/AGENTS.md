@@ -7,9 +7,11 @@ Provider-neutral schema, codec, validation, prompt appendix, and context formatt
 | Module | Authority |
 | --- | --- |
 | `SessionSectionCodec` / `validateSessionSection` | Only mutator of the parsed `SessionSection` schema. Fail closed on invalid input. |
+| `SessionSectionPresentation` | Open `cssClass` / `style` maps. Not a named-layout allowlist; unsafe CSS values fail closed. |
 | `decodeSectionEpoch` | Finite non-negative integer decode; missing/invalid → `0`. |
 | `sessionSectionPrompt` | Authoring appendix text and when it is attached. |
 | `SessionSectionContext` | XML tag format for conversation binding and session-section context. |
+| `SessionSectionForm` | Note-level `formId` group resolve/merge. Fail closed on mixed mode, binding mismatch, duplicate questions, and cap breaches. |
 | `SessionSectionTurn` | DTO types for FeatureHost Act submit and Collect open-chat focus (implemented in features/composition). |
 
 ## Boundaries

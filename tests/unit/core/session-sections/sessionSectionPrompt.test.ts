@@ -34,8 +34,20 @@ describe('buildDeanSystemPromptAppendices', () => {
   });
 
   it('documents standalone new-chat Collect forms without invented conversation ids', () => {
-    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('startNewChat: true');
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('startNewChat');
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('required submit-button label');
     expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('omit `conversationId` and `epoch`');
     expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('Never invent a conversation id');
+  });
+
+  it('documents split-fence forms that share formId without mixing modes', () => {
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('formId');
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain('interleave normal editor prose');
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain(
+      'Never mix bound and standalone under one `formId`',
+    );
+    expect(SESSION_SECTION_AUTHORING_APPENDIX).toContain(
+      'only on the last member in the note',
+    );
   });
 });

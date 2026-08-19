@@ -14,9 +14,15 @@ import {
 } from '../../core/session-sections';
 import { t } from '../../i18n/i18n';
 import type { FeatureHost } from '../FeatureHost';
+import { applySessionSectionPresentation } from './applySessionSectionPresentation';
 import { CollectSessionSectionController } from './CollectSessionSectionController';
+import { flushCollectSessionSections } from './CollectSessionSectionRegistry';
 import { recordSessionSectionDiagnostic } from './SessionSectionDiagnostics';
 import { activateSessionSectionAction } from './SessionSectionService';
+import {
+  readOpenMarkdownNote,
+  shouldRenderSessionSectionSubmit,
+} from './shouldRenderSessionSectionSubmit';
 import { openStandaloneCollectDraft } from './StandaloneCollectDraftService';
 
 const usedActions = new Set<string>();
@@ -42,6 +48,8 @@ export interface RenderSessionSectionWidgetOptions {
   readonly notePath: string;
   readonly section: SessionSection;
   readonly ctx?: MarkdownPostProcessorContext;
+  /** Full note text when the caller already has it (tests / processor). */
+  readonly noteContent?: string;
 }
 
 /**
@@ -53,8 +61,11 @@ export function renderSessionSectionWidget(
   options: RenderSessionSectionWidgetOptions,
 ): void {
   const { host, containerEl, source, notePath, section, ctx } = options;
+  const noteContent = options.noteContent ?? readOpenMarkdownNote(host.app, notePath);
+  const showSubmit = shouldRenderSessionSectionSubmit(section, noteContent);
   containerEl.empty();
   containerEl.addClass('dean-session-section');
+  applySessionSectionPresentation(containerEl, section);
   // Live Preview embeds sit under CodeMirror; without this, CM steals mousedown
   // and radios/checkboxes/text fields never activate.
   enableInteractiveEmbed(containerEl);
@@ -112,7 +123,7 @@ export function renderSessionSectionWidget(
     });
   }
 
-  if (isStandaloneCollectSessionSection(section)) {
+  if (showSubmit && isStandaloneCollectSessionSection(section)) {
     renderStartNewChatButton(containerEl, {
       host,
       notePath,
@@ -121,7 +132,7 @@ export function renderSessionSectionWidget(
     });
   }
 
-  if (isBoundSessionSection(section) && section.actions.length > 0) {
+  if (showSubmit && isBoundSessionSection(section) && section.actions.length > 0) {
     const actionsEl = containerEl.createDiv({ cls: 'dean-session-section-actions' });
     for (const action of section.actions) {
       renderActionButton(actionsEl, {
@@ -131,6 +142,8 @@ export function renderSessionSectionWidget(
         sectionId: section.id,
         actionId: action.id,
         actionLabel: action.label,
+        cssClass: action.cssClass,
+        style: action.style,
         collect,
       });
     }
@@ -151,11 +164,11 @@ function renderStartNewChatButton(
   const actionsEl = containerEl.createDiv({ cls: 'dean-session-section-actions' });
   const button = actionsEl.createEl('button', {
     cls: 'dean-session-section-start-chat',
-    text: t('settings.sessionSections.newChat.label'),
+    text: section.startNewChat,
   });
   button.setAttribute('type', 'button');
-  button.setAttribute('aria-label', t('settings.sessionSections.newChat.aria'));
-  button.setAttribute('title', t('settings.sessionSections.newChat.aria'));
+  button.setAttribute('aria-label', section.startNewChat);
+  button.setAttribute('title', section.startNewChat);
   enableInteractiveControl(button);
   if (!collect) {
     button.setAttribute('disabled', 'true');
@@ -179,6 +192,11 @@ function renderStartNewChatButton(
     button.setAttribute('aria-busy', 'true');
     void (async () => {
       try {
+        const noteFlush = await flushCollectSessionSections(notePath);
+        if (noteFlush.status === 'blocked') {
+          new Notice(t('settings.sessionSections.blocked.writeBackFailed'));
+          return;
+        }
         const result = await openStandaloneCollectDraft({
           host,
           section,
@@ -259,6 +277,8 @@ function renderActionButton(
     readonly sectionId: string;
     readonly actionId: string;
     readonly actionLabel: string;
+    readonly cssClass?: string;
+    readonly style?: Readonly<Record<string, string>>;
     readonly collect: CollectSessionSectionController | null;
   },
 ): void {
@@ -272,6 +292,10 @@ function renderActionButton(
   });
   button.setAttribute('type', 'button');
   button.setAttribute('data-action-id', actionId);
+  applySessionSectionPresentation(button, {
+    cssClass: options.cssClass,
+    style: options.style,
+  });
   enableInteractiveControl(button);
 
   const reset = row.createEl('button', { cls: 'dean-session-section-action-reset' });
@@ -310,6 +334,11 @@ function renderActionButton(
       : source;
     void (async () => {
       try {
+        const noteFlush = await flushCollectSessionSections(notePath);
+        if (noteFlush.status === 'blocked') {
+          new Notice(t('settings.sessionSections.blocked.writeBackFailedAction'));
+          return;
+        }
         if (collect) {
           await collect.flush();
         }
@@ -345,6 +374,9 @@ function renderCollectForm(
 
   for (const question of section.questions) {
     const item = questionsEl.createDiv({ cls: 'dean-session-section-question' });
+    item.setAttribute('data-question-id', question.id);
+    item.setAttribute('data-question-type', question.type);
+    applySessionSectionPresentation(item, question);
     item.createDiv({
       cls: 'dean-session-section-question-prompt',
       text: question.prompt,
@@ -377,6 +409,7 @@ function renderQuestionControl(
         cls: 'dean-session-section-question-option',
         attr: { for: inputId },
       });
+      applySessionSectionPresentation(label, option);
       const input = label.createEl('input', {
         attr: {
           type: 'radio',
@@ -415,6 +448,7 @@ function renderQuestionControl(
         cls: 'dean-session-section-question-option',
         attr: { for: inputId },
       });
+      applySessionSectionPresentation(label, option);
       const input = label.createEl('input', {
         attr: {
           type: 'checkbox',

@@ -11,6 +11,12 @@ export const SESSION_SECTION_LIMITS = {
   promptChars: 8_000,
   answerChars: 8_000,
   sectionsPerNote: 16,
+  membersPerForm: 8,
+  questionsPerForm: 40,
+  cssClassTokens: 8,
+  cssClassTokenChars: 64,
+  styleDecls: 32,
+  styleValueChars: 200,
 } as const;
 
 export const SESSION_SECTION_LOCAL_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
@@ -30,11 +36,15 @@ export interface SessionSectionAction {
   readonly id: string;
   readonly label: string;
   readonly prompt: string;
+  readonly cssClass?: string;
+  readonly style?: Readonly<Record<string, string>>;
 }
 
 export interface SessionSectionQuestionOption {
   readonly id: string;
   readonly label: string;
+  readonly cssClass?: string;
+  readonly style?: Readonly<Record<string, string>>;
 }
 
 export interface SessionSectionQuestion {
@@ -42,6 +52,8 @@ export interface SessionSectionQuestion {
   readonly prompt: string;
   readonly type: SessionSectionQuestionType;
   readonly options?: readonly SessionSectionQuestionOption[];
+  readonly cssClass?: string;
+  readonly style?: Readonly<Record<string, string>>;
 }
 
 export type SessionSectionAnswers = Record<string, string | string[]>;
@@ -49,11 +61,14 @@ export type SessionSectionAnswers = Record<string, string | string[]>;
 interface SessionSectionBase {
   readonly schemaVersion: typeof SESSION_SECTION_SCHEMA_VERSION;
   readonly id: string;
+  readonly formId?: string;
   readonly title: string;
   readonly status: SessionSectionStatus;
   readonly createdAt: number;
   readonly questions: readonly SessionSectionQuestion[];
   readonly answers: SessionSectionAnswers;
+  readonly cssClass?: string;
+  readonly style?: Readonly<Record<string, string>>;
 }
 
 export interface BoundActSessionSection extends SessionSectionBase {
@@ -74,7 +89,8 @@ export interface BoundCollectSessionSection extends SessionSectionBase {
 
 export interface StandaloneCollectSessionSection extends SessionSectionBase {
   readonly kind: 'collect';
-  readonly startNewChat: true;
+  /** Authored submit-button label. Presence of this string marks the standalone variant. */
+  readonly startNewChat: string;
   readonly actions: readonly [];
   readonly conversationId?: never;
   readonly epoch?: never;
@@ -87,7 +103,7 @@ export type SessionSection = BoundSessionSection | StandaloneCollectSessionSecti
 export function isStandaloneCollectSessionSection(
   section: SessionSection,
 ): section is StandaloneCollectSessionSection {
-  return section.kind === 'collect' && section.startNewChat === true;
+  return section.kind === 'collect' && typeof section.startNewChat === 'string';
 }
 
 export function isBoundSessionSection(

@@ -301,6 +301,7 @@
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
         "composerUnavailable": "Не удалось открыть новый черновик чата.",
         "writeBackFailed": "Не удалось сохранить ответы формы. Новый чат не был открыт.",
+        "writeBackFailedAction": "Не удалось сохранить ответы формы. Действие не было отправлено.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },

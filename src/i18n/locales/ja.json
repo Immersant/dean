@@ -301,6 +301,7 @@
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
         "composerUnavailable": "新しいチャットの下書きを開けませんでした。",
         "writeBackFailed": "フォームの回答を保存できなかったため、新しいチャットは開かれませんでした。",
+        "writeBackFailedAction": "フォームの回答を保存できなかったため、アクションは送信されませんでした。",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },

@@ -31,6 +31,7 @@ import {
   escapeMathDelimitersForStreaming,
   normalizeLatexMathDelimiters,
 } from '../../../utils/markdownMath';
+import { openWorkspaceLink } from '../../../utils/obsidianCompat';
 import type { FeatureHost } from '../../FeatureHost';
 import { findRewindContext } from '../rewind';
 import { formatConversationDirectoryTitle } from '../utils/conversationDirectoryTitle';
@@ -946,8 +947,8 @@ export class MessageRenderer {
       return;
     }
     renderSessionSectionMessageChip(contentEl, section, {
-      onOpenNote: (notePath) => {
-        void this.app.workspace.openLinkText(notePath, '', false);
+      onOpenNote: (notePath, event) => {
+        void openWorkspaceLink(this.app, notePath, '', event);
       },
     });
   }

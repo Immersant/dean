@@ -301,6 +301,7 @@
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
         "composerUnavailable": "새 채팅 초안을 열 수 없습니다.",
         "writeBackFailed": "양식 답변을 저장할 수 없어 새 채팅을 열지 않았습니다.",
+        "writeBackFailedAction": "양식 답변을 저장할 수 없어 작업을 보내지 않았습니다.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },

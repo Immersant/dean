@@ -8,7 +8,7 @@ const section: StandaloneCollectSessionSection = {
   title: 'Discovery #1',
   status: 'open',
   createdAt: 1710000100000,
-  startNewChat: true,
+  startNewChat: 'Start new chat',
   actions: [],
   questions: [
     { id: 'goal', prompt: 'What should we build?', type: 'markdown' },
@@ -49,6 +49,33 @@ describe('formatStandaloneCollectDraft', () => {
       '## Anything else?',
       '',
       '_Not answered_',
+    ].join('\n'));
+  });
+
+  it('formats a multi-member form view in document order', () => {
+    const draft = formatStandaloneCollectDraft({
+      title: 'Intake',
+      questions: [
+        { id: 'goal', prompt: 'What should we build?', type: 'markdown' },
+        { id: 'notes', prompt: 'Anything else?', type: 'text' },
+      ],
+      answers: {
+        goal: 'A reviewable workflow.',
+        notes: 'Keep the fences split.',
+      },
+    }, 'Notes/Discovery.md');
+    expect(draft).toBe([
+      '# Intake',
+      '',
+      'Source note: Notes/Discovery.md',
+      '',
+      '## What should we build?',
+      '',
+      'A reviewable workflow.',
+      '',
+      '## Anything else?',
+      '',
+      'Keep the fences split.',
     ].join('\n'));
   });
 
