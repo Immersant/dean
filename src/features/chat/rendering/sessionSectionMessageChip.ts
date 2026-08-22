@@ -1,7 +1,11 @@
 import { setIcon } from 'obsidian';
 
-import type { ExecutionInputSessionSectionSnapshot } from '../../../core/types';
+import type {
+  ExecutionInputSessionSectionQuestionSnapshot,
+  ExecutionInputSessionSectionSnapshot,
+} from '../../../core/types';
 import { t } from '../../../i18n/i18n';
+import { setupCollapsible } from './collapsible';
 
 export interface SessionSectionMessageChipOptions {
   readonly onOpenNote?: (notePath: string, event?: MouseEvent) => void;
@@ -64,7 +68,109 @@ export function renderSessionSectionMessageChip(
     });
   }
 
+  const disclosure = formatSessionSectionChipDisclosure(section);
+  if (disclosure) {
+    chip.addClass('dean-session-section-message-chip--has-prompt');
+
+    const toggle = chip.createEl('button', {
+      cls: 'dean-session-section-message-chip-toggle',
+      attr: { type: 'button' },
+    });
+    const toggleIcon = toggle.createSpan({
+      cls: 'dean-session-section-message-chip-toggle-icon',
+    });
+    setIcon(toggleIcon, 'chevron-down');
+    setPromptToggleAria(toggle, false);
+
+    const promptEl = chip.createEl('pre', {
+      cls: 'dean-session-section-message-chip-prompt',
+      text: disclosure,
+    });
+
+    setupCollapsible(chip, toggle, promptEl, { isExpanded: false }, {
+      onToggle: isExpanded => setPromptToggleAria(toggle, isExpanded),
+    });
+    toggle.addEventListener('click', (event) => {
+      event.preventDefault?.();
+      event.stopPropagation?.();
+    });
+  }
+
   return chip;
+}
+
+export function formatSessionSectionChipDisclosure(
+  section: ExecutionInputSessionSectionSnapshot,
+): string | undefined {
+  const blocks: string[] = [];
+  if (typeof section.prompt === 'string' && section.prompt.trim()) {
+    blocks.push(section.prompt);
+  }
+  const qa = formatSessionSectionChipQuestions(section);
+  if (qa) {
+    blocks.push(qa);
+  }
+  return blocks.length > 0 ? blocks.join('\n\n') : undefined;
+}
+
+function formatSessionSectionChipQuestions(
+  section: ExecutionInputSessionSectionSnapshot,
+): string | undefined {
+  const answers = section.answers ?? {};
+  const consumed = new Set<string>();
+  const blocks: string[] = [];
+
+  for (const question of section.questions ?? []) {
+    consumed.add(question.id);
+    blocks.push(formatQuestionBlock(question.prompt, answers[question.id], question));
+  }
+  for (const [id, value] of Object.entries(answers)) {
+    if (consumed.has(id)) {
+      continue;
+    }
+    blocks.push(formatQuestionBlock(id, value, undefined));
+  }
+  return blocks.length > 0 ? blocks.join('\n\n') : undefined;
+}
+
+function formatQuestionBlock(
+  heading: string,
+  value: string | string[] | undefined,
+  question: ExecutionInputSessionSectionQuestionSnapshot | undefined,
+): string {
+  const answerLines = formatAnswerLines(value, question);
+  if (answerLines.length === 0) {
+    answerLines.push(t('settings.sessionSections.newChatDraft.notAnswered'));
+  }
+  return [heading, ...answerLines].join('\n');
+}
+
+function formatAnswerLines(
+  value: string | string[] | undefined,
+  question: ExecutionInputSessionSectionQuestionSnapshot | undefined,
+): string[] {
+  const values = Array.isArray(value)
+    ? value
+    : typeof value === 'string' && value.trim()
+      ? [value]
+      : [];
+  const lines: string[] = [];
+  for (const item of values) {
+    if (!item.trim()) {
+      continue;
+    }
+    lines.push(question?.options?.find(option => option.id === item)?.label ?? item);
+  }
+  return lines;
+}
+
+function setPromptToggleAria(toggle: HTMLElement, isExpanded: boolean): void {
+  toggle.setAttribute(
+    'aria-label',
+    isExpanded
+      ? t('settings.sessionSections.chip.hidePromptAria')
+      : t('settings.sessionSections.chip.showPromptAria'),
+  );
 }
 
 export function formatSessionSectionOriginChipLabel(

@@ -10,7 +10,7 @@ Provider-neutral schema, codec, validation, prompt appendix, and context formatt
 | `SessionSectionPresentation` | Open `cssClass` / `style` maps. Not a named-layout allowlist; unsafe CSS values fail closed. |
 | `decodeSectionEpoch` | Finite non-negative integer decode; missing/invalid → `0`. |
 | `sessionSectionPrompt` | Authoring appendix text and when it is attached. |
-| `SessionSectionContext` | XML tag format for conversation binding and session-section context. |
+| `SessionSectionContext` | XML tag format for conversation binding and session-section context. Collect Act turns inline merged questions and answers inside `<session_section>`; chip/display stays separate. |
 | `SessionSectionForm` | Note-level `formId` group resolve/merge. Fail closed on mixed mode, binding mismatch, duplicate questions, and cap breaches. |
 | `SessionSectionTurn` | DTO types for FeatureHost Act submit and Collect open-chat focus (implemented in features/composition). |
 

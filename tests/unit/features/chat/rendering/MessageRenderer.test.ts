@@ -349,6 +349,7 @@ describe('MessageRenderer', () => {
             actionId: 'done',
             actionLabel: 'Review',
             title: 'Design feedback',
+            prompt: 'Continue from the questionnaire answers in this note.',
           },
         },
       },

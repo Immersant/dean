@@ -105,6 +105,7 @@ Tab activation and conversation hydration do not themselves authorize creation o
 
 ## Gotchas
 
+- `CanvasSelectionController` copies fields from live canvas selection objects only. It must not read vault files or parse `dean-session` fences while polling; the agent may later read the file named on a `type="file"` node when it needs the linked-note contents.
 - `DeanView.onClose()` must abort active tabs and dispose execution coordinators.
 - Bang-bash mode bypasses provider execution and runs a local shell command directly. It is available only when the enabled provider exposes it in `ProviderChatUIConfig`.
 - Forking is provider-owned under the hood. Use execution and provider history contracts instead of reconstructing provider session IDs in feature code.

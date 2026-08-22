@@ -5,9 +5,11 @@ import {
   type SessionSection,
   type SessionSectionAction,
   type SessionSectionAnswers,
+  type SessionSectionQuestion,
   type SessionSectionTurnRequest,
   type SessionSectionTurnResult,
 } from '../../core/session-sections';
+import type { ExecutionInputSessionSectionQuestionSnapshot } from '../../core/types';
 import { t } from '../../i18n/i18n';
 import type { FeatureHost } from '../FeatureHost';
 import { resolveNoteSessionSectionForm } from './resolveNoteSessionSectionForm';
@@ -115,6 +117,7 @@ export async function activateSessionSectionAction(
     form && form.ok
       ? {
           answers: form.answers,
+          questions: form.questions,
           formId: form.formId,
           memberSectionIds: form.memberSectionIds,
         }
@@ -136,6 +139,7 @@ export async function activateSessionSectionAction(
 
 export interface SessionSectionFormTurnOverlay {
   readonly answers: SessionSectionAnswers;
+  readonly questions: readonly SessionSectionQuestion[];
   readonly formId: string;
   readonly memberSectionIds: readonly string[];
 }
@@ -147,6 +151,7 @@ export function buildSessionSectionTurnRequest(
   form?: SessionSectionFormTurnOverlay,
 ): SessionSectionTurnRequest {
   const answers = form?.answers ?? section.answers;
+  const questions = form?.questions ?? section.questions;
   return {
     displayContent: t('settings.sessionSections.displayLabel', { label: action.label }),
     canonicalText: action.prompt,
@@ -161,12 +166,34 @@ export function buildSessionSectionTurnRequest(
       actionLabel: action.label,
       title: section.title,
       prompt: action.prompt,
-      ...(Object.keys(answers).length > 0 ? { answers: { ...answers } } : {}),
+      ...(questions.length > 0 ? { questions: snapshotQuestions(questions) } : {}),
+      ...(Object.keys(answers).length > 0 ? { answers: cloneAnswers(answers) } : {}),
       ...(form
         ? { formId: form.formId, memberSectionIds: [...form.memberSectionIds] }
         : {}),
     },
   };
+}
+
+function snapshotQuestions(
+  questions: readonly SessionSectionQuestion[],
+): ExecutionInputSessionSectionQuestionSnapshot[] {
+  return questions.map(question => ({
+    id: question.id,
+    prompt: question.prompt,
+    type: question.type,
+    ...(question.options
+      ? { options: question.options.map(option => ({ id: option.id, label: option.label })) }
+      : {}),
+  }));
+}
+
+function cloneAnswers(answers: SessionSectionAnswers): SessionSectionAnswers {
+  const cloned: SessionSectionAnswers = {};
+  for (const [key, value] of Object.entries(answers)) {
+    cloned[key] = Array.isArray(value) ? [...value] : value;
+  }
+  return cloned;
 }
 
 

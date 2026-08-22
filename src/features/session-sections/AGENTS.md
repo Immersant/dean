@@ -25,7 +25,7 @@ Obsidian editor widgets for durable `dean-session` fences: Act buttons and Colle
 - Standalone Collect forms set `startNewChat` to a required submit-button label and have no conversation binding or Act actions.
 - `FeatureHost.openSessionSectionDraft` may open only an unsent fresh draft; it must not resolve a conversation or initialize provider execution.
 - Bound Collect `Open chat`, bound Act actions, and standalone `Start new chat` are separate paths and must not fall back to one another.
-- Optional `formId` groups multiple fences in one note. Bound forms submit merged answers on Act. Standalone forms compose merged answers into the new-chat draft. Mixed bound/standalone groups fail closed.
+- Optional `formId` groups multiple fences in one note. Bound forms submit merged questions and answers on Act. Standalone forms compose merged answers into the new-chat draft. Mixed bound/standalone groups fail closed.
 - Act / Start new chat render only on the last `formId` member in document order. Earlier members are fields only. **Open chat** is not a submit control.
 - Act buttons stay disabled after click until the adjacent reset control is used. Used-state is in-memory per note/section/action so Collect remounts keep the button spent.
 - Collect flushes on blur and widget destroy, not every keystroke (writes remount the processor).

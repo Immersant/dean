@@ -56,12 +56,37 @@ export interface ExecutionInputBrowserSnapshot {
   url?: string;
 }
 
+export interface ExecutionInputCanvasNodeSnapshot {
+  id: string;
+  type?: string;
+  file?: string;
+  subpath?: string;
+  text?: string;
+  label?: string;
+  url?: string;
+  color?: string;
+}
+
 export interface ExecutionInputCanvasSnapshot {
   canvasPath: string;
   nodeIds: string[];
+  nodes?: ExecutionInputCanvasNodeSnapshot[];
 }
 
 export type ExecutionInputSessionSectionAnswers = Record<string, string | string[]>;
+
+/** Presentation-free question copy for the Act turn payload. */
+export interface ExecutionInputSessionSectionQuestionOptionSnapshot {
+  id: string;
+  label: string;
+}
+
+export interface ExecutionInputSessionSectionQuestionSnapshot {
+  id: string;
+  prompt: string;
+  type: 'single' | 'multi' | 'text' | 'markdown';
+  options?: readonly ExecutionInputSessionSectionQuestionOptionSnapshot[];
+}
 
 /** Snapshot of an Act click origin for the input ledger and chat projection. */
 export interface ExecutionInputSessionSectionSnapshot {
@@ -74,6 +99,7 @@ export interface ExecutionInputSessionSectionSnapshot {
   actionLabel?: string;
   title?: string;
   prompt?: string;
+  questions?: readonly ExecutionInputSessionSectionQuestionSnapshot[];
   answers?: ExecutionInputSessionSectionAnswers;
   formId?: string;
   memberSectionIds?: readonly string[];

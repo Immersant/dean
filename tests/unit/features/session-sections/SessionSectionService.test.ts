@@ -52,6 +52,51 @@ describe('SessionSectionService', () => {
       conversationId: 'conv-1',
       notePath: 'Notes/Spec.md',
     });
+    expect(request.sessionSection.questions).toBeUndefined();
+    expect(request.sessionSection.answers).toBeUndefined();
+  });
+
+  it('buildSessionSectionTurnRequest copies questions without presentation fields', () => {
+    const yaml = `
+schemaVersion: 1
+id: sec_review
+conversationId: conv-1
+epoch: 2
+kind: collect
+title: Feedback
+status: open
+createdAt: 1710000100000
+questions:
+  - id: approach
+    prompt: Which nav?
+    type: single
+    cssClass: gallery-option
+    options:
+      - id: tabs
+        label: Tabs
+        cssClass: note-chip
+answers:
+  approach: tabs
+actions:
+  - id: review
+    label: Review
+    prompt: Review this note carefully.
+`.trim();
+    const section = parseSessionSectionYaml(yaml);
+    if (!isBoundSessionSection(section)) {
+      throw new Error('expected bound section fixture');
+    }
+    const request = buildSessionSectionTurnRequest(section, section.actions[0], 'Notes/Spec.md');
+
+    expect(request.sessionSection.questions).toEqual([
+      {
+        id: 'approach',
+        prompt: 'Which nav?',
+        type: 'single',
+        options: [{ id: 'tabs', label: 'Tabs' }],
+      },
+    ]);
+    expect(request.sessionSection.answers).toEqual({ approach: 'tabs' });
   });
 
   it('activateSessionSectionAction cancels without submit when user declines', async () => {
@@ -208,6 +253,10 @@ actions:
           sectionId: 'sec_done',
           formId: 'form_feedback',
           memberSectionIds: ['sec_nav', 'sec_done'],
+          questions: [
+            expect.objectContaining({ id: 'approach', prompt: 'Which nav?', type: 'text' }),
+            expect.objectContaining({ id: 'notes', prompt: 'Comments', type: 'markdown' }),
+          ],
           answers: { approach: 'tabs', notes: 'Keep it small.' },
         }),
       }),
@@ -290,6 +339,9 @@ actions:
       'conv-1',
       expect.objectContaining({
         sessionSection: expect.objectContaining({
+          questions: [
+            expect.objectContaining({ id: 'notes', prompt: 'Comments', type: 'text' }),
+          ],
           answers: { notes: 'Only this fence' },
         }),
       }),

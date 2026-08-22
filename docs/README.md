@@ -2,7 +2,7 @@
 
 Dean is an Obsidian plugin that embeds provider-backed coding agents in a sidebar chat and an inline-edit flow. The vault is the agent's working directory. Claude is the default provider. Codex, Grok, OpenCode, and Pi are optional adapters that plug into the same conversation model.
 
-This folder is the human-readable project documentation. Agent execution rules live in the root [`AGENTS.md`](../AGENTS.md) and the scoped `AGENTS.md` files under `src/`. User installation and troubleshooting stay in the root [`README.md`](../README.md). Contribution policy stays in [`CONTRIBUTING.md`](../CONTRIBUTING.md).
+This folder is the human-readable project documentation. Agent execution rules live in the root [`AGENTS.md`](../AGENTS.md) and the scoped `AGENTS.md` files under `src/`. User installation and troubleshooting stay in the root [`README.md`](../README.md).
 
 | Document | Contents |
 | --- | --- |
@@ -20,4 +20,4 @@ Current plugin identity:
 - Obsidian: desktop only, `minAppVersion` `1.7.2`
 - Runtime: Node `>=24 <25` (CI uses `.node-version`)
 
-`docs/superpowers/` holds dated implementation specs and plans (for example the product rename). Those are historical design records, not the current architecture guide.
+Dated implementation specs and plans are not kept in `docs/`. Git history is the archive for retired design records.

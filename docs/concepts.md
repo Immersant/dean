@@ -122,13 +122,15 @@ The view can sit in the right sidebar, left sidebar, or a main workspace tab (`c
 A request carries:
 
 - Input blocks (text and images)
-- Context (current note, editor selection, browser selection, canvas selection, external directories)
+- Context (current note, editor selection, browser selection, structured Canvas node summaries, external directories)
 - Optional conversation history for recovery
 - Desired configuration (model, reasoning, permission mode, mode, service tier)
 - Tool policy (`passive`, `read-only`, `provider-default`, `unrestricted`, or an allow-list)
 - An `AbortSignal`
 
 It does not carry credentials, environment, or a provider settings bag. The backend reads those from `ProviderHost` at execution time.
+
+Canvas snapshots preserve selected node IDs for compatibility and may include copied node metadata such as type, file, subpath, text, label, URL, and color. A session-section Act snapshot may carry the submitted questions and current answers; grouped Collect forms merge both before the turn is created. Submitted form data is captured in the execution input, so providers do not need to recover it by reading the originating note.
 
 ## Messages and stream chunks
 

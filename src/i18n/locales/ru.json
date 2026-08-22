@@ -309,7 +309,9 @@
       "displayLabel": "Section: {label}",
       "chip": {
         "fallback": "Session section",
-        "openNoteAria": "Open session section note {path}"
+        "openNoteAria": "Open session section note {path}",
+        "showPromptAria": "Show session section prompt",
+        "hidePromptAria": "Hide session section prompt"
       },
       "action": {
         "resetAria": "Сбросить действие"

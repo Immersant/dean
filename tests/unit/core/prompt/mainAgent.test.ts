@@ -41,6 +41,7 @@ describe('systemPrompt', () => {
       expect(prompt).toContain('## Path Conventions');
       expect(prompt).toContain('## User Message Format');
       expect(prompt).toContain('## Obsidian Context');
+      expect(prompt).toContain('## Living Workspace');
       expect(prompt).toContain('## Selection Context');
       expect(prompt).toContain('## Custom Instructions');
       expect(prompt).toContain('Use curl if the user explicitly asks for it.');
@@ -90,9 +91,15 @@ describe('systemPrompt', () => {
       expect(prompt).toContain('<linked_note path="path/to/note.md" />');
       expect(prompt).toContain('<editor_cursor path="path/to/note.md" line="8">');
       expect(prompt).toContain('<canvas_selection path="boards/project.canvas">');
+      expect(prompt).toContain(
+        '<canvas_node id="form-1" type="file" file="forms/intake.md" subpath="#Questions" color="1" />',
+      );
       expect(prompt).toContain('<context_file path="/external/project" />');
+      expect(prompt).toContain('<question id="approach" type="single">');
+      expect(prompt).toContain('do not Read the host note just to recover them');
       expect(prompt).toContain('Legacy messages may');
       expect(prompt).toContain('path-only note reference');
+      expect(prompt).toContain('canvas node IDs');
     });
 
     it('should omit Claude-specific tool guidance from the shared prompt', () => {
@@ -103,6 +110,37 @@ describe('systemPrompt', () => {
       expect(prompt).not.toContain('### Agent (Subagents)');
       expect(prompt).not.toContain('### TodoWrite');
       expect(prompt).not.toContain('### Skills');
+    });
+
+    it('should teach a living-workspace identity and operating rules', () => {
+      const prompt = buildSystemPrompt();
+
+      expect(prompt).toContain('lives inside the user\'s Obsidian vault');
+      expect(prompt).toContain('**Artifact-first**');
+      expect(prompt).toContain('## Living Workspace');
+      expect(prompt).toContain('type: file');
+      expect(prompt).toContain('kanban-plugin: board');
+      expect(prompt).toContain('*.excalidraw.md');
+      expect(prompt).toContain('Kanban, Excalidraw, Dataview, Tasks, Bases, Templater, Advanced URI are optional');
+      expect(prompt).toContain('never invent');
+      expect(prompt).toContain('actively maintain the board');
+      expect(prompt).toContain('at least `520` wide and `360` high');
+      expect(prompt).toContain('at least `640` wide and `480` high');
+      expect(prompt).toContain('Set `subpath` on file nodes');
+      expect(prompt).toContain('scrolls directly to the relevant heading or block');
+      expect(prompt).not.toContain('**Forms**');
+      expect(prompt).not.toContain('Default for durable user input');
+      expect(prompt).not.toContain('Do not wait for the user to request a form');
+      expect(prompt).not.toContain('workspace/<slug>/');
+      expect(prompt).not.toContain('x +=');
+    });
+
+    it('should keep living-workspace guidance in the provider-native profile', () => {
+      const prompt = buildSystemPrompt({}, { toolGuidanceProfile: 'provider-native' });
+
+      expect(prompt).toContain('## Living Workspace');
+      expect(prompt).toContain('**Artifact-first**');
+      expect(prompt).toContain('kanban-plugin: board');
     });
 
   });

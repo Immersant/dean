@@ -42,9 +42,11 @@ Tab IDs are reserved before asynchronous assembly. Admission and activation are 
 | `NavigationController` | Keyboard and history navigation |
 | `SelectionController` | Editor selection context |
 | `BrowserSelectionController` | Browser selection context |
-| `CanvasSelectionController` | Canvas selection context |
+| `CanvasSelectionController` | Canvas selection context and safe node summaries |
 
 Renderers and UI components may render state and emit user intent. They must not mutate tab membership, conversation persistence, or provider-session lifecycle.
+
+Canvas selection context contains the Canvas path and selected node summaries copied from Obsidian's live Canvas objects. Summaries may include node type, file and subpath, text, label, URL, and color; text is capped at 200 characters. Polling does not read linked vault files or parse `dean-session` fences. The agent can read a selected file node's path later when the task requires its contents.
 
 ### Renderers
 
@@ -102,7 +104,7 @@ Bound Act sections submit a prepared prompt after user confirmation. Bound Colle
 
 Standalone Collect sections set `startNewChat` to a required submit-button label, omit `conversationId`, `epoch`, and actions, then open an unsent editable draft in a fresh Dean chat using the current default provider and model. The source note path appears in the draft text only; Dean does not automatically attach the note as execution context.
 
-Several fences in the same note may share an optional `formId` so a form can be split around normal editor prose. Bound members must share `conversationId` and `epoch`; Act submit merges every member's answers. Standalone members all set `startNewChat` to a button label; that control composes the full form. Dean shows Act / the authored standalone submit only on the last `formId` member. Bound and standalone fences cannot share a `formId`. **Open chat** still only focuses the bound conversation.
+Several fences in the same note may share an optional `formId` so a form can be split around normal editor prose. Bound members must share `conversationId` and `epoch`; Act submit sends every member's merged questions and current answers with the prepared prompt. Standalone members all set `startNewChat` to a button label; that control composes the full form. Dean shows Act / the authored standalone submit only on the last `formId` member. Bound and standalone fences cannot share a `formId`. **Open chat** still only focuses the bound conversation.
 
 ```dean-session
 schemaVersion: 1

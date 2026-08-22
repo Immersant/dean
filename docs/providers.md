@@ -135,11 +135,9 @@ Pi via `pi --mode rpc`.
 
 Provider-specific launch, extensions, normalization, history, and state stay in the owning provider directory.
 
-## Adding or changing provider behavior
+## Changing provider behavior
 
-New-provider pull requests are not accepted. See [`CONTRIBUTING.md`](../CONTRIBUTING.md). Improvements to an existing provider are welcome when they preserve ownership boundaries.
-
-When changing an existing provider:
+When changing a provider:
 
 1. Prefer provider-native behavior over local reimplementation.
 2. Normalize at the boundary into core events, snapshots, or history projections.

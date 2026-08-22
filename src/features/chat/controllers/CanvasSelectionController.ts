@@ -1,20 +1,31 @@
 import type { App, ItemView } from 'obsidian';
 
-import type { CanvasSelectionContext } from '../../../utils/canvas';
+import {
+  canvasSelectionsEqual,
+  type CanvasSelectionContext,
+  formatCanvasSelectionChipLabel,
+  summarizeCanvasSelectionNode,
+} from '../../../utils/canvas';
 import type { ComposerContextTray } from '../ui/ComposerContextTray';
 
 const CANVAS_POLL_INTERVAL = 250;
 
-type CanvasSelectionNode = { id?: unknown };
-
 type CanvasViewLike = ItemView & {
   canvas?: {
-    selection?: Set<CanvasSelectionNode>;
+    selection?: Set<unknown>;
   };
   file?: {
     path?: unknown;
   };
 };
+
+function nodeChipTitleLine(node: NonNullable<CanvasSelectionContext['nodes']>[number]): string {
+  if (node.file) return node.file;
+  if (node.label) return node.label;
+  if (node.text) return node.text.split(/\r?\n/, 1)[0] ?? node.text;
+  if (node.url) return node.url;
+  return node.id;
+}
 
 export class CanvasSelectionController {
   private app: App;
@@ -63,18 +74,16 @@ export class CanvasSelectionController {
     const canvasPath = canvasView.file?.path;
     if (typeof canvasPath !== 'string' || !canvasPath) return;
 
-    const nodeIds = [...selection]
-      .map(node => node.id)
-      .filter((id): id is string => typeof id === 'string' && id.length > 0);
+    const nodes = [...selection].flatMap((node) => {
+      const summary = summarizeCanvasSelectionNode(node);
+      return summary ? [summary] : [];
+    });
+    const nodeIds = nodes.map(node => node.id);
 
     if (nodeIds.length > 0) {
-      const sameSelection = this.storedSelection
-        && this.storedSelection.canvasPath === canvasPath
-        && this.storedSelection.nodeIds.length === nodeIds.length
-        && this.storedSelection.nodeIds.every(id => nodeIds.includes(id));
-
-      if (!sameSelection) {
-        this.storedSelection = { canvasPath, nodeIds };
+      const nextSelection: CanvasSelectionContext = { canvasPath, nodeIds, nodes };
+      if (!canvasSelectionsEqual(this.storedSelection, nextSelection)) {
+        this.storedSelection = nextSelection;
         this.updateIndicator();
         this.onUserSelectionChanged?.();
       }
@@ -106,15 +115,18 @@ export class CanvasSelectionController {
 
   private updateIndicator(): void {
     if (this.storedSelection) {
-      const { nodeIds } = this.storedSelection;
-      const nodeLabel = nodeIds.length === 1 ? '1 node' : `${nodeIds.length} nodes`;
-      const label = `${nodeLabel} selected`;
+      const label = formatCanvasSelectionChipLabel(this.storedSelection);
+      const nodes = this.storedSelection.nodes ?? [];
+      const title = nodes.length > 1
+        ? nodes.map(nodeChipTitleLine).join('\n')
+        : undefined;
       this.contextTray.setItems('canvas-selection', [{
         id: 'canvas-selection',
         kind: 'selection',
         label,
         icon: 'network',
         ariaLabel: label,
+        ...(title ? { title } : {}),
         onRemove: () => {
           this.clear();
           this.onUserSelectionChanged?.();
@@ -135,6 +147,9 @@ export class CanvasSelectionController {
     return {
       canvasPath: this.storedSelection.canvasPath,
       nodeIds: [...this.storedSelection.nodeIds],
+      ...(this.storedSelection.nodes
+        ? { nodes: this.storedSelection.nodes.map(node => ({ ...node })) }
+        : {}),
     };
   }
 
