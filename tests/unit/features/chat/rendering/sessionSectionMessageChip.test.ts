@@ -89,10 +89,13 @@ describe('sessionSectionMessageChip', () => {
     const chip = findChild(contentEl, 'dean-session-section-message-chip');
     expect(chip.hasClass('dean-session-section-message-chip--has-prompt')).toBe(true);
 
-    const toggle = findChild(chip, 'dean-session-section-message-chip-toggle');
+    const bar = findChild(chip, 'dean-session-section-message-chip-bar');
+    const toggle = findChild(bar, 'dean-session-section-message-chip-toggle');
+    expect(findChild(bar, 'dean-session-section-message-chip-main')).toBeTruthy();
     expect(toggle.tagName).toBe('BUTTON');
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     expect(toggle.getAttribute('aria-label')).toBe('Show session section prompt');
+    expect(findChild(bar, 'dean-session-section-message-chip-prompt')).toBeUndefined();
 
     const promptEl = findChild(chip, 'dean-session-section-message-chip-prompt');
     expect(promptEl.tagName).toBe('PRE');
@@ -227,5 +230,17 @@ describe('sessionSectionMessageChip', () => {
 });
 
 function findChild(parent: any, className: string): any {
-  return parent.children.find((child: any) => child.hasClass?.(className));
+  if (!parent?.children) {
+    return undefined;
+  }
+  for (const child of parent.children) {
+    if (child.hasClass?.(className)) {
+      return child;
+    }
+    const nested = findChild(child, className);
+    if (nested) {
+      return nested;
+    }
+  }
+  return undefined;
 }

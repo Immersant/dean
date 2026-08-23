@@ -30,12 +30,16 @@ export function renderSessionSectionMessageChip(
     chip.setAttribute('data-action-id', section.actionId);
   }
 
+  const bar = chip.createDiv({
+    cls: 'dean-session-section-message-chip-bar',
+  });
+
   const main = options.onOpenNote
-    ? chip.createEl('button', {
+    ? bar.createEl('button', {
       cls: 'dean-session-section-message-chip-main',
       attr: { type: 'button' },
     })
-    : chip.createSpan({ cls: 'dean-session-section-message-chip-main' });
+    : bar.createSpan({ cls: 'dean-session-section-message-chip-main' });
 
   const iconEl = main.createSpan({ cls: 'dean-session-section-message-chip-icon' });
   setIcon(iconEl, 'file-text');
@@ -72,7 +76,7 @@ export function renderSessionSectionMessageChip(
   if (disclosure) {
     chip.addClass('dean-session-section-message-chip--has-prompt');
 
-    const toggle = chip.createEl('button', {
+    const toggle = bar.createEl('button', {
       cls: 'dean-session-section-message-chip-toggle',
       attr: { type: 'button' },
     });

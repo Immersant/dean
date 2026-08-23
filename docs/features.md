@@ -98,7 +98,7 @@ The edit itself is an auxiliary provider execution (`InlineEditService` in `src/
 
 ## Editor session sections
 
-Editor session sections are opt-in through **Enable editor session sections** in settings. They are fenced `dean-session` YAML blocks that agents can leave in vault notes for durable actions or forms.
+Editor session sections are enabled by default and can be turned off with **Enable editor session sections** in settings. They are fenced `dean-session` YAML blocks that agents can leave in vault notes for durable actions or forms.
 
 Bound Act sections submit a prepared prompt after user confirmation. Bound Collect sections save answers back into the note and can focus their existing conversation with **Open chat**.
 

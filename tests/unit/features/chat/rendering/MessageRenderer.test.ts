@@ -366,9 +366,7 @@ describe('MessageRenderer', () => {
     expect(chip.getAttribute('data-section-id')).toBe('sec_collect');
     expect(chip.getAttribute('data-note-path')).toBe('Notes/Spec.md');
 
-    const main = chip.children.find(
-      (child: any) => child.hasClass?.('dean-session-section-message-chip-main'),
-    );
+    const main = chip.querySelector('.dean-session-section-message-chip-main');
     main.dispatchEvent('click', { preventDefault: () => {}, stopPropagation: () => {} });
     expect(openLinkText).toHaveBeenCalledWith('Notes/Spec.md', '', false);
   });

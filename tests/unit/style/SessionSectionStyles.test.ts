@@ -25,4 +25,24 @@ describe('session-section styles', () => {
       /@container \(max-width: 420px\) \{[\s\S]*?\.dean-session-section-action-row[\s\S]*?width: 100%;/,
     );
   });
+
+  it('keeps the chat origin chip toggle on the same row as the label', () => {
+    const chipRule = css.match(/\.dean-session-section-message-chip \{([\s\S]*?)\}/)?.[1] ?? '';
+    const barRule = css.match(/\.dean-session-section-message-chip-bar \{([\s\S]*?)\}/)?.[1] ?? '';
+    const mainRule = css.match(/\.dean-session-section-message-chip-main \{([\s\S]*?)\}/)?.[1] ?? '';
+
+    expect(chipRule).not.toContain('flex-wrap: wrap;');
+    expect(barRule).toContain('display: flex;');
+    expect(barRule).toContain('flex-wrap: nowrap;');
+    expect(barRule).toContain('max-width: 100%;');
+    expect(barRule).toContain('min-width: 0;');
+    expect(mainRule).toContain('min-width: 0;');
+    expect(mainRule).toContain('overflow: hidden;');
+    expect(css).toMatch(
+      /button\.dean-session-section-message-chip-main \{[\s\S]*?width:\s*auto;/,
+    );
+    expect(css).toMatch(
+      /button\.dean-session-section-message-chip-toggle \{[\s\S]*?width:\s*auto;/,
+    );
+  });
 });

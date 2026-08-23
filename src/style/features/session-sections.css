@@ -342,17 +342,30 @@
 
 .dean-session-section-message-chip {
   display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
+  flex-direction: column;
+  align-items: flex-start;
   margin: 0 0 6px;
   max-width: 100%;
+  min-width: 0;
+}
+
+.dean-session-section-message-chip-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .dean-session-section-message-chip-main {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  box-sizing: border-box;
+  min-width: 0;
+  flex: 0 1 auto;
   max-width: 100%;
+  overflow: hidden;
   padding: 2px 8px;
   border-radius: 999px;
   border: 1px solid var(--background-modifier-border);
@@ -364,27 +377,35 @@
 }
 
 .dean-session-section-message-chip--has-prompt .dean-session-section-message-chip-main {
+  max-width: none;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   border-right-width: 0;
 }
 
 button.dean-session-section-message-chip-main {
+  appearance: none;
+  margin: 0;
+  width: auto;
   font: inherit;
   text-align: left;
+  box-shadow: none;
 }
 
 button.dean-session-section-message-chip-main:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
   border-color: var(--background-modifier-border-hover, var(--background-modifier-border));
+  box-shadow: none;
 }
 
 .dean-session-section-message-chip-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: auto;
   padding: 2px 6px;
   border-radius: 0 999px 999px 0;
   border: 1px solid var(--background-modifier-border);
@@ -394,13 +415,18 @@ button.dean-session-section-message-chip-main:hover {
 }
 
 button.dean-session-section-message-chip-toggle {
+  appearance: none;
+  margin: 0;
+  width: auto;
   font: inherit;
+  box-shadow: none;
 }
 
 button.dean-session-section-message-chip-toggle:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
   border-color: var(--background-modifier-border-hover, var(--background-modifier-border));
+  box-shadow: none;
 }
 
 .dean-session-section-message-chip-toggle-icon {
@@ -419,8 +445,10 @@ button.dean-session-section-message-chip-toggle:hover {
 }
 
 .dean-session-section-message-chip-prompt {
-  flex: 1 1 100%;
+  align-self: stretch;
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   max-height: 240px;
   overflow: auto;
   margin: 4px 0 0;
@@ -448,6 +476,8 @@ button.dean-session-section-message-chip-toggle:hover {
 }
 
 .dean-session-section-message-chip-label {
+  min-width: 0;
+  flex: 0 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -456,6 +486,8 @@ button.dean-session-section-message-chip-toggle:hover {
 }
 
 .dean-session-section-message-chip-path {
+  min-width: 0;
+  flex: 0 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

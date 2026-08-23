@@ -86,8 +86,8 @@ describe('types.ts', () => {
       expect(DEFAULT_SETTINGS.dualPaneSide).toBe('right');
     });
 
-    it('should disable editor session sections by default', () => {
-      expect(DEFAULT_SETTINGS.enableEditorSessionSections).toBe(false);
+    it('should enable editor session sections by default', () => {
+      expect(DEFAULT_SETTINGS.enableEditorSessionSections).toBe(true);
     });
   });
 

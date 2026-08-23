@@ -290,7 +290,7 @@
     },
     "enableEditorSessionSections": {
       "name": "Enable editor session sections",
-      "desc": "Allow agents to leave durable interactive sections in vault notes (Act buttons and Collect forms). Off by default."
+      "desc": "Allow agents to leave durable interactive sections in vault notes (Act buttons and Collect forms). On by default."
     },
     "sessionSections": {
       "blocked": {

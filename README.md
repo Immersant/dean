@@ -30,7 +30,7 @@ Open the chat sidebar from the ribbon icon or command palette. Select text and u
 
 **Canvas Context** — Select Canvas nodes to send their file, text, link, and other node metadata with your next message.
 
-**Editor Session Sections** — Opt in to durable in-note Act buttons and Collect forms that agents can author as `dean-session` fences.
+**Editor Session Sections** — Durable in-note Act buttons and Collect forms that agents can author as `dean-session` fences. Enabled by default.
 
 ## Requirements
 

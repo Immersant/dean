@@ -108,7 +108,9 @@ function normalizeEnableFilePane(value: unknown): boolean {
 }
 
 function normalizeEnableEditorSessionSections(value: unknown): boolean {
-  return typeof value === 'boolean' ? value : false;
+  return typeof value === 'boolean'
+    ? value
+    : DEFAULT_DEAN_SETTINGS.enableEditorSessionSections;
 }
 
 function normalizeDualPaneSide(value: unknown): DualPaneSide {

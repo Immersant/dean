@@ -321,7 +321,7 @@ export class DeanSettingTab extends PluginSettingTab {
       .setDesc(t('settings.enableEditorSessionSections.desc'))
       .addToggle((toggle) =>
         toggle
-          .setValue(this.plugin.settings.enableEditorSessionSections ?? false)
+          .setValue(this.plugin.settings.enableEditorSessionSections ?? true)
           .onChange(async (value) => {
             await this.plugin.mutateSettings((settings) => {
               settings.enableEditorSessionSections = value;
