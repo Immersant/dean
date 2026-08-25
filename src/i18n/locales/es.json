@@ -356,6 +356,11 @@
         "unknownConversation": "Unknown conversation"
       }
     },
+    "artifacts": {
+      "invalid": {
+        "title": "Invalid artifact"
+      }
+    },
     "enableFilePane": {
       "name": "Activar panel de archivos",
       "desc": "Mostrar una pestaña Archivos en el gestor de sesiones del modo de panel doble."

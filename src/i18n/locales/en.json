@@ -290,7 +290,7 @@
     },
     "enableEditorSessionSections": {
       "name": "Enable editor session sections",
-      "desc": "Allow agents to leave durable interactive sections in vault notes (Act buttons and Collect forms). On by default."
+      "desc": "Allow agents to leave durable Act/Collect sections and display artifacts in vault notes. On by default."
     },
     "sessionSections": {
       "blocked": {
@@ -354,6 +354,11 @@
         "archived": "Archived",
         "stale": "Stale",
         "unknownConversation": "Unknown conversation"
+      }
+    },
+    "artifacts": {
+      "invalid": {
+        "title": "Invalid artifact"
       }
     },
     "enableFilePane": {

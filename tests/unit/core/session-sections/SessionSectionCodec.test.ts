@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import {
   SESSION_SECTION_LIMITS,
   type SessionSection,
@@ -266,6 +269,30 @@ describe('SessionSectionCodec', () => {
 
     const again = parseSessionSectionYaml(serializeSessionSectionYaml(section));
     expect(again).toEqual(section);
+  });
+
+  it('parses the theme-branding collect fence in mobile-layout-drafts', () => {
+    const note = readFileSync(join(process.cwd(), 'mobile-layout-drafts.md'), 'utf8');
+    const match = note.match(/```dean-session\n([\s\S]*?)\n```/);
+    if (!match?.[1]) {
+      throw new Error('expected session-section example fence');
+    }
+    const section = parseSessionSectionYaml(match[1]);
+    expect(section.id).toBe('theme-branding');
+    expect(section.kind).toBe('collect');
+    if (section.kind !== 'collect' || !('conversationId' in section)) {
+      throw new Error('expected bound collect');
+    }
+    expect(section.conversationId).toBe('conv-1787504478385-jpj8wt3jd');
+    expect(section.epoch).toBe(0);
+    expect(section.questions.map((question) => question.id)).toEqual([
+      'appearance',
+      'accent',
+      'wordmark',
+      'surfaces',
+      'notes',
+    ]);
+    expect(section.actions[0].id).toBe('continue');
   });
 
   it('rejects unsafe style values and dean- reserved cssClass tokens', () => {

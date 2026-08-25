@@ -1,0 +1,86 @@
+/* Editor artifacts (dean-artifact fences in vault notes) */
+
+.dean-artifact {
+  margin: 0.5em 0;
+  padding: 16px 18px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  container-type: inline-size;
+  font-size: max(16px, var(--font-text-size));
+  line-height: 1.5;
+  pointer-events: auto;
+  user-select: text;
+}
+
+.block-language-dean-artifact,
+.cm-preview-code-block.block-language-dean-artifact,
+.markdown-source-view.mod-cm6 .cm-embed-block:has(.dean-artifact) {
+  pointer-events: auto;
+  user-select: text;
+}
+
+.dean-artifact-header {
+  margin-bottom: 12px;
+}
+
+.dean-artifact-title {
+  font-size: 1.15em;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.dean-artifact-body {
+  color: var(--text-normal);
+}
+
+.dean-artifact-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dean-artifact-body th,
+.dean-artifact-body td {
+  padding: 6px 8px;
+  border: 1px solid var(--background-modifier-border);
+  text-align: left;
+}
+
+.dean-artifact-body ul,
+.dean-artifact-body ol {
+  margin: 0.4em 0 0.4em 1.2em;
+}
+
+.dean-artifact-body progress {
+  width: 100%;
+  pointer-events: none;
+}
+
+.dean-artifact--invalid {
+  border-color: var(--text-error);
+  background: var(--background-primary);
+}
+
+.dean-artifact-invalid-title {
+  font-weight: 600;
+  color: var(--text-error);
+  margin-bottom: 4px;
+}
+
+.dean-artifact-invalid-message {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  white-space: pre-wrap;
+}
+
+.dean-artifact-inactive {
+  margin: 0;
+  padding: 10px 12px;
+  overflow: auto;
+  background: var(--background-primary-alt);
+  border-radius: 4px;
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  white-space: pre-wrap;
+}

@@ -356,6 +356,11 @@
         "unknownConversation": "Unknown conversation"
       }
     },
+    "artifacts": {
+      "invalid": {
+        "title": "Invalid artifact"
+      }
+    },
     "enableFilePane": {
       "name": "启用文件面板",
       "desc": "在双栏模式的会话管理器中显示“文件”标签页。"

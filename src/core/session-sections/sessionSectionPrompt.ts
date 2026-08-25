@@ -1,3 +1,4 @@
+import { ARTIFACT_AUTHORING_APPENDIX } from '../artifacts/deanArtifactPrompt';
 import type { ProviderToolPolicy } from '../execution/ProviderExecutionRequest';
 import type { DeanSettings } from '../types/settings';
 import { SESSION_SECTION_FENCE_LANGUAGE, SESSION_SECTION_SCHEMA_VERSION } from './SessionSection';
@@ -105,5 +106,5 @@ export function buildDeanSystemPromptAppendices(
   if (toolPolicy?.kind === 'passive' || toolPolicy?.kind === 'read-only') {
     return [];
   }
-  return [SESSION_SECTION_AUTHORING_APPENDIX];
+  return [SESSION_SECTION_AUTHORING_APPENDIX, ARTIFACT_AUTHORING_APPENDIX];
 }

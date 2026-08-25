@@ -121,6 +121,22 @@ questions:
 answers: {}
 ```
 
+## Editor artifacts
+
+The same **Enable editor session sections** setting also turns on `dean-artifact` fences. These are display-only HTML element widgets in vault notes: a YAML header, then a blank line, then an allowlisted HTML fragment. Dean rebuilds the fragment with native elements (`createEl`). Scripts, iframes, forms, media, and `href`/`src` fail closed. Use `dean-session` for questions and Act buttons.
+
+```dean-artifact
+schemaVersion: 1
+id: sprint-health
+title: Sprint health
+createdAt: 1786992000000
+
+<div>
+  <div><strong>Open</strong> 12</div>
+  <div><strong>Blocked</strong> 3</div>
+</div>
+```
+
 ## Settings
 
 `DeanSettingTab` (`src/features/settings/DeanSettings.ts`) is the Obsidian settings tab. Tabs are `general` plus one tab per registered provider id.

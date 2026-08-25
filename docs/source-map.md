@@ -54,6 +54,7 @@ Provider-neutral infrastructure.
 | `auxiliary/` | Title generation, instruction refine, inline edit, text collectors |
 | `prompt/` | Shared prompt text for main agent, inline edit, instruction refine, title generation |
 | `session-sections/` | Editor session-section schema, codec, validation, prompt appendix, and context formatting |
+| `artifacts/` | Editor artifact schema, HTML allowlist walk, codec, and authoring appendix |
 | `commands/builtInCommands.ts` | `/clear`, `/add-dir`, `/resume`, `/fork`, `/fast` |
 | `skills/` | Agent-skill document codec and repository |
 | `storage/` | `VaultFileAdapter`, path-containment checks |
@@ -79,6 +80,7 @@ Provider-neutral infrastructure.
 | `chat/session-manager/` | Dual-pane list organization and icons |
 | `chat/state/` | Transient `ChatState` |
 | `session-sections/` | `dean-session` Markdown processors, widgets, Collect write-back, and Act orchestration |
+| `artifacts/` | `dean-artifact` Markdown processor and native `createEl` mount |
 | `inline-edit/ui/` | CodeMirror overlay modal and markdown preview |
 | `settings/` | Settings tab shell, skill coordinator, keyboard-nav parser |
 

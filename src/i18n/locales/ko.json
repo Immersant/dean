@@ -356,6 +356,11 @@
         "unknownConversation": "Unknown conversation"
       }
     },
+    "artifacts": {
+      "invalid": {
+        "title": "Invalid artifact"
+      }
+    },
     "enableFilePane": {
       "name": "파일 창 활성화",
       "desc": "이중 창 모드의 세션 관리자에 파일 탭을 표시합니다."

@@ -1,3 +1,4 @@
+import { ARTIFACT_AUTHORING_APPENDIX } from '@/core/artifacts/deanArtifactPrompt';
 import { parseSessionSectionYaml } from '@/core/session-sections/SessionSectionCodec';
 import {
   buildDeanSystemPromptAppendices,
@@ -18,6 +19,7 @@ describe('buildDeanSystemPromptAppendices', () => {
   it('returns the authoring appendix when the flag is on', () => {
     expect(buildDeanSystemPromptAppendices({ enableEditorSessionSections: true })).toEqual([
       SESSION_SECTION_AUTHORING_APPENDIX,
+      ARTIFACT_AUTHORING_APPENDIX,
     ]);
   });
 
@@ -36,7 +38,7 @@ describe('buildDeanSystemPromptAppendices', () => {
     expect(buildDeanSystemPromptAppendices(
       { enableEditorSessionSections: true },
       { kind: 'provider-default' },
-    )).toEqual([SESSION_SECTION_AUTHORING_APPENDIX]);
+    )).toEqual([SESSION_SECTION_AUTHORING_APPENDIX, ARTIFACT_AUTHORING_APPENDIX]);
   });
 
   it('documents standalone new-chat Collect forms without invented conversation ids', () => {
@@ -91,6 +93,15 @@ describe('buildDeanSystemPromptAppendices', () => {
       expect.stringContaining('questions:'),
       expect.stringContaining('options:'),
     ]));
+  });
+
+  it('documents dean-artifact display fences separately from session sections', () => {
+    expect(ARTIFACT_AUTHORING_APPENDIX).toContain('dean-artifact');
+    expect(ARTIFACT_AUTHORING_APPENDIX).toContain('display-only');
+    expect(ARTIFACT_AUTHORING_APPENDIX).not.toContain('<script>');
+    expect(buildDeanSystemPromptAppendices({ enableEditorSessionSections: true })).toContain(
+      ARTIFACT_AUTHORING_APPENDIX,
+    );
   });
 
   it('teaches pinning dean-session forms onto optional workspace boards', () => {

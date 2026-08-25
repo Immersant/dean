@@ -356,6 +356,11 @@
         "unknownConversation": "Unknown conversation"
       }
     },
+    "artifacts": {
+      "invalid": {
+        "title": "Invalid artifact"
+      }
+    },
     "enableFilePane": {
       "name": "ファイルペインを有効化",
       "desc": "デュアルペインモードのセッションマネージャーに「ファイル」タブを表示します。"

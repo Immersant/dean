@@ -356,6 +356,11 @@
         "unknownConversation": "Unknown conversation"
       }
     },
+    "artifacts": {
+      "invalid": {
+        "title": "Invalid artifact"
+      }
+    },
     "enableFilePane": {
       "name": "Включить панель файлов",
       "desc": "Показывать вкладку «Файлы» в менеджере сессий двухпанельного режима."

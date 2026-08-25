@@ -67,6 +67,10 @@ import {
   VIEW_TYPE_DEAN,
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
+import {
+  ARTIFACT_FENCE_LANGUAGE,
+  renderDeanArtifactBlock,
+} from './features/artifacts';
 import { DeanView } from './features/chat/DeanView';
 import type { ChatExecutionPersistence } from './features/chat/execution/ChatExecutionCoordinator';
 import {
@@ -330,6 +334,12 @@ export default class DeanPlugin extends Plugin {
         SESSION_SECTION_FENCE_LANGUAGE,
         (source, el, ctx) => {
           renderSessionSectionBlock(this, source, el, ctx);
+        },
+      );
+      this.registerMarkdownCodeBlockProcessor(
+        ARTIFACT_FENCE_LANGUAGE,
+        (source, el, ctx) => {
+          renderDeanArtifactBlock(this, source, el, ctx);
         },
       );
       this.scheduleRemainingSessionMetadataLoad();

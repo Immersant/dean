@@ -356,6 +356,11 @@
         "unknownConversation": "Unknown conversation"
       }
     },
+    "artifacts": {
+      "invalid": {
+        "title": "Invalid artifact"
+      }
+    },
     "enableFilePane": {
       "name": "啟用檔案面板",
       "desc": "在雙欄模式的工作階段管理器中顯示「檔案」分頁。"

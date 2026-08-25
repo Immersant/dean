@@ -356,6 +356,11 @@
         "unknownConversation": "Unknown conversation"
       }
     },
+    "artifacts": {
+      "invalid": {
+        "title": "Invalid artifact"
+      }
+    },
     "enableFilePane": {
       "name": "Activer le volet des fichiers",
       "desc": "Afficher un onglet Fichiers dans le gestionnaire de sessions du mode double volet."
