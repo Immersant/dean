@@ -9,6 +9,7 @@ The system serves both a personal vault and collaboration through shared notes a
 ## Decisions
 
 - Use one shared, provider-neutral durable workflow engine. Do not make conversations, Markdown fences, or Canvas metadata the sole workflow authority.
+- Chats are not workflows by default. Dean promotes a conversation to a workflow only when it has a clear durable outcome, a safe target, and a reason to continue asynchronously.
 - Treat chat, notes, and Canvas as native entry and inspection surfaces over that engine.
 - Start work in the background when intent, outcome, and target are unambiguous. Do not put a dedicated launch button in the normal path.
 - Run independent workflows concurrently, bounded by provider/process capacity. Each run owns its own provider session and output trail.
@@ -107,6 +108,9 @@ Dean creates or continues a workflow without a launch ceremony when all of the f
 1. The request has a recognizable outcome.
 2. A safe target is explicit or unambiguously inferred from the current linked note or Canvas selection.
 3. Starting does not itself edit human-owned content or introduce unapproved external side effects.
+4. The work benefits from independent, durable continuation rather than an ordinary synchronous chat response.
+
+An ordinary chat conversation remains only a conversation unless these promotion conditions are satisfied. Dean may state that it has started background work, but it must not create a workflow merely because a chat turn exists.
 
 Examples:
 
