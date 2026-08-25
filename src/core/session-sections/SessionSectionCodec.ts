@@ -210,6 +210,9 @@ export function serializeSessionSectionYaml(section: SessionSection): string {
         label: action.label,
         prompt: action.prompt,
       };
+      if (action.startNewChat) {
+        entry.startNewChat = true;
+      }
       serializeSessionSectionPresentation(entry, action);
       return entry;
     });

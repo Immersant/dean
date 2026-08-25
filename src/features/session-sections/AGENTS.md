@@ -20,7 +20,7 @@ Obsidian editor widgets for durable `dean-session` fences: Act buttons and Colle
 
 ## Boundaries
 
-- Call `FeatureHost.submitSessionSectionTurn` only for **Act** clicks. Collect write-back stays vault-only and never starts a chat turn.
+- Standard **Act** clicks call `FeatureHost.submitSessionSectionTurn`; actions with `startNewChat: true` call `FeatureHost.openSessionSectionDraft` with an unsent draft instead. Collect write-back stays vault-only.
 - Collect forms may call `FeatureHost.focusSessionSectionChat` to open and focus the bound sidebar conversation. That path must not submit a turn.
 - Standalone Collect forms set `startNewChat` to a required submit-button label and have no conversation binding or Act actions.
 - `FeatureHost.openSessionSectionDraft` may open only an unsent fresh draft; it must not resolve a conversation or initialize provider execution.

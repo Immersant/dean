@@ -36,6 +36,8 @@ export interface SessionSectionAction {
   readonly id: string;
   readonly label: string;
   readonly prompt: string;
+  /** Opens a fresh unsent chat draft instead of submitting to the bound conversation. */
+  readonly startNewChat?: boolean;
   readonly cssClass?: string;
   readonly style?: Readonly<Record<string, string>>;
 }

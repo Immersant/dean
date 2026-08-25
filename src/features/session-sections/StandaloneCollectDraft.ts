@@ -10,6 +10,33 @@ export interface StandaloneCollectDraftView {
   readonly answers: SessionSectionAnswers;
 }
 
+export interface SessionSectionActionDraftView extends StandaloneCollectDraftView {
+  readonly prompt: string;
+}
+
+/** Format a fresh draft from an Act action without creating a chat turn. */
+export function formatSessionSectionActionDraft(
+  section: SessionSectionActionDraftView,
+  notePath: string,
+): string {
+  const lines = [
+    `# ${escapeHeading(section.title)}`,
+    '',
+    t('settings.sessionSections.newChatDraft.sourceNote', { path: notePath }),
+    '',
+    section.prompt,
+  ];
+  for (const question of section.questions) {
+    lines.push(
+      '',
+      `## ${escapeHeading(question.prompt)}`,
+      '',
+      ...formatAnswer(question, section.answers[question.id]),
+    );
+  }
+  return lines.join('\n');
+}
+
 export function formatStandaloneCollectDraft(
   section: StandaloneCollectDraftView,
   notePath: string,

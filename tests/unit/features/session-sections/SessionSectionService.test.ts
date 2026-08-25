@@ -161,6 +161,40 @@ actions:
     );
   });
 
+  it('opens a fresh unsent draft for an opted-in Act action', async () => {
+    const openSessionSectionDraft = jest.fn().mockResolvedValue({ status: 'opened' });
+    const submit = jest.fn();
+    const getConversationSync = jest.fn();
+    const getConversationById = jest.fn();
+    const host = {
+      app: {},
+      getConversationSync,
+      getConversationById,
+      submitSessionSectionTurn: submit,
+      openSessionSectionDraft,
+    } as unknown as FeatureHost;
+
+    const result = await activateSessionSectionAction({
+      host,
+      source: VALID_ACT.replace(
+        'prompt: Review this note carefully.',
+        'prompt: Review this note carefully.\n    startNewChat: true',
+      ),
+      notePath: 'Notes/Spec.md',
+      actionId: 'review',
+    });
+
+    expect(result).toEqual({ status: 'opened' });
+    expect(openSessionSectionDraft).toHaveBeenCalledWith({
+      content: expect.stringContaining('Review this note carefully.'),
+      sourceNotePath: 'Notes/Spec.md',
+    });
+    expect(confirmSessionSectionAction).not.toHaveBeenCalled();
+    expect(getConversationSync).not.toHaveBeenCalled();
+    expect(getConversationById).not.toHaveBeenCalled();
+    expect(submit).not.toHaveBeenCalled();
+  });
+
   const FORM_NAV = `
 schemaVersion: 1
 id: sec_nav
@@ -215,7 +249,11 @@ actions:
     ].join('\n');
   }
 
-  function hostWithVault(submit: jest.Mock, note = formNote()) {
+  function hostWithVault(
+    submit: jest.Mock,
+    note = formNote(),
+    openSessionSectionDraft?: jest.Mock,
+  ) {
     const file = { path: 'Notes/Spec.md', extension: 'md' };
     return {
       app: {
@@ -231,6 +269,7 @@ actions:
       }),
       getConversationById: jest.fn(),
       submitSessionSectionTurn: submit,
+      ...(openSessionSectionDraft ? { openSessionSectionDraft } : {}),
     } as unknown as FeatureHost;
   }
 
@@ -261,6 +300,35 @@ actions:
         }),
       }),
     );
+  });
+
+  it('includes merged form answers in an opted-in Act new-chat draft', async () => {
+    const openSessionSectionDraft = jest.fn().mockResolvedValue({ status: 'opened' });
+    const submit = jest.fn();
+    const source = FORM_DONE.replace(
+      'prompt: Continue from the merged answers.',
+      'prompt: Continue from the merged answers.\n    startNewChat: true',
+    );
+    const note = formNote().replace(FORM_DONE, source);
+    const formHost = hostWithVault(submit, note, openSessionSectionDraft);
+
+    const result = await activateSessionSectionAction({
+      host: formHost,
+      source,
+      notePath: 'Notes/Spec.md',
+      actionId: 'done',
+    });
+
+    expect(result).toEqual({ status: 'opened' });
+    expect(openSessionSectionDraft).toHaveBeenCalledWith(expect.objectContaining({
+      content: expect.stringContaining('Continue from the merged answers.'),
+    }));
+    expect(openSessionSectionDraft.mock.calls[0][0].content).toContain('Which nav?');
+    expect(openSessionSectionDraft.mock.calls[0][0].content).toContain('tabs');
+    expect(openSessionSectionDraft.mock.calls[0][0].content).toContain('Comments');
+    expect(openSessionSectionDraft.mock.calls[0][0].content).toContain('Keep it small.');
+    expect(submit).not.toHaveBeenCalled();
+    expect(confirmSessionSectionAction).not.toHaveBeenCalled();
   });
 
   it('does not confirm or submit when the form group is invalid', async () => {

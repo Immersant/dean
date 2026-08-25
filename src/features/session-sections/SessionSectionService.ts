@@ -5,6 +5,7 @@ import {
   type SessionSection,
   type SessionSectionAction,
   type SessionSectionAnswers,
+  type SessionSectionDraftResult,
   type SessionSectionQuestion,
   type SessionSectionTurnRequest,
   type SessionSectionTurnResult,
@@ -15,6 +16,7 @@ import type { FeatureHost } from '../FeatureHost';
 import { resolveNoteSessionSectionForm } from './resolveNoteSessionSectionForm';
 import { confirmSessionSectionAction } from './SessionSectionConfirmModal';
 import { recordSessionSectionDiagnostic } from './SessionSectionDiagnostics';
+import { formatSessionSectionActionDraft } from './StandaloneCollectDraft';
 
 export interface ActivateSessionSectionActionOptions {
   readonly host: FeatureHost;
@@ -24,12 +26,12 @@ export interface ActivateSessionSectionActionOptions {
 }
 
 /**
- * Re-parse the fence, confirm the Act prompt, then submit through FeatureHost.
+ * Re-parse the fence, then either open an opted-in new-chat draft or submit through FeatureHost.
  * Always re-parses so a stale widget cannot pair an old action with a new epoch.
  */
 export async function activateSessionSectionAction(
   options: ActivateSessionSectionActionOptions,
-): Promise<SessionSectionTurnResult | { status: 'cancelled' }> {
+): Promise<SessionSectionTurnResult | SessionSectionDraftResult | { status: 'cancelled' }> {
   const { host, source, notePath, actionId } = options;
 
   let section: SessionSection;
@@ -83,6 +85,29 @@ export async function activateSessionSectionAction(
       actionId,
     });
     return { status: 'blocked', reason: 'invalid-request' };
+  }
+
+  if (action.startNewChat) {
+    const questions = form && form.ok ? form.questions : section.questions;
+    const answers = form && form.ok ? form.answers : section.answers;
+    const result = await host.openSessionSectionDraft({
+      content: formatSessionSectionActionDraft({
+        title: action.label,
+        prompt: action.prompt,
+        questions,
+        answers,
+      }, notePath),
+      sourceNotePath: notePath,
+    });
+    recordSessionSectionDiagnostic({
+      level: result.status === 'opened' ? 'info' : 'warn',
+      code: result.status === 'opened' ? 'new-chat-draft-opened' : 'new-chat-draft-blocked',
+      message: result.status === 'opened' ? 'Opened Act new-chat draft' : result.reason,
+      conversationId: section.conversationId,
+      sectionId: section.id,
+      actionId,
+    });
+    return result;
   }
 
   const conversation = host.getConversationSync(section.conversationId)

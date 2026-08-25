@@ -89,6 +89,23 @@ describe('SessionSectionCodec', () => {
     expect(section.questions).toEqual([]);
   });
 
+  it('accepts and round-trips an Act action that opens a new chat draft', () => {
+    const section = parseSessionSectionYaml(ACT_YAML.replace(
+      'prompt: Review this note for consistency.',
+      'prompt: Review this note for consistency.\n    startNewChat: true',
+    ));
+
+    expect(section.actions[0]).toMatchObject({ startNewChat: true });
+    expect(parseSessionSectionYaml(serializeSessionSectionYaml(section))).toEqual(section);
+  });
+
+  it('rejects non-boolean Act action startNewChat values', () => {
+    expect(() => parseSessionSectionYaml(ACT_YAML.replace(
+      'prompt: Review this note for consistency.',
+      'prompt: Review this note for consistency.\n    startNewChat: Start new chat',
+    ))).toThrow(/startNewChat/);
+  });
+
   it('validates a collect section with answers and co-located actions', () => {
     const section = validateSessionSection(COLLECT_SECTION);
     expect(section.kind).toBe('collect');

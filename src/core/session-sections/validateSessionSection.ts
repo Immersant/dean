@@ -84,6 +84,10 @@ function parseAction(value: unknown, index: number): SessionSectionAction {
     throw new SessionSectionValidationError(`actions[${index}] must be a mapping`);
   }
   assertNoForbiddenKeys(value, `actions[${index}]`);
+  const startNewChat = value.startNewChat;
+  if (startNewChat !== undefined && typeof startNewChat !== 'boolean') {
+    throw new SessionSectionValidationError(`actions[${index}].startNewChat must be a boolean`);
+  }
   return {
     id: requireLocalId(value.id, `actions[${index}].id`),
     label: requireNonEmptyString(value.label, `actions[${index}].label`, SESSION_SECTION_LIMITS.labelChars),
@@ -92,6 +96,7 @@ function parseAction(value: unknown, index: number): SessionSectionAction {
       `actions[${index}].prompt`,
       SESSION_SECTION_LIMITS.promptChars,
     ),
+    ...(startNewChat === true ? { startNewChat: true } : {}),
     ...parseSessionSectionPresentation(value, `actions[${index}]`),
   };
 }
