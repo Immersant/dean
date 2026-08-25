@@ -14,6 +14,7 @@ export type ProviderExecutionOwnerKind =
   | 'title'
   | 'instruction'
   | 'inline-edit'
+  | 'workflow-promotion'
   | 'warmup';
 
 export type ProviderExecutionInvalidationReason =

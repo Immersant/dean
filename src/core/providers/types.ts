@@ -1,4 +1,5 @@
 import type { CursorContext } from '../../utils/editor';
+import type { AuxiliaryExecutionContext } from '../auxiliary/AuxiliaryExecutionContext';
 import type { SharedAppStorage } from '../bootstrap/storage';
 import type {
   ProviderExecutionBackend,
@@ -21,6 +22,7 @@ import type { ProviderCommandCatalog } from './commands/ProviderCommandCatalog';
 import type { ProviderCommandDiscoveryResult } from './commands/ProviderCommandDiscoveryResult';
 import type { ProviderVaultEntryRepository } from './commands/ProviderVaultEntryRepository';
 import type { ProviderHost } from './ProviderHost';
+import type { ProviderWorkflowPromotionService } from '../workflows';
 
 export type { ProviderId } from '../types/provider';
 
@@ -58,6 +60,9 @@ export interface ProviderRegistration {
   chatUIConfig: ProviderChatUIConfig;
   settingsReconciler: ProviderSettingsReconciler;
   createExecutionBackend: (plugin: ProviderHost) => ProviderExecutionBackend;
+  createWorkflowPromotionService?: (
+    context: AuxiliaryExecutionContext,
+  ) => ProviderWorkflowPromotionService;
   createSubagentHistoryService?: (plugin: ProviderHost) => ProviderSubagentHistoryService;
   resolveTitleGenerationModel?: (plugin: ProviderHost) => string | undefined;
   historyService: ProviderConversationHistoryService;
