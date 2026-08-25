@@ -2,7 +2,7 @@ import type { WorkflowRun, WorkflowRunEvent, WorkflowRunStatus } from './Workflo
 
 const ALLOWED_TRANSITIONS: Readonly<Record<WorkflowRunStatus, readonly WorkflowRunStatus[]>> = {
   queued: ['running', 'cancelled', 'needs-attention'],
-  running: ['waiting', 'completed', 'failed', 'cancelled', 'needs-attention'],
+  running: ['waiting', 'recovering', 'completed', 'failed', 'cancelled', 'needs-attention'],
   waiting: ['queued', 'cancelled', 'needs-attention'],
   recovering: ['queued', 'running', 'needs-attention', 'failed'],
   completed: [],

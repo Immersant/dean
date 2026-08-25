@@ -117,6 +117,24 @@ export class WorkflowScheduler {
     return true;
   }
 
+  /**
+   * Provider-native recovery is intentionally unavailable until a provider
+   * registers and proves its own resume path. Interrupted runs must never be
+   * resumed from Dean's generic workflow record.
+   */
+  async recover(): Promise<void> {
+    for (const workflow of this.deps.repository.list()) {
+      for (const run of workflow.runs) {
+        if (run.status !== 'running' && run.status !== 'recovering') continue;
+        await this.deps.repository.transitionRun(workflow.id, run.id, 'needs-attention', {
+          at: Date.now(),
+          kind: 'recovery-unavailable',
+          message: 'This provider cannot safely resume this workflow run.',
+        });
+      }
+    }
+  }
+
   private getKey(workflowId: string, runId: string): string {
     return `${workflowId}:${runId}`;
   }

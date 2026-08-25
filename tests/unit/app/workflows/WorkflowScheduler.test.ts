@@ -9,7 +9,7 @@ import {
 } from '@/core/execution';
 import type { Workflow, WorkflowStore } from '@/core/workflows';
 
-function createWorkflow(): Workflow {
+function createWorkflow(status: Workflow['runs'][number]['status'] = 'queued'): Workflow {
   return {
     schemaVersion: 1,
     id: 'workflow-001',
@@ -21,7 +21,7 @@ function createWorkflow(): Workflow {
       id: 'run-001',
       workflowId: 'workflow-001',
       providerId: 'claude',
-      status: 'queued',
+      status,
       createdAt: 1_700_000_000_000,
       input: { prompt: 'Research approaches.', targets: [] },
       events: [],
@@ -118,5 +118,36 @@ describe('WorkflowScheduler', () => {
       ],
     }));
     expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails closed when restart recovery is unavailable for an interrupted run', async () => {
+    const repository = new WorkflowRepository(createStore(), {
+      createId: () => 'unused',
+      now: () => 1_700_000_000_001,
+    });
+    const workflow = createWorkflow('running');
+    await repository.create(workflow);
+    const scheduler = new WorkflowScheduler({
+      repository,
+      lifecycleRegistry: new ProviderExecutionLifecycleRegistry(),
+      resolveBackend: () => createBackend(jest.fn().mockResolvedValue(undefined)),
+      interactionPort: {} as ProviderInteractionPort,
+      vaultWorkingDirectory: 'C:/vault',
+      buildRequest: (_run, signal): ProviderExecutionRequest => ({
+        input: [{ type: 'text', text: 'Research approaches.' }],
+        configuration: { systemInstructions: { kind: 'provider-default' } },
+        toolPolicy: { kind: 'provider-default' },
+        signal,
+      }),
+    });
+
+    await scheduler.recover();
+
+    expect(repository.get(workflow.id)?.runs[0]).toEqual(expect.objectContaining({
+      status: 'needs-attention',
+      events: [
+        expect.objectContaining({ kind: 'recovery-unavailable' }),
+      ],
+    }));
   });
 });

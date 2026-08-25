@@ -52,4 +52,22 @@ describe('transitionWorkflowRun', () => {
       message: 'Attempting a forbidden restart.',
     })).toThrow(WorkflowTransitionError);
   });
+
+  it('marks an interrupted running run as recovering before restart handling', () => {
+    const runningRun: WorkflowRun = {
+      ...QUEUED_RUN,
+      status: 'running',
+      events: [{
+        at: 1_700_000_000_001,
+        kind: 'started',
+        message: 'Provider execution accepted the run.',
+      }],
+    };
+
+    expect(transitionWorkflowRun(runningRun, 'recovering', {
+      at: 1_700_000_000_002,
+      kind: 'recovery-unavailable',
+      message: 'Checking whether the provider can resume.',
+    })).toEqual(expect.objectContaining({ status: 'recovering' }));
+  });
 });
