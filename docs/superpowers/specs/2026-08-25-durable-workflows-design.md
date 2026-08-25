@@ -10,6 +10,7 @@ The system serves both a personal vault and collaboration through shared notes a
 
 - Use one shared, provider-neutral durable workflow engine. Do not make conversations, Markdown fences, or Canvas metadata the sole workflow authority.
 - Chats are not workflows by default. Dean promotes a conversation to a workflow only when it has a clear durable outcome, a safe target, and a reason to continue asynchronously.
+- Background phrases such as "work on this async", "continue in background", and "leave an artifact" express a strong user preference to evaluate workflow promotion; they are not the only promotion path.
 - Treat chat, notes, and Canvas as native entry and inspection surfaces over that engine.
 - Start work in the background when intent, outcome, and target are unambiguous. Do not put a dedicated launch button in the normal path.
 - Run independent workflows concurrently, bounded by provider/process capacity. Each run owns its own provider session and output trail.
@@ -103,14 +104,14 @@ Artifacts are not provider transcripts. Existing `dean-artifact` blocks remain d
 
 ## Background-first initiation
 
-Dean creates or continues a workflow without a launch ceremony when all of the following are true:
+Dean creates or continues a workflow without a launch ceremony only after the active provider returns a typed promotion decision and all of the following are true:
 
 1. The request has a recognizable outcome.
 2. A safe target is explicit or unambiguously inferred from the current linked note or Canvas selection.
 3. Starting does not itself edit human-owned content or introduce unapproved external side effects.
-4. The work benefits from independent, durable continuation rather than an ordinary synchronous chat response.
+4. The provider identifies independent, durable continuation rather than an ordinary synchronous chat response.
 
-An ordinary chat conversation remains only a conversation unless these promotion conditions are satisfied. Dean may state that it has started background work, but it must not create a workflow merely because a chat turn exists.
+An ordinary chat conversation remains only a conversation unless these promotion conditions are satisfied. The active provider returns one of: ordinary chat, a background workflow nomination with a safe target, or clarification required. Dean must not infer promotion by parsing assistant prose. A user background phrase asks the provider to evaluate promotion before replying; without one, the provider may nominate follow-up work after its normal response. Dean must not create a workflow merely because a chat turn exists.
 
 Examples:
 
@@ -158,12 +159,15 @@ No recovery path may reconstruct a provider session ID, transcript, or request s
 
 Add explicit provider-neutral contracts and registry capability flags for:
 
+- provider-owned typed workflow-promotion decisions from chat context and user preference signals
 - establishing an isolated workflow-run execution
 - optional live steering
 - optional safe recovery from provider-owned opaque run state
 - capability/diagnostic reporting when a provider does not support one of these behaviors
 
 Each provider registration, capability definition, settings reconciliation path, and UI config must be reviewed individually. Do not assume Claude, Codex, Grok, OpenCode, and Pi have equivalent process, resume, steering, permission, or interaction semantics.
+
+When a provider cannot produce a typed workflow-promotion decision, Dean keeps the conversation ordinary unless the user uses a provider-supported explicit workflow command. It must not substitute keyword heuristics or assistant-text parsing.
 
 ## Ownership and dependencies
 
