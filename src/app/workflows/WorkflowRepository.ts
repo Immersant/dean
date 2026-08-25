@@ -1,3 +1,8 @@
+import {
+  transitionWorkflowRun,
+  type WorkflowRunEvent,
+  type WorkflowRunStatus,
+} from '../../core/workflows';
 import type {
   Workflow,
   WorkflowInputSnapshot,
@@ -77,6 +82,29 @@ export class WorkflowRepository {
     });
     if (!retry) throw new Error('Workflow retry was not created.');
     return retry;
+  }
+
+  async transitionRun(
+    workflowId: string,
+    runId: string,
+    status: WorkflowRunStatus,
+    event: WorkflowRunEvent,
+  ): Promise<WorkflowRun> {
+    let transitioned: WorkflowRun | null = null;
+    await this.withWorkflowWrite(workflowId, (workflow) => {
+      const index = workflow.runs.findIndex(run => run.id === runId);
+      if (index < 0) throw new Error(`Workflow run "${runId}" was not found.`);
+      transitioned = transitionWorkflowRun(workflow.runs[index], status, event);
+      const runs = [...workflow.runs];
+      runs[index] = transitioned;
+      return {
+        ...workflow,
+        updatedAt: event.at,
+        runs,
+      };
+    });
+    if (!transitioned) throw new Error('Workflow run transition was not applied.');
+    return transitioned;
   }
 
   private async withWorkflowWrite(
