@@ -1,7 +1,7 @@
 import type { WorkflowRun } from '@/core/workflows/Workflow';
 import {
-  WorkflowTransitionError,
   transitionWorkflowRun,
+  WorkflowTransitionError,
 } from '@/core/workflows/WorkflowTransitions';
 
 const QUEUED_RUN: WorkflowRun = {

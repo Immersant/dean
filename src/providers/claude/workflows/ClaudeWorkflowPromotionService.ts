@@ -1,5 +1,5 @@
-import { AuxiliarySessionController } from '../../../core/auxiliary/AuxiliarySessionController';
 import type { AuxiliaryExecutionContext } from '../../../core/auxiliary/AuxiliaryExecutionContext';
+import { AuxiliarySessionController } from '../../../core/auxiliary/AuxiliarySessionController';
 import {
   isWorkflowPromotionDecision,
   type ProviderWorkflowPromotionService,

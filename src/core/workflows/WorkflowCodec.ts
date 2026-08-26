@@ -1,8 +1,7 @@
-import type { ProviderId } from '../types/provider';
 import {
+  type Workflow,
   WORKFLOW_RUN_STATUSES,
   WORKFLOW_SCHEMA_VERSION,
-  type Workflow,
   type WorkflowArtifact,
   type WorkflowInputSnapshot,
   type WorkflowRun,
@@ -60,7 +59,7 @@ function decodeRun(value: unknown): WorkflowRun {
   return {
     id: requireId(record.id, 'Workflow run id'),
     workflowId: requireId(record.workflowId, 'Workflow run workflow id'),
-    providerId: requireText(record.providerId, 'Workflow run provider id') as ProviderId,
+    providerId: requireText(record.providerId, 'Workflow run provider id'),
     status: decodeRunStatus(record.status),
     createdAt: requireTimestamp(record.createdAt, 'Workflow run creation time'),
     input: decodeInput(record.input),

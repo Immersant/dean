@@ -1,14 +1,14 @@
-import {
-  transitionWorkflowRun,
-  type WorkflowRunEvent,
-  type WorkflowRunStatus,
-} from '../../core/workflows';
 import type {
   Workflow,
   WorkflowInputSnapshot,
   WorkflowRun,
   WorkflowStore,
   WorkflowTarget,
+} from '../../core/workflows';
+import {
+  transitionWorkflowRun,
+  type WorkflowRunEvent,
+  type WorkflowRunStatus,
 } from '../../core/workflows';
 
 export interface WorkflowRepositoryDependencies {

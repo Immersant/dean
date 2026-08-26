@@ -1,8 +1,8 @@
 import { WorkflowRepository } from '@/app/workflows/WorkflowRepository';
 import { WorkflowScheduler } from '@/app/workflows/WorkflowScheduler';
 import {
-  ProviderExecutionLifecycleRegistry,
   type ProviderExecutionBackend,
+  ProviderExecutionLifecycleRegistry,
   type ProviderExecutionRequest,
   type ProviderExecutionSession,
   type ProviderInteractionPort,

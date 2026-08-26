@@ -18,11 +18,11 @@ import type {
   ToolCallInfo,
 } from '../types';
 import type { ProviderId } from '../types/provider';
+import type { ProviderWorkflowPromotionService } from '../workflows';
 import type { ProviderCommandCatalog } from './commands/ProviderCommandCatalog';
 import type { ProviderCommandDiscoveryResult } from './commands/ProviderCommandDiscoveryResult';
 import type { ProviderVaultEntryRepository } from './commands/ProviderVaultEntryRepository';
 import type { ProviderHost } from './ProviderHost';
-import type { ProviderWorkflowPromotionService } from '../workflows';
 
 export type { ProviderId } from '../types/provider';
 

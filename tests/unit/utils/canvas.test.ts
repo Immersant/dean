@@ -1,7 +1,7 @@
 import {
   appendCanvasContext,
-  canvasSelectionsEqual,
   type CanvasSelectionContext,
+  canvasSelectionsEqual,
   formatCanvasContext,
   formatCanvasSelectionChipLabel,
   summarizeCanvasSelectionNode,

@@ -1,6 +1,6 @@
 import {
-  WorkflowCodecError,
   parseWorkflowRecord,
+  WorkflowCodecError,
 } from '@/core/workflows/WorkflowCodec';
 
 const VALID_WORKFLOW = {

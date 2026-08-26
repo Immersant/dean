@@ -1,8 +1,8 @@
 import type { App, ItemView } from 'obsidian';
 
 import {
-  canvasSelectionsEqual,
   type CanvasSelectionContext,
+  canvasSelectionsEqual,
   formatCanvasSelectionChipLabel,
   summarizeCanvasSelectionNode,
 } from '../../../utils/canvas';

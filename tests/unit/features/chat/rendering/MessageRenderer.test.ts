@@ -94,6 +94,7 @@ function createRenderer(
 describe('MessageRenderer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (renderStoredThinkingBlock as jest.Mock).mockReset();
     (Menu as typeof Menu & { instances: unknown[] }).instances.length = 0;
   });
 
@@ -130,6 +131,68 @@ describe('MessageRenderer', () => {
 
     expect(renderStoredSpy).not.toHaveBeenCalled();
     expect(welcomeEl.hasClass('dean-welcome')).toBe(true);
+  });
+
+  it('hides thinking from earlier assistant messages while keeping their answers visible', () => {
+    const { renderer, messagesEl } = createRenderer();
+    (renderStoredThinkingBlock as jest.Mock).mockImplementation((parentEl: HTMLElement) => (
+      parentEl.createDiv({ cls: 'dean-thinking-block' })
+    ));
+
+    renderer.renderMessages([
+      {
+        id: 'assistant-1',
+        role: 'assistant',
+        content: '',
+        timestamp: 1,
+        contentBlocks: [
+          { type: 'thinking', content: 'earlier reasoning', durationSeconds: 4 },
+          { type: 'text', content: 'Earlier answer' },
+        ],
+      },
+      {
+        id: 'assistant-2',
+        role: 'assistant',
+        content: '',
+        timestamp: 2,
+        contentBlocks: [
+          { type: 'thinking', content: 'current reasoning', durationSeconds: 2 },
+          { type: 'text', content: 'Current answer' },
+        ],
+      },
+    ], () => 'Hello');
+
+    const assistantMessages = messagesEl.querySelectorAll('.dean-message-assistant');
+    const earlierThinking = assistantMessages[0].querySelector('.dean-thinking-block');
+    const currentThinking = assistantMessages[1].querySelector('.dean-thinking-block');
+
+    expect(earlierThinking?.hasClass('dean-hidden')).toBe(true);
+    expect(assistantMessages[0].querySelector('.dean-text-block')?.hasClass('dean-hidden')).toBe(false);
+    expect(currentThinking?.hasClass('dean-hidden')).toBe(false);
+  });
+
+  it('hides earlier thinking when a new live assistant message starts without thinking', () => {
+    const { renderer, messagesEl } = createRenderer();
+    const earlierMessage = renderer.addMessage({
+      id: 'assistant-1',
+      role: 'assistant',
+      content: '',
+      timestamp: 1,
+    });
+    const earlierContent = earlierMessage.querySelector('.dean-message-content');
+    const earlierThinking = earlierContent?.createDiv({ cls: 'dean-thinking-block' });
+    earlierContent?.createDiv({ cls: 'dean-text-block', text: 'Earlier answer' });
+
+    renderer.addMessage({
+      id: 'assistant-2',
+      role: 'assistant',
+      content: '',
+      timestamp: 2,
+    });
+
+    expect(earlierThinking?.hasClass('dean-hidden')).toBe(true);
+    expect(messagesEl.querySelectorAll('.dean-message-assistant')).toHaveLength(2);
+    expect(earlierContent?.querySelector('.dean-text-block')?.hasClass('dean-hidden')).toBe(false);
   });
 
   // ============================================

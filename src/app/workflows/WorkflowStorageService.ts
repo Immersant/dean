@@ -1,4 +1,5 @@
 import { WORKFLOWS_PATH } from '../../core/bootstrap/storagePaths';
+import type { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
 import {
   assertValidWorkflowId,
   parseWorkflowRecord,
@@ -6,7 +7,6 @@ import {
   type WorkflowScanResult,
   type WorkflowStore,
 } from '../../core/workflows';
-import type { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
 
 const WORKFLOW_FILE_SUFFIX = '.json';
 

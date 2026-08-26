@@ -1,12 +1,12 @@
 import type {
   ProviderExecutionBackend,
-  ProviderExecutionRun,
   ProviderExecutionRequest,
+  ProviderExecutionRun,
   ProviderInteractionPort,
 } from '../../core/execution';
-import { ProviderExecutionLifecycleRegistry } from '../../core/execution';
+import type { ProviderExecutionLifecycleRegistry } from '../../core/execution';
 import type { WorkflowRun } from '../../core/workflows';
-import { WorkflowRepository } from './WorkflowRepository';
+import type { WorkflowRepository } from './WorkflowRepository';
 
 export interface WorkflowSchedulerDependencies {
   readonly repository: WorkflowRepository;

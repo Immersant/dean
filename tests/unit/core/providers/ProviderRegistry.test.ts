@@ -63,7 +63,8 @@ describe('ProviderRegistry', () => {
 
     expect(ProviderRegistry.createWorkflowPromotionService(host, 'claude'))
       .toMatchObject({ decide: expect.any(Function) });
-    expect(ProviderRegistry.createWorkflowPromotionService(host, 'codex')).toBeNull();
+    expect(ProviderRegistry.createWorkflowPromotionService(host, 'codex'))
+      .toMatchObject({ decide: expect.any(Function) });
     expect(ProviderRegistry.createWorkflowPromotionService(host, 'grok')).toBeNull();
     expect(ProviderRegistry.createWorkflowPromotionService(host, 'opencode')).toBeNull();
     expect(ProviderRegistry.createWorkflowPromotionService(host, 'pi')).toBeNull();
