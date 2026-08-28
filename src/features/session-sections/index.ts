@@ -34,6 +34,7 @@ export {
   confirmSessionSectionAction,
   SessionSectionConfirmModal,
   type SessionSectionConfirmModalOptions,
+  type SessionSectionConfirmResult,
 } from './SessionSectionConfirmModal';
 export {
   clearSessionSectionDiagnostics,

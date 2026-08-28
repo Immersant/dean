@@ -174,10 +174,6 @@ export class MessageRenderer {
       }
     }
 
-    if (msg.role === 'assistant') {
-      this.hidePreviousThinkingBlocks();
-    }
-
     const msgEl = this.messagesEl.createDiv({
       cls: `dean-message dean-message-${msg.role}`,
       attr: {
@@ -315,10 +311,6 @@ export class MessageRenderer {
       return;
     }
 
-    if (msg.role === 'assistant') {
-      this.hidePreviousThinkingBlocks();
-    }
-
     const msgEl = this.messagesEl.createDiv({
       cls: `dean-message dean-message-${msg.role}`,
       attr: {
@@ -401,6 +393,10 @@ export class MessageRenderer {
     });
   }
 
+  async renderThinkingPreview(el: HTMLElement, markdown: string): Promise<void> {
+    await this.renderContent(el, markdown);
+  }
+
   /**
    * Renders assistant message content (content blocks or fallback).
    */
@@ -415,7 +411,7 @@ export class MessageRenderer {
             contentEl,
             block.content,
             block.durationSeconds,
-            (el, md) => this.renderContent(el, md)
+            (el, md) => this.renderContent(el, md),
           );
         } else if (block.type === 'text') {
           const normalized = stripLegacyInterruptIndicator(block.content);
@@ -490,14 +486,6 @@ export class MessageRenderer {
     }
 
     return hadLegacyInterruptIndicator;
-  }
-
-  private hidePreviousThinkingBlocks(): void {
-    for (const messageEl of this.messagesEl.querySelectorAll<HTMLElement>('.dean-message-assistant')) {
-      for (const thinkingBlock of messageEl.querySelectorAll<HTMLElement>('.dean-thinking-block')) {
-        thinkingBlock.addClass('dean-hidden');
-      }
-    }
   }
 
   renderCitationGroup(parentEl: HTMLElement, citations: CitationGroup): HTMLElement {

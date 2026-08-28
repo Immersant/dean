@@ -351,6 +351,7 @@
         "action": "Action",
         "prompt": "Prompt that will be sent",
         "send": "Send",
+        "newChat": "New chat",
         "archived": "Archived",
         "stale": "Stale",
         "unknownConversation": "Unknown conversation"

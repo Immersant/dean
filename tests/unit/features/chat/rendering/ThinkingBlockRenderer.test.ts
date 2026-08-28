@@ -1,13 +1,16 @@
 import { createMockEl } from '@test/helpers/MockElement';
 
 import {
+  appendThinkingText,
   createThinkingBlock,
   finalizeThinkingBlock,
   renderStoredThinkingBlock,
 } from '@/features/chat/rendering/ThinkingBlockRenderer';
 
 // Mock renderContent function
-const mockRenderContent = jest.fn().mockResolvedValue(undefined);
+const mockRenderContent = jest.fn().mockImplementation(async (el, markdown) => {
+  el.setText(markdown);
+});
 
 describe('ThinkingBlockRenderer', () => {
   beforeEach(() => {
@@ -26,6 +29,27 @@ describe('ThinkingBlockRenderer', () => {
       const state = createThinkingBlock(parentEl);
 
       expect(state.labelEl.textContent).toContain('Thinking');
+    });
+
+    it('replaces the timer with the complete streamed description', () => {
+      const parentEl = createMockEl();
+      const state = createThinkingBlock(parentEl);
+
+      appendThinkingText(state, 'Inspecting the current ');
+      appendThinkingText(state, 'thinking renderer.');
+
+      expect(state.labelEl.textContent).toBe('Inspecting the current thinking renderer.');
+      expect(state.timerInterval).toBeNull();
+    });
+
+    it('removes outer whitespace from the streamed preview without changing its content', () => {
+      const parentEl = createMockEl();
+      const state = createThinkingBlock(parentEl);
+
+      appendThinkingText(state, '\n\nInspecting the renderer.\n');
+
+      expect(state.labelEl.textContent).toBe('Inspecting the renderer.');
+      expect(state.content).toBe('\n\nInspecting the renderer.\n');
     });
 
     it('should clean up timer on finalize', () => {
@@ -72,10 +96,12 @@ describe('ThinkingBlockRenderer', () => {
       expect(state.contentEl.style.display).toBe('none');
     });
 
-    it('should update label with final duration', () => {
+    it('keeps the complete description when finalized', () => {
       const parentEl = createMockEl();
 
       const state = createThinkingBlock(parentEl);
+
+      appendThinkingText(state, 'Reviewing the complete implementation plan.');
 
       // Advance time by 5 seconds
       jest.advanceTimersByTime(5000);
@@ -83,7 +109,7 @@ describe('ThinkingBlockRenderer', () => {
       const duration = finalizeThinkingBlock(state);
 
       expect(duration).toBeGreaterThanOrEqual(5);
-      expect(state.labelEl.textContent).toContain('Thought for');
+      expect(state.labelEl.textContent).toBe('Reviewing the complete implementation plan.');
     });
 
     it('should sync isExpanded state so toggle works correctly after finalize', () => {
@@ -128,12 +154,60 @@ describe('ThinkingBlockRenderer', () => {
   });
 
   describe('renderStoredThinkingBlock', () => {
-    it('should render stored block with duration label', () => {
+    it('renders the complete stored description instead of the duration', () => {
       const parentEl = createMockEl();
 
       const wrapperEl = renderStoredThinkingBlock(parentEl, 'thinking content', 10, mockRenderContent);
+      const header = (wrapperEl as any)._children[0];
+      const label = header._children[0];
 
-      expect(wrapperEl).toBeDefined();
+      expect(label.textContent).toBe('thinking content');
     });
+
+    it('falls back to Thought when stored content is empty', () => {
+      const parentEl = createMockEl();
+
+      const wrapperEl = renderStoredThinkingBlock(parentEl, '', 10, mockRenderContent);
+      const header = (wrapperEl as any)._children[0];
+      const label = header._children[0];
+
+      expect(label.textContent).toBe('Thought');
+    });
+
+    it('removes outer whitespace from a stored preview', () => {
+      const parentEl = createMockEl();
+
+      const wrapperEl = renderStoredThinkingBlock(
+        parentEl,
+        '\n\nStored description.\n',
+        10,
+        mockRenderContent
+      );
+      const header = (wrapperEl as any)._children[0];
+      const label = header._children[0];
+
+      expect(label.textContent).toBe('Stored description.');
+      expect(mockRenderContent).toHaveBeenCalledWith(
+        expect.anything(),
+        '\n\nStored description.\n'
+      );
+    });
+
+    it('renders Markdown in the stored description label', () => {
+      const parentEl = createMockEl();
+
+      const wrapperEl = renderStoredThinkingBlock(
+        parentEl,
+        '**Checking** the renderer.',
+        10,
+        mockRenderContent
+      );
+      const header = (wrapperEl as any)._children[0];
+      const label = header._children[0];
+
+      expect(label.tagName).toBe('DIV');
+      expect(mockRenderContent).toHaveBeenCalledWith(label, '**Checking** the renderer.');
+    });
+
   });
 });

@@ -1,10 +1,6 @@
-import { isBoundSessionSection, parseSessionSectionYaml } from '@/core/session-sections';
 import type { FeatureHost } from '@/features/FeatureHost';
 import { clearSessionSectionDiagnostics } from '@/features/session-sections/SessionSectionDiagnostics';
-import {
-  activateSessionSectionAction,
-  buildSessionSectionTurnRequest,
-} from '@/features/session-sections/SessionSectionService';
+import { activateSessionSectionAction } from '@/features/session-sections/SessionSectionService';
 
 jest.mock('@/features/session-sections/SessionSectionConfirmModal', () => ({
   confirmSessionSectionAction: jest.fn(),
@@ -33,74 +29,8 @@ describe('SessionSectionService', () => {
     jest.clearAllMocks();
   });
 
-  it('buildSessionSectionTurnRequest uses prompt as canonical and short display label', () => {
-    const section = parseSessionSectionYaml(VALID_ACT);
-    if (!isBoundSessionSection(section)) {
-      throw new Error('expected bound section fixture');
-    }
-    const action = section.actions[0];
-    const request = buildSessionSectionTurnRequest(section, action, 'Notes/Spec.md');
-
-    expect(request.canonicalText).toBe('Review this note carefully.');
-    expect(request.displayContent).toContain('Review');
-    expect(request.epoch).toBe(2);
-    expect(request.hostNotePath).toBe('Notes/Spec.md');
-    expect(request.sessionSection).toMatchObject({
-      sectionId: 'sec_review',
-      actionId: 'review',
-      actionLabel: 'Review',
-      conversationId: 'conv-1',
-      notePath: 'Notes/Spec.md',
-    });
-    expect(request.sessionSection.questions).toBeUndefined();
-    expect(request.sessionSection.answers).toBeUndefined();
-  });
-
-  it('buildSessionSectionTurnRequest copies questions without presentation fields', () => {
-    const yaml = `
-schemaVersion: 1
-id: sec_review
-conversationId: conv-1
-epoch: 2
-kind: collect
-title: Feedback
-status: open
-createdAt: 1710000100000
-questions:
-  - id: approach
-    prompt: Which nav?
-    type: single
-    cssClass: gallery-option
-    options:
-      - id: tabs
-        label: Tabs
-        cssClass: note-chip
-answers:
-  approach: tabs
-actions:
-  - id: review
-    label: Review
-    prompt: Review this note carefully.
-`.trim();
-    const section = parseSessionSectionYaml(yaml);
-    if (!isBoundSessionSection(section)) {
-      throw new Error('expected bound section fixture');
-    }
-    const request = buildSessionSectionTurnRequest(section, section.actions[0], 'Notes/Spec.md');
-
-    expect(request.sessionSection.questions).toEqual([
-      {
-        id: 'approach',
-        prompt: 'Which nav?',
-        type: 'single',
-        options: [{ id: 'tabs', label: 'Tabs' }],
-      },
-    ]);
-    expect(request.sessionSection.answers).toEqual({ approach: 'tabs' });
-  });
-
   it('activateSessionSectionAction cancels without submit when user declines', async () => {
-    jest.mocked(confirmSessionSectionAction).mockResolvedValue(false);
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('cancelled');
     const submit = jest.fn();
     const host = {
       app: {},
@@ -120,9 +50,10 @@ actions:
     expect(submit).not.toHaveBeenCalled();
   });
 
-  it('activateSessionSectionAction submits after confirm', async () => {
-    jest.mocked(confirmSessionSectionAction).mockResolvedValue(true);
+  it('activateSessionSectionAction sends to the bound conversation when chosen', async () => {
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('send');
     const submit = jest.fn().mockResolvedValue({ status: 'sent' });
+    const openSessionSectionDraft = jest.fn().mockResolvedValue({ status: 'opened' });
     const host = {
       app: {},
       getConversationSync: jest.fn().mockReturnValue({
@@ -132,6 +63,7 @@ actions:
       }),
       getConversationById: jest.fn(),
       submitSessionSectionTurn: submit,
+      openSessionSectionDraft,
     } as unknown as FeatureHost;
 
     const result = await activateSessionSectionAction({
@@ -144,24 +76,28 @@ actions:
     expect(result).toEqual({ status: 'sent' });
     expect(submit).toHaveBeenCalledWith(
       'conv-1',
-      expect.objectContaining({
-        epoch: 2,
-        hostNotePath: 'Notes/Spec.md',
-        canonicalText: 'Review this note carefully.',
-      }),
+      expect.objectContaining({ canonicalText: 'Review this note carefully.' }),
     );
+    expect(openSessionSectionDraft).not.toHaveBeenCalled();
     expect(confirmSessionSectionAction).toHaveBeenCalledWith(
       host.app,
       expect.objectContaining({
-        conversationTitle: 'Design session',
         notePath: 'Notes/Spec.md',
         actionLabel: 'Review',
-        prompt: 'Review this note carefully.',
+        allowSend: true,
+        draft: [
+          '# Review',
+          '',
+          'Source note: Notes/Spec.md',
+          '',
+          'Review this note carefully.',
+        ].join('\n'),
       }),
     );
   });
 
   it('opens a fresh unsent draft for an opted-in Act action', async () => {
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('new-chat');
     const openSessionSectionDraft = jest.fn().mockResolvedValue({ status: 'opened' });
     const submit = jest.fn();
     const getConversationSync = jest.fn();
@@ -189,7 +125,7 @@ actions:
       content: expect.stringContaining('Review this note carefully.'),
       sourceNotePath: 'Notes/Spec.md',
     });
-    expect(confirmSessionSectionAction).not.toHaveBeenCalled();
+    expect(confirmSessionSectionAction).toHaveBeenCalledTimes(1);
     expect(getConversationSync).not.toHaveBeenCalled();
     expect(getConversationById).not.toHaveBeenCalled();
     expect(submit).not.toHaveBeenCalled();
@@ -273,8 +209,29 @@ actions:
     } as unknown as FeatureHost;
   }
 
-  it('merges sibling formId answers into the Act turn snapshot', async () => {
-    jest.mocked(confirmSessionSectionAction).mockResolvedValue(true);
+  it('merges sibling formId answers into the confirmed Act draft', async () => {
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('new-chat');
+    const submit = jest.fn();
+    const openSessionSectionDraft = jest.fn().mockResolvedValue({ status: 'opened' });
+
+    const result = await activateSessionSectionAction({
+      host: hostWithVault(submit, formNote(), openSessionSectionDraft),
+      source: FORM_DONE,
+      notePath: 'Notes/Spec.md',
+      actionId: 'done',
+    });
+
+    expect(result).toEqual({ status: 'opened' });
+    const draft = openSessionSectionDraft.mock.calls[0][0].content as string;
+    expect(draft).toContain('Which nav?');
+    expect(draft).toContain('tabs');
+    expect(draft).toContain('Comments');
+    expect(draft).toContain('Keep it small.');
+    expect(submit).not.toHaveBeenCalled();
+  });
+
+  it('sends merged bound Collect answers when Send is chosen', async () => {
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('send');
     const submit = jest.fn().mockResolvedValue({ status: 'sent' });
 
     const result = await activateSessionSectionAction({
@@ -289,13 +246,8 @@ actions:
       'conv-1',
       expect.objectContaining({
         sessionSection: expect.objectContaining({
-          sectionId: 'sec_done',
           formId: 'form_feedback',
           memberSectionIds: ['sec_nav', 'sec_done'],
-          questions: [
-            expect.objectContaining({ id: 'approach', prompt: 'Which nav?', type: 'text' }),
-            expect.objectContaining({ id: 'notes', prompt: 'Comments', type: 'markdown' }),
-          ],
           answers: { approach: 'tabs', notes: 'Keep it small.' },
         }),
       }),
@@ -303,6 +255,7 @@ actions:
   });
 
   it('includes merged form answers in an opted-in Act new-chat draft', async () => {
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('new-chat');
     const openSessionSectionDraft = jest.fn().mockResolvedValue({ status: 'opened' });
     const submit = jest.fn();
     const source = FORM_DONE.replace(
@@ -328,7 +281,7 @@ actions:
     expect(openSessionSectionDraft.mock.calls[0][0].content).toContain('Comments');
     expect(openSessionSectionDraft.mock.calls[0][0].content).toContain('Keep it small.');
     expect(submit).not.toHaveBeenCalled();
-    expect(confirmSessionSectionAction).not.toHaveBeenCalled();
+    expect(confirmSessionSectionAction).toHaveBeenCalledTimes(1);
   });
 
   it('does not confirm or submit when the form group is invalid', async () => {
@@ -372,8 +325,9 @@ answers:
   });
 
   it('keeps single-fence answers when formId is absent', async () => {
-    jest.mocked(confirmSessionSectionAction).mockResolvedValue(true);
-    const submit = jest.fn().mockResolvedValue({ status: 'sent' });
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('new-chat');
+    const submit = jest.fn();
+    const openSessionSectionDraft = jest.fn().mockResolvedValue({ status: 'opened' });
     const collectWithAnswers = `
 schemaVersion: 1
 id: sec_review
@@ -396,25 +350,17 @@ actions:
 `.trim();
 
     const result = await activateSessionSectionAction({
-      host: hostWithVault(submit),
+      host: hostWithVault(submit, formNote(), openSessionSectionDraft),
       source: collectWithAnswers,
       notePath: 'Notes/Spec.md',
       actionId: 'review',
     });
 
-    expect(result).toEqual({ status: 'sent' });
-    expect(submit).toHaveBeenCalledWith(
-      'conv-1',
-      expect.objectContaining({
-        sessionSection: expect.objectContaining({
-          questions: [
-            expect.objectContaining({ id: 'notes', prompt: 'Comments', type: 'text' }),
-          ],
-          answers: { notes: 'Only this fence' },
-        }),
-      }),
-    );
-    expect(submit.mock.calls[0][1].sessionSection.formId).toBeUndefined();
+    expect(result).toEqual({ status: 'opened' });
+    const draft = openSessionSectionDraft.mock.calls[0][0].content as string;
+    expect(draft).toContain('Comments');
+    expect(draft).toContain('Only this fence');
+    expect(submit).not.toHaveBeenCalled();
   });
 
   it('activateSessionSectionAction does not submit missing actions', async () => {

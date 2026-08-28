@@ -173,8 +173,8 @@ describe('prepareOpencodeLaunchArtifacts', () => {
 
     expect(result.configPath).toBe(path.join(tmpRoot, '.dean', 'opencode', 'config.json'));
     expect(result.systemPromptPath).toBe(path.join(tmpRoot, '.dean', 'opencode', 'system.md'));
-    expect(result.configContent).toContain(`"prompt": "{file:${result.systemPromptPath}}"`);
     const generatedConfig = JSON.parse(await fs.readFile(result.configPath, 'utf8'));
+    expect(generatedConfig.agent.build.prompt).toBe(`{file:${result.systemPromptPath}}`);
     expect(generatedConfig).toMatchObject({
       default_agent: 'build',
       providers: {

@@ -3,27 +3,28 @@ import { type App, Modal } from 'obsidian';
 import { t } from '../../i18n/i18n';
 
 export interface SessionSectionConfirmModalOptions {
-  readonly conversationTitle: string;
-  readonly conversationArchived?: boolean;
   readonly notePath: string;
   readonly actionLabel: string;
-  readonly prompt: string;
+  readonly draft: string;
+  readonly allowSend: boolean;
   readonly stale?: boolean;
 }
 
+export type SessionSectionConfirmResult = 'cancelled' | 'send' | 'new-chat';
+
 /**
- * Act confirm: conversation, note path, action label, and full prompt as plain text.
- * Does not markdown-render the prompt (markdown can hide instructions).
+ * New-chat confirm: note path, action label, and full draft as plain text.
+ * Does not markdown-render the draft (markdown can hide instructions).
  */
 export class SessionSectionConfirmModal extends Modal {
   private readonly options: SessionSectionConfirmModalOptions;
-  private readonly resolve: (confirmed: boolean) => void;
+  private readonly resolve: (result: SessionSectionConfirmResult) => void;
   private resolved = false;
 
   constructor(
     app: App,
     options: SessionSectionConfirmModalOptions,
-    resolve: (confirmed: boolean) => void,
+    resolve: (result: SessionSectionConfirmResult) => void,
   ) {
     super(app);
     this.options = options;
@@ -31,27 +32,16 @@ export class SessionSectionConfirmModal extends Modal {
   }
 
   onOpen(): void {
-    this.setTitle(t('settings.sessionSections.confirm.title'));
+    this.setTitle(t(
+      this.options.allowSend
+        ? 'settings.sessionSections.confirm.title'
+        : 'settings.sessionSections.confirm.newChat',
+    ));
     this.modalEl.addClass('dean-session-section-confirm-modal');
 
     const meta = this.contentEl.createDiv({ cls: 'dean-session-section-confirm-meta' });
-    const conversationLine = meta.createDiv({ cls: 'dean-session-section-confirm-row' });
-    conversationLine.createSpan({
-      cls: 'dean-session-section-confirm-label',
-      text: t('settings.sessionSections.confirm.conversation'),
-    });
-    conversationLine.createSpan({
-      cls: 'dean-session-section-confirm-value',
-      text: this.options.conversationTitle,
-    });
-    if (this.options.conversationArchived) {
-      conversationLine.createSpan({
-        cls: 'dean-session-section-confirm-badge',
-        text: t('settings.sessionSections.confirm.archived'),
-      });
-    }
     if (this.options.stale) {
-      conversationLine.createSpan({
+      meta.createSpan({
         cls: 'dean-session-section-confirm-badge dean-session-section-confirm-badge--stale',
         text: t('settings.sessionSections.confirm.stale'),
       });
@@ -81,10 +71,10 @@ export class SessionSectionConfirmModal extends Modal {
       cls: 'dean-session-section-confirm-prompt-label',
       text: t('settings.sessionSections.confirm.prompt'),
     });
-    // Full prompt as plain text only — never innerHTML or MarkdownRenderer.
+    // Full draft as plain text only — never innerHTML or MarkdownRenderer.
     this.contentEl.createEl('pre', {
       cls: 'dean-session-section-confirm-prompt',
-      text: this.options.prompt,
+      text: this.options.draft,
     });
 
     const actions = this.contentEl.createDiv({ cls: 'dean-session-section-confirm-actions' });
@@ -95,21 +85,34 @@ export class SessionSectionConfirmModal extends Modal {
     cancelBtn.setAttribute('type', 'button');
     cancelBtn.addEventListener('click', () => this.close());
 
-    const sendBtn = actions.createEl('button', {
-      cls: 'dean-session-section-confirm-send mod-cta',
-      text: t('settings.sessionSections.confirm.send'),
+    const newChatBtn = actions.createEl('button', {
+      cls: `dean-session-section-confirm-new-chat${this.options.allowSend ? '' : ' mod-cta'}`,
+      text: t('settings.sessionSections.confirm.newChat'),
     });
-    sendBtn.setAttribute('type', 'button');
-    sendBtn.addEventListener('click', () => {
+    newChatBtn.setAttribute('type', 'button');
+    newChatBtn.addEventListener('click', () => {
       this.resolved = true;
-      this.resolve(true);
+      this.resolve('new-chat');
       this.close();
     });
+
+    if (this.options.allowSend) {
+      const sendBtn = actions.createEl('button', {
+        cls: 'dean-session-section-confirm-send mod-cta',
+        text: t('settings.sessionSections.confirm.send'),
+      });
+      sendBtn.setAttribute('type', 'button');
+      sendBtn.addEventListener('click', () => {
+        this.resolved = true;
+        this.resolve('send');
+        this.close();
+      });
+    }
   }
 
   onClose(): void {
     if (!this.resolved) {
-      this.resolve(false);
+      this.resolve('cancelled');
     }
     this.contentEl.empty();
   }
@@ -118,7 +121,7 @@ export class SessionSectionConfirmModal extends Modal {
 export function confirmSessionSectionAction(
   app: App,
   options: SessionSectionConfirmModalOptions,
-): Promise<boolean> {
+): Promise<SessionSectionConfirmResult> {
   return new Promise(resolve => {
     new SessionSectionConfirmModal(app, options, resolve).open();
   });

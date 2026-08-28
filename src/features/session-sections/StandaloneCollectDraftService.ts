@@ -5,6 +5,7 @@ import type {
 import type { FeatureHost } from '../FeatureHost';
 import type { CollectSessionSectionController } from './CollectSessionSectionController';
 import { resolveNoteSessionSectionForm } from './resolveNoteSessionSectionForm';
+import { confirmSessionSectionAction } from './SessionSectionConfirmModal';
 import { recordSessionSectionDiagnostic } from './SessionSectionDiagnostics';
 import {
   formatStandaloneCollectDraft,
@@ -20,6 +21,7 @@ export interface OpenStandaloneCollectDraftOptions {
 
 export type StandaloneCollectDraftOpenResult =
   | SessionSectionDraftResult
+  | { readonly status: 'cancelled' }
   | { readonly status: 'blocked'; readonly reason: 'writeback-failed' };
 
 export async function openStandaloneCollectDraft(
@@ -64,8 +66,26 @@ export async function openStandaloneCollectDraft(
     };
   }
 
+  const content = formatStandaloneCollectDraft(draftView, options.notePath);
+  const confirmed = await confirmSessionSectionAction(options.host.app, {
+    notePath: options.notePath,
+    actionLabel: options.section.startNewChat,
+    draft: content,
+    allowSend: false,
+    stale: options.section.status === 'stale',
+  });
+  if (confirmed === 'cancelled') {
+    recordSessionSectionDiagnostic({
+      level: 'info',
+      code: 'cancelled',
+      message: 'User cancelled Collect new-chat confirmation',
+      sectionId: options.section.id,
+    });
+    return { status: 'cancelled' };
+  }
+
   const result = await options.host.openSessionSectionDraft({
-    content: formatStandaloneCollectDraft(draftView, options.notePath),
+    content,
     sourceNotePath: options.notePath,
   });
   recordSessionSectionDiagnostic({

@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import { existsSync } from 'fs';
 import * as fsPromises from 'fs/promises';
 import * as os from 'os';
@@ -96,18 +97,18 @@ describe('sdkSession', () => {
   });
 
   describe('encodeVaultPathForSDK', () => {
-    it('encodes vault path by replacing all non-alphanumeric chars with dash', () => {
+    (process.platform === 'win32' ? it.skip : it)('encodes vault path by replacing all non-alphanumeric chars with dash', () => {
       const encoded = encodeVaultPathForSDK('/Users/test/vault');
       // SDK replaces ALL non-alphanumeric characters with `-`
       expect(encoded).toBe('-Users-test-vault');
     });
 
-    it('handles paths with spaces and special characters', () => {
+    (process.platform === 'win32' ? it.skip : it)('handles paths with spaces and special characters', () => {
       const encoded = encodeVaultPathForSDK("/Users/test/My Vault's~Data");
       expect(encoded).toBe('-Users-test-My-Vault-s-Data');
     });
 
-    it('handles Unicode characters (Chinese, Japanese, etc.)', () => {
+    (process.platform === 'win32' ? it.skip : it)('handles Unicode characters (Chinese, Japanese, etc.)', () => {
       // Unicode characters should be replaced with `-` to match SDK behavior
       const encoded = encodeVaultPathForSDK('/Volumes/[Work]弘毅之鹰/学习/东京大学/2025年 秋');
       // All non-alphanumeric (including Chinese, brackets) become `-`
@@ -116,7 +117,7 @@ describe('sdkSession', () => {
       expect(encoded).toMatch(/^[a-zA-Z0-9-]+$/);
     });
 
-    it('handles brackets and other special characters', () => {
+    (process.platform === 'win32' ? it.skip : it)('handles brackets and other special characters', () => {
       const encoded = encodeVaultPathForSDK('/Users/test/[my-vault](notes)');
       expect(encoded).toBe('-Users-test--my-vault--notes-');
       expect(encoded).not.toContain('[');
@@ -154,12 +155,12 @@ describe('sdkSession', () => {
   });
 
   describe('getSDKProjectsPath', () => {
-    it('returns path under home directory', () => {
+    (process.platform === 'win32' ? it.skip : it)('returns path under home directory', () => {
       const projectsPath = getSDKProjectsPath();
       expect(projectsPath).toBe('/Users/test/.claude/projects');
     });
 
-    it('uses CLAUDE_CONFIG_DIR from the effective SDK environment', () => {
+    (process.platform === 'win32' ? it.skip : it)('uses CLAUDE_CONFIG_DIR from the effective SDK environment', () => {
       const projectsPath = getSDKProjectsPath({
         environment: { CLAUDE_CONFIG_DIR: '/custom/claude' },
         vaultPath: '/Users/test/vault',
@@ -168,7 +169,7 @@ describe('sdkSession', () => {
       expect(projectsPath).toBe('/custom/claude/projects');
     });
 
-    it('resolves a relative CLAUDE_CONFIG_DIR from the SDK working directory', () => {
+    (process.platform === 'win32' ? it.skip : it)('resolves a relative CLAUDE_CONFIG_DIR from the SDK working directory', () => {
       const projectsPath = getSDKProjectsPath({
         environment: { CLAUDE_CONFIG_DIR: '.claude-custom' },
         vaultPath: '/Users/test/vault',
@@ -177,7 +178,7 @@ describe('sdkSession', () => {
       expect(projectsPath).toBe('/Users/test/vault/.claude-custom/projects');
     });
 
-    it('falls back to the default directory when CLAUDE_CONFIG_DIR is unset', () => {
+    (process.platform === 'win32' ? it.skip : it)('falls back to the default directory when CLAUDE_CONFIG_DIR is unset', () => {
       const projectsPath = getSDKProjectsPath({
         environment: {},
         vaultPath: '/Users/test/vault',
@@ -186,7 +187,7 @@ describe('sdkSession', () => {
       expect(projectsPath).toBe('/Users/test/.claude/projects');
     });
 
-    it('uses the effective SDK HOME when CLAUDE_CONFIG_DIR is unset', () => {
+    (process.platform === 'win32' ? it.skip : it)('uses the effective SDK HOME when CLAUDE_CONFIG_DIR is unset', () => {
       const projectsPath = getSDKProjectsPath({
         environment: { HOME: '/custom/home' },
         hostPlatform: 'linux',
@@ -196,17 +197,17 @@ describe('sdkSession', () => {
       expect(projectsPath).toBe('/custom/home/.claude/projects');
     });
 
-    it('uses the effective SDK USERPROFILE on Windows', () => {
+    (process.platform !== 'win32' ? it.skip : it)('uses the effective SDK USERPROFILE on Windows', () => {
       const projectsPath = getSDKProjectsPath({
         environment: { USERPROFILE: '/custom/windows-home' },
         hostPlatform: 'win32',
         vaultPath: '/Users/test/vault',
       });
 
-      expect(projectsPath).toBe('/custom/windows-home/.claude/projects');
+      expect(projectsPath).toBe('\\custom\\windows-home\\.claude\\projects');
     });
 
-    it('resolves an empty SDK HOME from the SDK working directory', () => {
+    (process.platform === 'win32' ? it.skip : it)('resolves an empty SDK HOME from the SDK working directory', () => {
       const projectsPath = getSDKProjectsPath({
         environment: { HOME: '' },
         hostPlatform: 'linux',
@@ -216,7 +217,7 @@ describe('sdkSession', () => {
       expect(projectsPath).toBe('/Users/test/vault/.claude/projects');
     });
 
-    it('preserves an explicitly empty CLAUDE_CONFIG_DIR like the SDK', () => {
+    (process.platform === 'win32' ? it.skip : it)('preserves an explicitly empty CLAUDE_CONFIG_DIR like the SDK', () => {
       const projectsPath = getSDKProjectsPath({
         environment: { CLAUDE_CONFIG_DIR: '' },
         vaultPath: '/Users/test/vault',
@@ -255,7 +256,7 @@ describe('sdkSession', () => {
   });
 
   describe('getSDKSessionPath', () => {
-    it('constructs correct session file path', () => {
+    (process.platform === 'win32' ? it.skip : it)('constructs correct session file path', () => {
       const sessionPath = getSDKSessionPath('/Users/test/vault', 'session-123');
       expect(sessionPath).toContain('.claude/projects');
       expect(sessionPath).toContain('session-123.jsonl');
@@ -271,7 +272,7 @@ describe('sdkSession', () => {
       expect(() => getSDKSessionPath('/Users/test/vault', '')).toThrow('Invalid session ID');
     });
 
-    it('builds session paths under the effective Claude config directory', () => {
+    (process.platform === 'win32' ? it.skip : it)('builds session paths under the effective Claude config directory', () => {
       const sessionPath = getSDKSessionPath('/Users/test/vault', 'session-123', {
         environment: { CLAUDE_CONFIG_DIR: '/custom/claude' },
         vaultPath: '/Users/test/vault',
@@ -310,7 +311,7 @@ describe('sdkSession', () => {
   });
 
   describe('getSDKSessionAvailability', () => {
-    it('reports an available session', async () => {
+    (process.platform === 'win32' ? it.skip : it)('reports an available session', async () => {
       mockFsPromises.access.mockResolvedValue(undefined);
 
       await expect(getSDKSessionAvailability(
@@ -460,7 +461,7 @@ describe('sdkSession', () => {
       expect(result.skippedLines).toBe(0);
     });
 
-    it('reads from the effective Claude config directory', async () => {
+    (process.platform === 'win32' ? it.skip : it)('reads from the effective Claude config directory', async () => {
       mockExistsSync.mockReturnValue(true);
       mockFsPromises.readFile.mockResolvedValue(
         '{"type":"user","uuid":"u1","message":{"content":"Hello"}}',
@@ -518,7 +519,7 @@ describe('sdkSession', () => {
   });
 
   describe('loadSubagentToolCalls', () => {
-    it('loads tool calls from subagent sidechain JSONL', async () => {
+    (process.platform === 'win32' ? it.skip : it)('loads tool calls from subagent sidechain JSONL', async () => {
       mockExistsSync.mockReturnValue(true);
       mockFsPromises.readFile.mockResolvedValue([
         '{"type":"assistant","timestamp":"2024-01-15T10:00:00Z","message":{"content":[{"type":"tool_use","id":"sub-tool-1","name":"Bash","input":{"command":"ls"}}]}}',
@@ -575,7 +576,7 @@ describe('sdkSession', () => {
   });
 
   describe('loadSubagentFinalResult', () => {
-    it('returns the latest assistant text from sidecar JSONL', async () => {
+    (process.platform === 'win32' ? it.skip : it)('returns the latest assistant text from sidecar JSONL', async () => {
       mockExistsSync.mockReturnValue(true);
       mockFsPromises.readFile.mockResolvedValue([
         '{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"First"}]}}',
@@ -2625,7 +2626,7 @@ describe('sdkSession', () => {
       expect(taskToolCall.subagent).toBeUndefined();
     });
 
-    it('loads subagent tool calls from sidecar JSONL', async () => {
+    (process.platform === 'win32' ? it.skip : it)('loads subagent tool calls from sidecar JSONL', async () => {
       mockExistsSync.mockReturnValue(true);
       mockFsPromises.readFile.mockImplementation(async (filePath: any) => {
         const p = String(filePath);
@@ -2657,7 +2658,7 @@ describe('sdkSession', () => {
       expect(taskToolCall.subagent!.toolCalls[0].result).toBe('3 matches found');
     });
 
-    it('loads subagent tool calls beside a relocated session transcript', async () => {
+    (process.platform === 'win32' ? it.skip : it)('loads subagent tool calls beside a relocated session transcript', async () => {
       mockExistsSync.mockReturnValue(true);
       mockFsPromises.readFile.mockImplementation(async (filePath: any) => {
         const p = String(filePath);

@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -15,7 +16,7 @@ describe('OpencodePaths', () => {
     Object.defineProperty(process, 'platform', { value: originalPlatform });
   });
 
-  it('prefers XDG data directories for OpenCode data', () => {
+  (process.platform === 'win32' ? it.skip : it)('prefers XDG data directories for OpenCode data', () => {
     expect(resolveOpencodeDataDir({
       HOME: '/home/tester',
       XDG_DATA_HOME: '/tmp/xdg-data',

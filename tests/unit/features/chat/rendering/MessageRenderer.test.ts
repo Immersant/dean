@@ -133,7 +133,7 @@ describe('MessageRenderer', () => {
     expect(welcomeEl.hasClass('dean-welcome')).toBe(true);
   });
 
-  it('hides thinking from earlier assistant messages while keeping their answers visible', () => {
+  it('keeps thinking descriptions visible for every assistant message in history', () => {
     const { renderer, messagesEl } = createRenderer();
     (renderStoredThinkingBlock as jest.Mock).mockImplementation((parentEl: HTMLElement) => (
       parentEl.createDiv({ cls: 'dean-thinking-block' })
@@ -166,12 +166,12 @@ describe('MessageRenderer', () => {
     const earlierThinking = assistantMessages[0].querySelector('.dean-thinking-block');
     const currentThinking = assistantMessages[1].querySelector('.dean-thinking-block');
 
-    expect(earlierThinking?.hasClass('dean-hidden')).toBe(true);
+    expect(earlierThinking?.hasClass('dean-hidden')).toBe(false);
     expect(assistantMessages[0].querySelector('.dean-text-block')?.hasClass('dean-hidden')).toBe(false);
     expect(currentThinking?.hasClass('dean-hidden')).toBe(false);
   });
 
-  it('hides earlier thinking when a new live assistant message starts without thinking', () => {
+  it('keeps earlier thinking visible when a new live assistant message starts', () => {
     const { renderer, messagesEl } = createRenderer();
     const earlierMessage = renderer.addMessage({
       id: 'assistant-1',
@@ -190,7 +190,7 @@ describe('MessageRenderer', () => {
       timestamp: 2,
     });
 
-    expect(earlierThinking?.hasClass('dean-hidden')).toBe(true);
+    expect(earlierThinking?.hasClass('dean-hidden')).toBe(false);
     expect(messagesEl.querySelectorAll('.dean-message-assistant')).toHaveLength(2);
     expect(earlierContent?.querySelector('.dean-text-block')?.hasClass('dean-hidden')).toBe(false);
   });

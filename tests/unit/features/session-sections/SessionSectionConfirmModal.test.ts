@@ -7,15 +7,15 @@ describe('SessionSectionConfirmModal', () => {
     const contentEl = createMockEl('div');
     const modalEl = createMockEl('div');
     const app = {} as any;
-    let resolveValue: boolean | undefined;
+    let resolveValue: string | undefined;
 
     const modal = new SessionSectionConfirmModal(
       app,
       {
-        conversationTitle: 'My session',
         notePath: 'Notes/Spec.md',
         actionLabel: 'Review',
-        prompt: 'Do the full review.\n<script>alert(1)</script>',
+        draft: 'Do the full review.\n<script>alert(1)</script>',
+        allowSend: true,
       },
       (value) => {
         resolveValue = value;
@@ -39,8 +39,14 @@ describe('SessionSectionConfirmModal', () => {
     expect(
       contentEl.children.some((child: { tagName?: string }) => child.tagName === 'SCRIPT'),
     ).toBe(false);
+    expect((modal as any).setTitle).toHaveBeenCalledWith('Send section action');
+    expect(contentEl.querySelector('.dean-session-section-confirm-send')?.textContent)
+      .toBe('Send');
+    expect(contentEl.querySelector('.dean-session-section-confirm-new-chat')?.textContent)
+      .toBe('New chat');
+    expect(contentEl.textContent).not.toContain('Conversation');
 
     SessionSectionConfirmModal.prototype.onClose.call(modal);
-    expect(resolveValue).toBe(false);
+    expect(resolveValue).toBe('cancelled');
   });
 });

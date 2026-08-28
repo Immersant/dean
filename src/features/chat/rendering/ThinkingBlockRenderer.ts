@@ -16,6 +16,10 @@ export interface ThinkingBlockOptions {
   onToggle?: (isExpanded: boolean) => void;
 }
 
+function getThinkingPreviewText(content: string): string {
+  return content.trim() || 'Thought';
+}
+
 export function createThinkingBlock(
   parentEl: HTMLElement,
   options: ThinkingBlockOptions = {},
@@ -30,7 +34,7 @@ export function createThinkingBlock(
   header.setAttribute('aria-label', 'Extended thinking - click to expand');
 
   // Label with timer
-  const labelEl = header.createSpan({ cls: 'dean-thinking-label' });
+  const labelEl = header.createDiv({ cls: 'dean-thinking-label' });
   const startTime = Date.now();
   labelEl.setText('Thinking 0s...');
 
@@ -66,11 +70,23 @@ export async function appendThinkingContent(
   content: string,
   renderContent: RenderContentFn
 ) {
-  state.content += content;
+  appendThinkingText(state, content);
   await renderContent(state.contentEl, state.content);
 }
 
-export function finalizeThinkingBlock(state: ThinkingBlockState): number {
+export function appendThinkingText(state: ThinkingBlockState, content: string): string {
+  state.content += content;
+  if (state.timerInterval !== null) {
+    window.clearInterval(state.timerInterval);
+    state.timerInterval = null;
+  }
+  state.labelEl.setText(getThinkingPreviewText(state.content));
+  return state.content;
+}
+
+export function finalizeThinkingBlock(
+  state: ThinkingBlockState,
+): number {
   // Stop the timer
   if (state.timerInterval) {
     window.clearInterval(state.timerInterval);
@@ -80,15 +96,11 @@ export function finalizeThinkingBlock(state: ThinkingBlockState): number {
   // Calculate final duration
   const durationSeconds = Math.floor((Date.now() - state.startTime) / 1000);
 
-  // Update label to show final duration (without "...")
-  state.labelEl.setText(`Thought for ${durationSeconds}s`);
-
   // Collapse when done and sync state
   const header = state.wrapperEl.querySelector('.dean-thinking-header');
   if (header) {
     collapseElement(state.wrapperEl, header as HTMLElement, state.contentEl, state);
   }
-
   return durationSeconds;
 }
 
@@ -102,7 +114,7 @@ export function renderStoredThinkingBlock(
   parentEl: HTMLElement,
   content: string,
   durationSeconds: number | undefined,
-  renderContent: RenderContentFn
+  renderContent: RenderContentFn,
 ): HTMLElement {
   const wrapperEl = parentEl.createDiv({ cls: 'dean-thinking-block' });
 
@@ -112,10 +124,11 @@ export function renderStoredThinkingBlock(
   header.setAttribute('role', 'button');
   header.setAttribute('aria-label', 'Extended thinking - click to expand');
 
-  // Label with duration
-  const labelEl = header.createSpan({ cls: 'dean-thinking-label' });
-  const labelText = durationSeconds !== undefined ? `Thought for ${durationSeconds}s` : 'Thought';
-  labelEl.setText(labelText);
+  // Compact preview of the stored thinking description
+  const labelEl = header.createDiv({ cls: 'dean-thinking-label' });
+  void renderContent(labelEl, getThinkingPreviewText(content)).catch(() => {
+    labelEl.setText(getThinkingPreviewText(content));
+  });
 
   // Collapsible content
   const contentEl = wrapperEl.createDiv({ cls: 'dean-thinking-content' });

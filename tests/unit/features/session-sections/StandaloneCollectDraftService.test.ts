@@ -3,6 +3,12 @@ import type { FeatureHost } from '@/features/FeatureHost';
 import type { CollectSessionSectionController } from '@/features/session-sections/CollectSessionSectionController';
 import { openStandaloneCollectDraft } from '@/features/session-sections/StandaloneCollectDraftService';
 
+jest.mock('@/features/session-sections/SessionSectionConfirmModal', () => ({
+  confirmSessionSectionAction: jest.fn(),
+}));
+
+import { confirmSessionSectionAction } from '@/features/session-sections/SessionSectionConfirmModal';
+
 const STANDALONE_SECTION: StandaloneCollectSessionSection = {
   schemaVersion: 1,
   id: 'standalone_discovery',
@@ -19,13 +25,18 @@ const STANDALONE_SECTION: StandaloneCollectSessionSection = {
 };
 
 describe('openStandaloneCollectDraft', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('new-chat');
+  });
+
   it('snapshots answers, flushes, then opens an unsent draft', async () => {
     const getAnswers = jest.fn().mockReturnValue({ goal: 'Use a fresh chat' });
     const flush = jest.fn().mockResolvedValue({ status: 'ready' });
     const openSessionSectionDraft = jest.fn().mockResolvedValue({ status: 'opened' });
 
     await expect(openStandaloneCollectDraft({
-      host: { openSessionSectionDraft } as unknown as FeatureHost,
+      host: { app: {}, openSessionSectionDraft } as unknown as FeatureHost,
       section: STANDALONE_SECTION,
       notePath: 'Notes/Discovery.md',
       collect: { getAnswers, flush } as unknown as CollectSessionSectionController,
@@ -40,6 +51,34 @@ describe('openStandaloneCollectDraft', () => {
     expect(getAnswers.mock.invocationCallOrder[0]).toBeLessThan(flush.mock.invocationCallOrder[0]);
     expect(flush.mock.invocationCallOrder[0])
       .toBeLessThan(openSessionSectionDraft.mock.invocationCallOrder[0]);
+    expect(confirmSessionSectionAction).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        actionLabel: 'Start new chat',
+        allowSend: false,
+        notePath: 'Notes/Discovery.md',
+        draft: expect.stringContaining('Use a fresh chat'),
+      }),
+    );
+  });
+
+  it('does not open a draft when the user cancels confirmation', async () => {
+    jest.mocked(confirmSessionSectionAction).mockResolvedValue('cancelled');
+    const flush = jest.fn().mockResolvedValue({ status: 'ready' });
+    const openSessionSectionDraft = jest.fn();
+
+    await expect(openStandaloneCollectDraft({
+      host: { app: {}, openSessionSectionDraft } as unknown as FeatureHost,
+      section: STANDALONE_SECTION,
+      notePath: 'Notes/Discovery.md',
+      collect: {
+        getAnswers: () => ({ goal: 'Keep the saved answer' }),
+        flush,
+      } as unknown as CollectSessionSectionController,
+    })).resolves.toEqual({ status: 'cancelled' });
+
+    expect(flush).toHaveBeenCalledTimes(1);
+    expect(openSessionSectionDraft).not.toHaveBeenCalled();
   });
 
   it('merges sibling formId answers into one standalone draft', async () => {

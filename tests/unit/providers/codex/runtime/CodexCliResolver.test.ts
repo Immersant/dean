@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import * as fs from 'fs';
 
 import { CodexCliResolver } from '@/providers/codex/runtime/CodexCliResolver';
@@ -53,7 +54,7 @@ describe('CodexCliResolver', () => {
     expect(resolved).toBe('/legacy/codex');
   });
 
-  it('auto-detects from the runtime PATH when no configured path is valid', () => {
+  (process.platform === 'win32' ? it.skip : it)('auto-detects from the runtime PATH when no configured path is valid', () => {
     mockedExists.mockImplementation((filePath: string) => filePath === '/custom/bin/codex');
     mockedStat.mockImplementation((filePath: string) => ({
       isFile: () => filePath === '/custom/bin/codex',

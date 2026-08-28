@@ -301,7 +301,7 @@
         "tabNotReady": "The chat tab is not ready yet. Try again in a moment.",
         "composerUnavailable": "Could not open a new chat draft.",
         "writeBackFailed": "Could not save the form answers. The new chat was not opened.",
-        "writeBackFailedAction": "Could not save the form answers. The action was not sent.",
+        "writeBackFailedAction": "Could not save the form answers. The new chat was not opened.",
         "rewindInProgress": "Wait for rewind to finish before using section actions.",
         "invalidRequest": "That section action is invalid."
       },
@@ -335,7 +335,7 @@
         "stale": "Stale"
       },
       "collect": {
-        "hint": "Answers save into this note when you leave a field. Use an action button (for example I'm done) to send them to the agent.",
+        "hint": "Answers save into this note when you leave a field. Use an action button (for example I'm done) to review them in a new chat draft.",
         "writeBackUnavailable": "Answers cannot be saved from this surface. Edit the fence in the note instead.",
         "readOnlyNote": "Fill answers in the form below. They save into this note on blur.",
         "answerPrefix": "Answer: {answer}",
@@ -349,8 +349,9 @@
         "conversation": "Conversation",
         "note": "Note",
         "action": "Action",
-        "prompt": "Prompt that will be sent",
+        "prompt": "New chat draft",
         "send": "Send",
+        "newChat": "New chat",
         "archived": "Archived",
         "stale": "Stale",
         "unknownConversation": "Unknown conversation"

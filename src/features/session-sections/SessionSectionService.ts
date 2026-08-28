@@ -26,7 +26,7 @@ export interface ActivateSessionSectionActionOptions {
 }
 
 /**
- * Re-parse the fence, then either open an opted-in new-chat draft or submit through FeatureHost.
+ * Re-parse the fence, confirm the composed content, then open a fresh unsent draft.
  * Always re-parses so a stale widget cannot pair an old action with a new epoch.
  */
 export async function activateSessionSectionAction(
@@ -87,47 +87,27 @@ export async function activateSessionSectionAction(
     return { status: 'blocked', reason: 'invalid-request' };
   }
 
-  if (action.startNewChat) {
-    const questions = form && form.ok ? form.questions : section.questions;
-    const answers = form && form.ok ? form.answers : section.answers;
-    const result = await host.openSessionSectionDraft({
-      content: formatSessionSectionActionDraft({
-        title: action.label,
-        prompt: action.prompt,
-        questions,
-        answers,
-      }, notePath),
-      sourceNotePath: notePath,
-    });
-    recordSessionSectionDiagnostic({
-      level: result.status === 'opened' ? 'info' : 'warn',
-      code: result.status === 'opened' ? 'new-chat-draft-opened' : 'new-chat-draft-blocked',
-      message: result.status === 'opened' ? 'Opened Act new-chat draft' : result.reason,
-      conversationId: section.conversationId,
-      sectionId: section.id,
-      actionId,
-    });
-    return result;
-  }
-
-  const conversation = host.getConversationSync(section.conversationId)
-    ?? await host.getConversationById(section.conversationId);
-  const conversationTitle = conversation?.title?.trim()
-    || t('settings.sessionSections.confirm.unknownConversation');
+  const questions = form && form.ok ? form.questions : section.questions;
+  const answers = form && form.ok ? form.answers : section.answers;
+  const draft = formatSessionSectionActionDraft({
+    title: action.label,
+    prompt: action.prompt,
+    questions,
+    answers,
+  }, notePath);
 
   const confirmed = await confirmSessionSectionAction(host.app, {
-    conversationTitle,
-    conversationArchived: conversation?.isArchived === true,
     notePath,
     actionLabel: action.label,
-    prompt: action.prompt,
+    draft,
+    allowSend: true,
     stale: section.status === 'stale',
   });
-  if (!confirmed) {
+  if (confirmed === 'cancelled') {
     recordSessionSectionDiagnostic({
       level: 'info',
       code: 'cancelled',
-      message: 'User cancelled Act confirm',
+      message: 'User cancelled Act new-chat confirmation',
       conversationId: section.conversationId,
       sectionId: section.id,
       actionId,
@@ -135,26 +115,40 @@ export async function activateSessionSectionAction(
     return { status: 'cancelled' };
   }
 
-  const request = buildSessionSectionTurnRequest(
-    section,
-    action,
-    notePath,
-    form && form.ok
-      ? {
-          answers: form.answers,
-          questions: form.questions,
-          formId: form.formId,
-          memberSectionIds: form.memberSectionIds,
-        }
-      : undefined,
-  );
-  const result = await host.submitSessionSectionTurn(section.conversationId, request);
+  if (confirmed === 'send') {
+    const request = buildSessionSectionTurnRequest(
+      section,
+      action,
+      notePath,
+      form && form.ok
+        ? {
+            answers: form.answers,
+            questions: form.questions,
+            formId: form.formId,
+            memberSectionIds: form.memberSectionIds,
+          }
+        : undefined,
+    );
+    const result = await host.submitSessionSectionTurn(section.conversationId, request);
+    recordSessionSectionDiagnostic({
+      level: result.status === 'blocked' ? 'warn' : 'info',
+      code: `submit-${result.status}`,
+      message: result.status === 'blocked' ? `Blocked: ${result.reason}` : `Act ${result.status}`,
+      conversationId: section.conversationId,
+      sectionId: section.id,
+      actionId,
+    });
+    return result;
+  }
+
+  const result = await host.openSessionSectionDraft({
+    content: draft,
+    sourceNotePath: notePath,
+  });
   recordSessionSectionDiagnostic({
-    level: result.status === 'blocked' ? 'warn' : 'info',
-    code: `submit-${result.status}`,
-    message: result.status === 'blocked'
-      ? `Blocked: ${result.reason}`
-      : `Act ${result.status}`,
+    level: result.status === 'opened' ? 'info' : 'warn',
+    code: result.status === 'opened' ? 'new-chat-draft-opened' : 'new-chat-draft-blocked',
+    message: result.status === 'opened' ? 'Opened Act new-chat draft' : result.reason,
     conversationId: section.conversationId,
     sectionId: section.id,
     actionId,
@@ -193,9 +187,7 @@ export function buildSessionSectionTurnRequest(
       prompt: action.prompt,
       ...(questions.length > 0 ? { questions: snapshotQuestions(questions) } : {}),
       ...(Object.keys(answers).length > 0 ? { answers: cloneAnswers(answers) } : {}),
-      ...(form
-        ? { formId: form.formId, memberSectionIds: [...form.memberSectionIds] }
-        : {}),
+      ...(form ? { formId: form.formId, memberSectionIds: [...form.memberSectionIds] } : {}),
     },
   };
 }

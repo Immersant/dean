@@ -465,7 +465,11 @@ export function parseYaml(content: string): Record<string, unknown> {
     // Handle YAML list items (- value) including flow-style objects and nested maps
     if (currentArrayKey && trimmed.startsWith('- ')) {
       const itemBody = trimmed.slice(2).trim();
-      const firstFieldMatch = itemBody.match(/^([^:{}[\]]+):\s*(.*)$/);
+      const isQuotedScalar = (itemBody.startsWith('"') && itemBody.endsWith('"'))
+        || (itemBody.startsWith("'") && itemBody.endsWith("'"));
+      const firstFieldMatch = isQuotedScalar
+        ? null
+        : itemBody.match(/^([^:{}[\]]+):\s*(.*)$/);
       // Block-style nested mapping: `- id: review` or bare `-` followed by indented keys
       if (!itemBody || firstFieldMatch) {
         const nested: Record<string, unknown> = {};

@@ -100,11 +100,11 @@ The edit itself is an auxiliary provider execution (`InlineEditService` in `src/
 
 Editor session sections are enabled by default and can be turned off with **Enable editor session sections** in settings. They are fenced `dean-session` YAML blocks that agents can leave in vault notes for durable actions or forms.
 
-Bound Act sections submit a prepared prompt after user confirmation. Bound Collect sections save answers back into the note and can focus their existing conversation with **Open chat**.
+Bound Act sections show a confirmation with **Send** to continue the bound conversation and **New chat** to open the prepared prompt as an editable, unsent draft. Bound Collect sections save answers back into the note and offer the same two choices; **Open chat** only focuses the existing conversation.
 
-Standalone Collect sections set `startNewChat` to a required submit-button label, omit `conversationId`, `epoch`, and actions, then open an unsent editable draft in a fresh Dean chat using the current default provider and model. The source note path appears in the draft text only; Dean does not automatically attach the note as execution context.
+Standalone Collect sections set `startNewChat` to a required submit-button label, omit `conversationId`, `epoch`, and actions, then show a confirmation before opening an unsent editable draft in a fresh Dean chat using the current default provider and model. The confirmation action is **New chat**. The source note path appears in the draft text only; Dean does not automatically attach the note as execution context.
 
-Several fences in the same note may share an optional `formId` so a form can be split around normal editor prose. Bound members must share `conversationId` and `epoch`; Act submit sends every member's merged questions and current answers with the prepared prompt. Standalone members all set `startNewChat` to a button label; that control composes the full form. Dean shows Act / the authored standalone submit only on the last `formId` member. Bound and standalone fences cannot share a `formId`. **Open chat** still only focuses the bound conversation.
+Several fences in the same note may share an optional `formId` so a form can be split around normal editor prose. Bound members must share `conversationId` and `epoch`; Act confirmation previews every member's merged questions and current answers with the prepared prompt before either destination is chosen. Standalone members all set `startNewChat` to a button label; that control composes the full form for confirmation. Dean shows Act / the authored standalone submit only on the last `formId` member. Bound and standalone fences cannot share a `formId`. **Open chat** still only focuses the bound conversation.
 
 ```dean-session
 schemaVersion: 1
