@@ -120,6 +120,7 @@ function createFixture(overrides: Record<string, unknown> = {}) {
     renameConversation: jest.fn().mockResolvedValue(undefined),
     settings: {
       enableAutoTitleGeneration: false,
+      enableEditorSessionSections: false,
       permissionMode: 'normal',
     },
     updateConversation: jest.fn().mockResolvedValue(undefined),
@@ -1746,5 +1747,188 @@ describe('InputController coordinator execution', () => {
       selectedModel: 'claude-model',
       currentNote: 'Projects/Plan.md',
     });
+  });
+});
+
+describe('InputController.submitProgrammaticTurn', () => {
+  const sectionRequest = {
+    displayContent: 'Section: Review',
+    canonicalText: 'Review this note for consistency.',
+    hostNotePath: 'Notes/Dashboard.md',
+    epoch: 0,
+    sessionSection: {
+      sectionId: 'sec_1',
+      notePath: 'Notes/Dashboard.md',
+      conversationId: 'conversation-1',
+      kind: 'act' as const,
+      actionId: 'review',
+      title: 'Follow-ups',
+      prompt: 'Review this note for consistency.',
+    },
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.mocked(ProviderSettingsCoordinator.getProviderSettingsSnapshot).mockReturnValue({
+      effortLevel: 'high',
+      model: 'claude-model',
+      permissionMode: 'normal',
+      serviceTier: 'standard',
+    });
+  });
+
+  it('sends a prepared turn without reading or clearing the composer', async () => {
+    const markCurrentNoteSent = jest.fn();
+    const startSession = jest.fn();
+    const getCurrentNotePath = jest.fn().mockReturnValue('Specs/RFC.md');
+    const fixture = createFixture({
+      getFileContextManager: () => ({
+        getCurrentNotePath,
+        markCurrentNoteSent,
+        shouldSendCurrentNote: jest.fn().mockReturnValue(false),
+        startSession,
+        transformContextMentions: jest.fn((text: string) => text),
+      }) as any,
+    });
+    fixture.plugin.settings.enableEditorSessionSections = true;
+    fixture.plugin.getConversationSync.mockReturnValue({
+      id: 'conversation-1',
+      providerId: 'claude',
+      sectionEpoch: 0,
+    });
+    fixture.input.value = 'composer draft stays';
+
+    const result = await fixture.controller.submitProgrammaticTurn(sectionRequest);
+
+    expect(result).toEqual({ status: 'sent' });
+    expect(fixture.input.value).toBe('composer draft stays');
+    expect(startSession).not.toHaveBeenCalled();
+    expect(markCurrentNoteSent).not.toHaveBeenCalled();
+    expect(getCurrentNotePath).not.toHaveBeenCalled();
+
+    const submission = fixture.coordinator.execute.mock.calls[0][0] as ChatTurnSubmission;
+    expect(submission.canonicalText).toBe(sectionRequest.canonicalText);
+    expect(submission.rawDisplayText).toBe(sectionRequest.displayContent);
+    expect(submission.context?.currentNote?.path).toBe('Notes/Dashboard.md');
+    expect(submission.context?.sessionSection).toMatchObject({
+      sectionId: 'sec_1',
+      actionId: 'review',
+    });
+    expect(submission.context?.conversationBinding).toEqual({
+      conversationId: 'conversation-1',
+      sectionEpoch: 0,
+    });
+    expect(submission.context?.editorSelection).toBeUndefined();
+    expect(fixture.state.messages[0]).toMatchObject({
+      role: 'user',
+      content: sectionRequest.canonicalText,
+      displayContent: sectionRequest.displayContent,
+      executionInput: {
+        schemaVersion: 1,
+        canonicalText: sectionRequest.canonicalText,
+        context: expect.objectContaining({
+          sessionSection: expect.objectContaining({
+            sectionId: 'sec_1',
+            actionId: 'review',
+          }),
+          currentNote: { path: 'Notes/Dashboard.md' },
+          conversationBinding: {
+            conversationId: 'conversation-1',
+            sectionEpoch: 0,
+          },
+        }),
+      },
+    });
+  });
+
+  it('queues independently of the composer while streaming', async () => {
+    const fixture = createFixture();
+    fixture.state.isStreaming = true;
+    fixture.state.queuedMessage = {
+      canvasContext: null,
+      content: 'composer queue',
+      editorContext: null,
+    };
+    fixture.input.value = 'still typing';
+
+    const result = await fixture.controller.submitProgrammaticTurn(sectionRequest);
+
+    expect(result).toEqual({ status: 'queued' });
+    expect(fixture.state.queuedProgrammaticTurn).toMatchObject({
+      displayContent: sectionRequest.displayContent,
+      canonicalText: sectionRequest.canonicalText,
+    });
+    expect(fixture.state.queuedMessage).toMatchObject({ content: 'composer queue' });
+    expect(fixture.input.value).toBe('still typing');
+    expect(fixture.coordinator.execute).not.toHaveBeenCalled();
+  });
+
+  it('drains programmatic queue before composer queue after a stream ends', async () => {
+    const fixture = createFixture();
+    const scheduled: Array<() => void> = [];
+    const timeoutSpy = jest.spyOn(window, 'setTimeout').mockImplementation((callback: any) => {
+      scheduled.push(callback);
+      return scheduled.length as unknown as ReturnType<typeof window.setTimeout>;
+    });
+    fixture.state.queuedProgrammaticTurn = sectionRequest;
+    fixture.state.queuedMessage = {
+      canvasContext: null,
+      content: 'composer later',
+      editorContext: null,
+    };
+
+    expect((fixture.controller as any).processQueuedMessage()).toBe(true);
+    expect(fixture.state.queuedProgrammaticTurn).toBeNull();
+    expect(fixture.state.queuedMessage).toMatchObject({ content: 'composer later' });
+    scheduled.shift()?.();
+    await waitForCall(fixture.coordinator.execute);
+
+    const submission = fixture.coordinator.execute.mock.calls[0][0] as ChatTurnSubmission;
+    expect(submission.canonicalText).toBe(sectionRequest.canonicalText);
+    timeoutSpy.mockRestore();
+  });
+
+  it('blocks while switching conversations', async () => {
+    const fixture = createFixture();
+    fixture.state.isSwitchingConversation = true;
+
+    const result = await fixture.controller.submitProgrammaticTurn(sectionRequest);
+
+    expect(result).toEqual({ status: 'blocked', reason: 'tab-not-ready' });
+    expect(fixture.coordinator.execute).not.toHaveBeenCalled();
+  });
+
+  it('blocks while rewinding', async () => {
+    const fixture = createFixture();
+    fixture.state.isRewinding = true;
+
+    const result = await fixture.controller.submitProgrammaticTurn(sectionRequest);
+
+    expect(result).toEqual({ status: 'blocked', reason: 'rewind-in-progress' });
+    expect(fixture.coordinator.execute).not.toHaveBeenCalled();
+  });
+
+  it('blocks when intent admission is closed', async () => {
+    const fixture = createFixture({ canStartTurn: () => false });
+
+    const result = await fixture.controller.submitProgrammaticTurn(sectionRequest);
+
+    expect(result).toEqual({ status: 'blocked', reason: 'tab-not-ready' });
+    expect(fixture.coordinator.execute).not.toHaveBeenCalled();
+  });
+
+  it('clearQueuedMessage clears both composer and programmatic queues', () => {
+    const fixture = createFixture();
+    fixture.state.queuedMessage = {
+      canvasContext: null,
+      content: 'composer',
+      editorContext: null,
+    };
+    fixture.state.queuedProgrammaticTurn = sectionRequest;
+
+    fixture.controller.clearQueuedMessage();
+
+    expect(fixture.state.queuedMessage).toBeNull();
+    expect(fixture.state.queuedProgrammaticTurn).toBeNull();
   });
 });

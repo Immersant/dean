@@ -1,7 +1,12 @@
 import type { BrowserSelectionContext } from '../../utils/browser';
 import type { CanvasSelectionContext } from '../../utils/canvas';
 import type { EditorSelectionContext } from '../../utils/editor';
-import type { ChatMessage, ImageAttachment } from '../types';
+import type {
+  ChatMessage,
+  ExecutionInputConversationBindingSnapshot,
+  ExecutionInputSessionSectionSnapshot,
+  ImageAttachment,
+} from '../types';
 
 export type ProviderExecutionInputBlock =
   | {
@@ -24,6 +29,8 @@ export interface ProviderExecutionContext {
   readonly browserSelection?: BrowserSelectionContext | null;
   readonly canvasSelection?: CanvasSelectionContext | null;
   readonly externalContextPaths?: readonly string[];
+  readonly conversationBinding?: ExecutionInputConversationBindingSnapshot;
+  readonly sessionSection?: ExecutionInputSessionSectionSnapshot;
 }
 
 export type ProviderSystemInstructions =

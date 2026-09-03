@@ -101,20 +101,21 @@ describe('CodexWorkspaceDependencyResolver', () => {
       createHostRuntimeContext(tempDir),
     );
 
+    const normalizedRuntimeRoot = runtimeRoot.replace(/\\/g, '/');
     expect(result).toEqual(expect.objectContaining({
       bundleVersion: '26.715.12143',
       artifactToolVersion: '2.8.24',
-      runtimeRoot,
-      nodeExecutable: path.join(runtimeRoot, 'dependencies', 'node', 'bin', 'node'),
-      nodePackages: path.join(runtimeRoot, 'dependencies', 'node', 'node_modules'),
-      pythonExecutable: path.join(runtimeRoot, 'dependencies', 'python', 'bin', 'python3'),
-      pythonPackages: path.join(runtimeRoot, 'dependencies', 'python'),
-      gitExecutable: path.join(runtimeRoot, 'dependencies', 'bin', 'fallback', 'git'),
-      pnpmExecutable: path.join(runtimeRoot, 'dependencies', 'bin', 'fallback', 'pnpm'),
+      runtimeRoot: normalizedRuntimeRoot,
+      nodeExecutable: `${normalizedRuntimeRoot}/dependencies/node/bin/node`,
+      nodePackages: `${normalizedRuntimeRoot}/dependencies/node/node_modules`,
+      pythonExecutable: `${normalizedRuntimeRoot}/dependencies/python/bin/python3`,
+      pythonPackages: `${normalizedRuntimeRoot}/dependencies/python`,
+      gitExecutable: `${normalizedRuntimeRoot}/dependencies/bin/fallback/git`,
+      pnpmExecutable: `${normalizedRuntimeRoot}/dependencies/bin/fallback/pnpm`,
     }));
 
     expect(formatCodexWorkspaceDependencies(result!)).toContain(
-      `- Node.js packages: \`${path.join(runtimeRoot, 'dependencies', 'node', 'node_modules')}\``,
+      `- Node.js packages: \`${normalizedRuntimeRoot}/dependencies/node/node_modules\``,
     );
   });
 
@@ -133,7 +134,7 @@ describe('CodexWorkspaceDependencyResolver', () => {
       },
     ));
 
-    expect(result?.runtimeRoot).toBe(explicitRuntimeRoot);
+    expect(result?.runtimeRoot).toBe(explicitRuntimeRoot.replace(/\\/g, '/'));
   });
 
   it('does not expose a partial bundle without artifact-tool', async () => {

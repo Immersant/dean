@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import type * as fsType from 'fs';
 import type * as osType from 'os';
 import type * as pathType from 'path';
@@ -206,7 +207,7 @@ describe('utils.ts', () => {
       process.env[envKey] = '/tmp/dean-test';
 
       try {
-        expect(normalizePathForFilesystem(`$${envKey}/notes/file.md`)).toBe('/tmp/dean-test/notes/file.md');
+        expect(normalizePathForFilesystem(`$${envKey}/notes/file.md`)).toBe(path.normalize('/tmp/dean-test/notes/file.md'));
       } finally {
         if (originalValue === undefined) {
           delete process.env[envKey];
@@ -233,8 +234,8 @@ describe('utils.ts', () => {
 
     it('handles non-existent environment variables', () => {
       // Non-existent env vars should be left as-is
-      expect(normalizePathForFilesystem('$NONEXISTENT/path')).toBe('$NONEXISTENT/path');
-      expect(normalizePathForFilesystem('%NONEXISTENT%/path')).toBe('%NONEXISTENT%/path');
+      expect(normalizePathForFilesystem('$NONEXISTENT/path')).toBe(path.normalize('$NONEXISTENT/path'));
+      expect(normalizePathForFilesystem('%NONEXISTENT%/path')).toBe(path.normalize('%NONEXISTENT%/path'));
     });
 
     it('handles mixed path separators', () => {
@@ -485,7 +486,7 @@ describe('utils.ts', () => {
         }) as fsType.Stats);
       }
 
-      it('should return first matching Claude CLI path', () => {
+      (process.platform === 'win32' ? it.skip : it)('should return first matching Claude CLI path', () => {
         jest.spyOn(os, 'homedir').mockReturnValue('/home/test');
         mockExistingFile('/home/test/.local/bin/claude');
 
@@ -499,21 +500,21 @@ describe('utils.ts', () => {
         expect(findClaudeCLIPath()).toBeNull();
       });
 
-      it('should check cli-wrapper.cjs paths as fallback on Unix', () => {
+      (process.platform === 'win32' ? it.skip : it)('should check cli-wrapper.cjs paths as fallback on Unix', () => {
         jest.spyOn(os, 'homedir').mockReturnValue('/home/test');
         mockExistingFile('/usr/local/lib/node_modules/@anthropic-ai/claude-code/cli-wrapper.cjs');
 
         expect(findClaudeCLIPath()).toBe('/usr/local/lib/node_modules/@anthropic-ai/claude-code/cli-wrapper.cjs');
       });
 
-      it('should resolve Claude CLI from custom PATH', () => {
+      (process.platform === 'win32' ? it.skip : it)('should resolve Claude CLI from custom PATH', () => {
         mockExistingFile('/custom/bin/claude');
 
         const customPath = '/custom/bin:/usr/bin';
         expect(findClaudeCLIPath(customPath)).toBe('/custom/bin/claude');
       });
 
-      it('should expand home directory in custom PATH', () => {
+      (process.platform === 'win32' ? it.skip : it)('should expand home directory in custom PATH', () => {
         jest.spyOn(os, 'homedir').mockReturnValue('/home/test');
         mockExistingFile('/home/test/bin/claude');
 

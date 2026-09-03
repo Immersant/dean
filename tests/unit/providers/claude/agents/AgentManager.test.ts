@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -183,7 +184,7 @@ describe('AgentManager', () => {
       expect(globalAgent?.source).toBe('global');
     });
 
-    it('loads global agents from the effective Claude config directory', async () => {
+    (process.platform === 'win32' ? it.skip : it)('loads global agents from the effective Claude config directory', async () => {
       const manager = new AgentManager(
         VAULT_PATH,
         createMockPluginManager(),
@@ -598,7 +599,7 @@ describe('AgentManager', () => {
       expect(after.some(a => a.id === 'new-agent' && a.source === 'builtin')).toBe(true);
     });
 
-    it('excludes file-loaded agents from built-in list', async () => {
+    (process.platform === 'win32' ? it.skip : it)('excludes file-loaded agents from built-in list', async () => {
       const manager = new AgentManager(VAULT_PATH, createMockPluginManager());
 
       // Vault has an agent file matching an init agent name

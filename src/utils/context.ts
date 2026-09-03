@@ -4,6 +4,14 @@
  * Note and context file formatting for prompts.
  */
 
+import type { ProviderExecutionContext } from '../core/execution/ProviderExecutionRequest';
+import {
+  appendDeanConversationBinding,
+  appendSessionSectionContext,
+} from '../core/session-sections/SessionSectionContext';
+import { appendBrowserContext } from './browser';
+import { appendCanvasContext } from './canvas';
+import { appendEditorContext } from './editor';
 import { escapePromptXmlAttribute, formatPromptXmlCdata } from './promptXml';
 
 const LINKED_NOTE_TAG = 'linked_note';
@@ -21,9 +29,9 @@ const NOTE_CONTEXT_SUFFIX_REGEX = new RegExp(`\\n\\n${NOTE_CONTEXT_BLOCK_PATTERN
  * Pattern to match XML context tags appended to prompts.
  * These tags are always preceded by \n\n separator.
  * Matches: linked_note/current_note, editor_selection (with attributes), editor_cursor (with attributes),
- * context_files, canvas_selection, browser_selection
+ * context_files, canvas_selection, browser_selection, dean_conversation, session_section
  */
-export const XML_CONTEXT_PATTERN = /\n\n<(?:linked_note|current_note|editor_selection|editor_cursor|context_files|canvas_selection|browser_selection)[\s>]/;
+export const XML_CONTEXT_PATTERN = /\n\n<(?:linked_note|current_note|editor_selection|editor_cursor|context_files|canvas_selection|browser_selection|dean_conversation|session_section)[\s>]/;
 const BRACKET_CONTEXT_PATTERN = /\n\[(?:Current note|Editor selection from|Browser selection from|Canvas selection from)\b/;
 
 export function formatCurrentNote(notePath: string): string {
@@ -126,6 +134,8 @@ export function extractUserQuery(prompt: string): string {
     .replace(/<context_files>[\s\S]*?<\/context_files>\s*/g, '')
     .replace(/<canvas_selection[\s\S]*?<\/canvas_selection>\s*/g, '')
     .replace(/<browser_selection[\s\S]*?<\/browser_selection>\s*/g, '')
+    .replace(/<dean_conversation(?:\s[^>]*)?\s*\/>\s*/g, '')
+    .replace(/<session_section[\s\S]*?<\/session_section>\s*/g, '')
     .trim();
 }
 
@@ -138,4 +148,52 @@ function formatContextFilesLine(files: string[]): string {
 
 export function appendContextFiles(prompt: string, files: string[]): string {
   return `${prompt}\n\n${formatContextFilesLine(files)}`;
+}
+
+/**
+ * Append provider execution context in the canonical order:
+ * note → editor → browser → canvas → dean_conversation → session_section.
+ *
+ * Does not append externalContextPaths (provider-specific: Pi uses context_files).
+ */
+export function appendProviderExecutionContext(
+  prompt: string,
+  context: ProviderExecutionContext | undefined,
+  options?: {
+    /** When true, skip editor_selection with mode === 'none' (OpenCode/Grok). */
+    skipNoneEditorSelection?: boolean;
+  },
+): string {
+  if (!context) {
+    return prompt;
+  }
+
+  let next = prompt;
+  if (context.currentNote) {
+    next = context.currentNote.content === undefined
+      ? appendCurrentNote(next, context.currentNote.path)
+      : appendCurrentNoteContent(
+        next,
+        context.currentNote.path,
+        context.currentNote.content,
+      );
+  }
+  if (context.editorSelection) {
+    if (!(options?.skipNoneEditorSelection && context.editorSelection.mode === 'none')) {
+      next = appendEditorContext(next, context.editorSelection);
+    }
+  }
+  if (context.browserSelection) {
+    next = appendBrowserContext(next, context.browserSelection);
+  }
+  if (context.canvasSelection) {
+    next = appendCanvasContext(next, context.canvasSelection);
+  }
+  if (context.conversationBinding) {
+    next = appendDeanConversationBinding(next, context.conversationBinding);
+  }
+  if (context.sessionSection) {
+    next = appendSessionSectionContext(next, context.sessionSection);
+  }
+  return next;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import type * as fsType from 'fs';
 import type * as pathType from 'path';
 
@@ -1195,7 +1196,7 @@ describe('Obsidian CLI path integration', () => {
     return require('../../../src/utils/env');
   }
 
-  it('uses the top-level app bundle binary dir on macOS helper processes', () => {
+  (process.platform === 'win32' ? it.skip : it)('uses the top-level app bundle binary dir on macOS helper processes', () => {
     const helperExecPath = '/Applications/Obsidian.app/Contents/Frameworks/Obsidian Helper (Renderer).app/Contents/MacOS/Obsidian Helper (Renderer)';
     process.env.PATH = '';
 
@@ -1207,7 +1208,7 @@ describe('Obsidian CLI path integration', () => {
     expect(segments).not.toContain('/Applications/Obsidian.app/Contents/Frameworks/Obsidian Helper (Renderer).app/Contents/MacOS');
   });
 
-  it('does not add transient Linux AppImage mount dirs', () => {
+  (process.platform === 'win32' ? it.skip : it)('does not add transient Linux AppImage mount dirs', () => {
     const appImageExecPath = '/tmp/.mount_Obsidian-abcd1234/usr/bin/obsidian';
     const appImageDir = path.dirname(appImageExecPath);
     process.env.HOME = '/home/test';

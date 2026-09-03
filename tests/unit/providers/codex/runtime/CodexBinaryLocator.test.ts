@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -25,7 +26,7 @@ describe('CodexBinaryLocator', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it('finds a codex executable on PATH', () => {
+  (process.platform === 'win32' ? it.skip : it)('finds a codex executable on PATH', () => {
     const pathDir = path.join(tempDir, 'bin');
     const pathBinary = path.join(pathDir, 'codex');
     fs.mkdirSync(pathDir, { recursive: true });
@@ -53,7 +54,7 @@ describe('CodexBinaryLocator', () => {
     expect(findCodexBinaryPath('', 'darwin')).toBe(appBinary);
   });
 
-  it('honors an explicit runtime PATH before preferred macOS Codex locations', () => {
+  (process.platform === 'win32' ? it.skip : it)('honors an explicit runtime PATH before preferred macOS Codex locations', () => {
     process.env.HOME = tempDir;
     const explicitDir = path.join(tempDir, 'explicit-bin');
     const explicitBinary = path.join(explicitDir, 'codex');

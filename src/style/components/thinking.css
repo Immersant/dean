@@ -47,9 +47,20 @@
 
 .dean-thinking-label {
   flex: 1;
+  min-width: 0;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--dean-brand);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.dean-thinking-label > :first-child {
+  margin-top: 0;
+}
+
+.dean-thinking-label > :last-child {
+  margin-bottom: 0;
 }
 
 /* Thinking block content - tree-branch style */

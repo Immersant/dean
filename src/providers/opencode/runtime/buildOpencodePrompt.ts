@@ -1,20 +1,13 @@
-import type { ChatMessage, ImageAttachment } from '../../../core/types';
-import {
-  appendBrowserContext,
-  type BrowserSelectionContext,
-} from '../../../utils/browser';
-import {
-  appendCanvasContext,
-  type CanvasSelectionContext,
-} from '../../../utils/canvas';
-import {
-  appendCurrentNote,
-  appendCurrentNoteContent,
-} from '../../../utils/context';
-import {
-  appendEditorContext,
-  type EditorSelectionContext,
-} from '../../../utils/editor';
+import type {
+  ChatMessage,
+  ExecutionInputConversationBindingSnapshot,
+  ExecutionInputSessionSectionSnapshot,
+  ImageAttachment,
+} from '../../../core/types';
+import type { BrowserSelectionContext } from '../../../utils/browser';
+import type { CanvasSelectionContext } from '../../../utils/canvas';
+import { appendProviderExecutionContext } from '../../../utils/context';
+import type { EditorSelectionContext } from '../../../utils/editor';
 import { buildContextFromHistory, buildPromptWithHistoryContext } from '../../../utils/session';
 import type { AcpContentBlock } from '../../acp';
 
@@ -27,35 +20,33 @@ export interface OpencodePromptRequest {
   browserSelection?: BrowserSelectionContext | null;
   canvasSelection?: CanvasSelectionContext | null;
   externalContextPaths?: string[];
+  conversationBinding?: ExecutionInputConversationBindingSnapshot;
+  sessionSection?: ExecutionInputSessionSectionSnapshot;
 }
 
 export function buildOpencodePromptText(
   request: OpencodePromptRequest,
   conversationHistory: ChatMessage[] = [],
 ): string {
-  let prompt = request.text;
-
-  if (request.currentNotePath) {
-    prompt = request.currentNoteContent === undefined
-      ? appendCurrentNote(prompt, request.currentNotePath)
-      : appendCurrentNoteContent(
-        prompt,
-        request.currentNotePath,
-        request.currentNoteContent,
-      );
-  }
-
-  if (request.editorSelection && request.editorSelection.mode !== 'none') {
-    prompt = appendEditorContext(prompt, request.editorSelection);
-  }
-
-  if (request.browserSelection) {
-    prompt = appendBrowserContext(prompt, request.browserSelection);
-  }
-
-  if (request.canvasSelection) {
-    prompt = appendCanvasContext(prompt, request.canvasSelection);
-  }
+  let prompt = appendProviderExecutionContext(request.text, {
+    ...(request.currentNotePath
+      ? {
+        currentNote: {
+          path: request.currentNotePath,
+          ...(request.currentNoteContent !== undefined
+            ? { content: request.currentNoteContent }
+            : {}),
+        },
+      }
+      : {}),
+    editorSelection: request.editorSelection,
+    browserSelection: request.browserSelection,
+    canvasSelection: request.canvasSelection,
+    conversationBinding: request.conversationBinding,
+    sessionSection: request.sessionSection,
+  }, {
+    skipNoneEditorSelection: true,
+  });
 
   if (conversationHistory.length > 0) {
     const historyContext = buildContextFromHistory(conversationHistory);

@@ -12,6 +12,7 @@ import { buildSystemPrompt } from '../../../core/prompt/mainAgent';
 import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSettingsCoordinator';
 import type { AppPluginManager } from '../../../core/providers/types';
+import { buildDeanSystemPromptAppendices } from '../../../core/session-sections/sessionSectionPrompt';
 import {
   isReadOnlyTool,
   READ_ONLY_TOOLS,
@@ -21,13 +22,7 @@ import type {
   DeanSettings,
   PermissionMode,
 } from '../../../core/types/settings';
-import { appendBrowserContext } from '../../../utils/browser';
-import { appendCanvasContext } from '../../../utils/canvas';
-import {
-  appendCurrentNote,
-  appendCurrentNoteContent,
-} from '../../../utils/context';
-import { appendEditorContext } from '../../../utils/editor';
+import { appendProviderExecutionContext } from '../../../utils/context';
 import {
   getEnhancedPath,
   getMissingNodeError,
@@ -141,6 +136,8 @@ export class ClaudeExecutionRequestEncoder {
         customPrompt: settings.systemPrompt,
         vaultPath: sessionConfig.vaultWorkingDirectory,
         userName: settings.userName,
+      }, {
+        appendices: buildDeanSystemPromptAppendices(settings, request.toolPolicy),
       });
     const externalPaths = uniqueStrings([
       ...(request.context?.externalContextPaths ?? []),
@@ -265,25 +262,7 @@ export class ClaudeExecutionRequestEncoder {
       .filter((block) => block.type === 'text')
       .map((block) => block.text)
       .join('\n\n');
-    const context = request.context;
-    if (context?.currentNote) {
-      prompt = context.currentNote.content === undefined
-        ? appendCurrentNote(prompt, context.currentNote.path)
-        : appendCurrentNoteContent(
-          prompt,
-          context.currentNote.path,
-          context.currentNote.content,
-        );
-    }
-    if (context?.editorSelection) {
-      prompt = appendEditorContext(prompt, context.editorSelection);
-    }
-    if (context?.browserSelection) {
-      prompt = appendBrowserContext(prompt, context.browserSelection);
-    }
-    if (context?.canvasSelection) {
-      prompt = appendCanvasContext(prompt, context.canvasSelection);
-    }
+    prompt = appendProviderExecutionContext(prompt, request.context);
 
     const history = replayConversationHistory
       ? request.conversationHistory

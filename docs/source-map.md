@@ -10,7 +10,7 @@ This is a directory-level map of the repository. Read the nearest `AGENTS.md` be
 | `tests/` | Jest unit and integration tests mirroring `src/` |
 | `scripts/` | Build, test runners, and architecture checks |
 | `docs/` | Human documentation (this folder) |
-| `assets/` | README images and sponsor artwork |
+| `assets/` | README images and other static artwork |
 | `manifest.json` | Obsidian plugin manifest |
 | `versions.json` | Obsidian community-plugin map of plugin version → `minAppVersion`. `check-release-version.mjs` does not read it; it only compares the release tag with `package.json` and `manifest.json` |
 | `styles.css` | Generated CSS output — do not edit |
@@ -53,6 +53,8 @@ Provider-neutral infrastructure.
 | `bootstrap/` | Persistence contracts and path constants (`.dean/`, sessions, input ledgers) |
 | `auxiliary/` | Title generation, instruction refine, inline edit, text collectors |
 | `prompt/` | Shared prompt text for main agent, inline edit, instruction refine, title generation |
+| `session-sections/` | Editor session-section schema, codec, validation, prompt appendix, and context formatting |
+| `artifacts/` | Editor artifact schema, HTML allowlist walk, codec, and authoring appendix |
 | `commands/builtInCommands.ts` | `/clear`, `/add-dir`, `/resume`, `/fork`, `/fast` |
 | `skills/` | Agent-skill document codec and repository |
 | `storage/` | `VaultFileAdapter`, path-containment checks |
@@ -77,6 +79,8 @@ Provider-neutral infrastructure.
 | `chat/services/` | Bang-bash, mentions cache, subagent manager, tab persistence |
 | `chat/session-manager/` | Dual-pane list organization and icons |
 | `chat/state/` | Transient `ChatState` |
+| `session-sections/` | `dean-session` Markdown processors, widgets, Collect write-back, and Act orchestration |
+| `artifacts/` | `dean-artifact` Markdown processor and native `createEl` mount |
 | `inline-edit/ui/` | CodeMirror overlay modal and markdown preview |
 | `settings/` | Settings tab shell, skill coordinator, keyboard-nav parser |
 

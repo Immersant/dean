@@ -15,6 +15,7 @@ import {
   updateCodexProviderSettings,
 } from './settings';
 import { codexChatUIConfig } from './ui/CodexChatUIConfig';
+import { CodexWorkflowPromotionService } from './workflows/CodexWorkflowPromotionService';
 
 export const codexProviderRegistration: ProviderModule = {
   id: 'codex',
@@ -44,6 +45,7 @@ export const codexProviderRegistration: ProviderModule = {
     },
   },
   createExecutionBackend: (plugin) => new CodexExecutionBackend(plugin),
+  createWorkflowPromotionService: context => new CodexWorkflowPromotionService(context),
   resolveTitleGenerationModel: (plugin) => {
     const settings = plugin.settings as unknown as Record<string, unknown>;
     const titleModel = typeof settings.titleGenerationModel === 'string'

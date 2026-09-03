@@ -91,7 +91,7 @@ Read the scoped `AGENTS.md` in that area before editing. Those files record owne
 
 ## Product identity
 
-The plugin id, view type, storage directory, and CSS prefix are `dean` / `dean-view` / `.dean/` / `.dean-`. `scripts/check-product-identity.test.mjs` asserts those identities and fails if the retired product name reappears in source or docs (`docs/superpowers/` is excluded).
+The plugin id, view type, storage directory, and CSS prefix are `dean` / `dean-view` / `.dean/` / `.dean-`. `scripts/check-product-identity.test.mjs` asserts those identities and fails if the retired product name reappears in source or docs.
 
 ## Versioning
 

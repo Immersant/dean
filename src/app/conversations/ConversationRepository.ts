@@ -26,6 +26,7 @@ import {
   DEFAULT_CHAT_PROVIDER_ID,
   type ProviderId,
 } from '../../core/providers/types';
+import { decodeSectionEpoch } from '../../core/session-sections/decodeSectionEpoch';
 import {
   type ChatMessage,
   type Conversation,
@@ -1728,6 +1729,7 @@ export class ConversationRepository {
       externalContextPaths: conversation.externalContextPaths,
       usage: conversation.usage,
       resumeAtMessageId: conversation.resumeAtMessageId,
+      sectionEpoch: decodeSectionEpoch(conversation.sectionEpoch),
     };
   }
 

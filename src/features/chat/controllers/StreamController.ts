@@ -59,6 +59,7 @@ import {
   updateAsyncSubagentRunning,
 } from '../rendering/SubagentRenderer';
 import {
+  appendThinkingText,
   createThinkingBlock,
   finalizeThinkingBlock,
   type ThinkingBlockState,
@@ -1147,11 +1148,15 @@ export class StreamController {
       this.syncThinkingRenderAvailability();
     }
 
-    state.currentThinkingState.content += content;
+    const thinkingContent = appendThinkingText(state.currentThinkingState, content);
+    await this.deps.renderer.renderThinkingPreview(
+      state.currentThinkingState.labelEl,
+      thinkingContent.trim() || 'Thought'
+    );
     this.thinkingRenderCoordinator.request(
       this.createStreamingSnapshot(
         state.currentThinkingState.contentEl,
-        state.currentThinkingState.content
+        thinkingContent
       )
     );
   }

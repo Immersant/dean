@@ -56,9 +56,59 @@ export interface ExecutionInputBrowserSnapshot {
   url?: string;
 }
 
+export interface ExecutionInputCanvasNodeSnapshot {
+  id: string;
+  type?: string;
+  file?: string;
+  subpath?: string;
+  text?: string;
+  label?: string;
+  url?: string;
+  color?: string;
+}
+
 export interface ExecutionInputCanvasSnapshot {
   canvasPath: string;
   nodeIds: string[];
+  nodes?: ExecutionInputCanvasNodeSnapshot[];
+}
+
+export type ExecutionInputSessionSectionAnswers = Record<string, string | string[]>;
+
+/** Presentation-free question copy for the Act turn payload. */
+export interface ExecutionInputSessionSectionQuestionOptionSnapshot {
+  id: string;
+  label: string;
+}
+
+export interface ExecutionInputSessionSectionQuestionSnapshot {
+  id: string;
+  prompt: string;
+  type: 'single' | 'multi' | 'text' | 'markdown';
+  options?: readonly ExecutionInputSessionSectionQuestionOptionSnapshot[];
+}
+
+/** Snapshot of an Act click origin for the input ledger and chat projection. */
+export interface ExecutionInputSessionSectionSnapshot {
+  sectionId: string;
+  notePath: string;
+  conversationId: string;
+  kind: 'act' | 'collect';
+  actionId?: string;
+  /** Human action label for chat chips (e.g. "Review"). */
+  actionLabel?: string;
+  title?: string;
+  prompt?: string;
+  questions?: readonly ExecutionInputSessionSectionQuestionSnapshot[];
+  answers?: ExecutionInputSessionSectionAnswers;
+  formId?: string;
+  memberSectionIds?: readonly string[];
+}
+
+/** Conversation id + section epoch stamped on turns when editor session sections are enabled. */
+export interface ExecutionInputConversationBindingSnapshot {
+  conversationId: string;
+  sectionEpoch: number;
 }
 
 export interface ExecutionInputContextSnapshot {
@@ -66,6 +116,8 @@ export interface ExecutionInputContextSnapshot {
   editorSelection?: ExecutionInputEditorSnapshot | null;
   browserSelection?: ExecutionInputBrowserSnapshot | null;
   canvasSelection?: ExecutionInputCanvasSnapshot | null;
+  conversationBinding?: ExecutionInputConversationBindingSnapshot;
+  sessionSection?: ExecutionInputSessionSectionSnapshot;
 }
 
 /** Canonical feature-owned input, before provider-native prompt formatting. */
@@ -159,6 +211,11 @@ export interface Conversation {
   titleGenerationStatus?: 'pending' | 'success' | 'failed';
   /** Assistant checkpoint identifier for resumeAtMessageId after rewind. */
   resumeAtMessageId?: string;
+  /**
+   * Epoch for editor session-section Act authorization.
+   * Incremented after a successful rewind persist. Decode with decodeSectionEpoch.
+   */
+  sectionEpoch?: number;
 }
 
 /** Native session locator that must never make an invalidated session resumable. */
@@ -216,6 +273,11 @@ export interface SessionMetadata {
   usage?: UsageInfo;
   /** Assistant checkpoint identifier for resumeAtMessageId after rewind. */
   resumeAtMessageId?: string;
+  /**
+   * Epoch for editor session-section Act authorization.
+   * Incremented after a successful rewind persist. Decode with decodeSectionEpoch.
+   */
+  sectionEpoch?: number;
 }
 
 /**

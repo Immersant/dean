@@ -11,6 +11,7 @@ import {
 } from '../../../utils/contextMentionResolver';
 import { buildExternalContextDisplayEntries } from '../../../utils/externalContext';
 import { externalContextScanner } from '../../../utils/externalContextScanner';
+import { openWorkspaceLink } from '../../../utils/obsidianCompat';
 import {
   getVaultPath,
   normalizePathForVault as normalizePathForVaultUtil,
@@ -83,7 +84,7 @@ export class FileContextManager {
               return;
             }
             try {
-              await this.app.workspace.getLeaf().openFile(file);
+              await openWorkspaceLink(this.app, file.path);
             } catch (error) {
               new Notice(`Failed to open file: ${error instanceof Error ? error.message : String(error)}`);
             }

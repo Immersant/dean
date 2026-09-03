@@ -283,11 +283,34 @@ export function createMockEl(tag = 'div'): any {
       return child;
     },
 
-    appendChild(child: any) { children.push(child); return child; },
-    insertBefore(el: MockElement, _ref: MockElement | null) { children.unshift(el); },
+    appendChild(child: any) {
+      children.push(child);
+      if (child && typeof child === 'object') {
+        child.parentElement = element;
+        child.parentNode = element;
+      }
+      return child;
+    },
+    insertBefore(el: MockElement, _ref: MockElement | null) {
+      children.unshift(el);
+      if (el && typeof el === 'object') {
+        (el as any).parentElement = element;
+        (el as any).parentNode = element;
+      }
+    },
     get firstChild() { return children[0] || null; },
     remove() {},
     empty() {
+      for (const child of children) {
+        if (child && typeof child === 'object') {
+          if ((child as any).parentElement === element) {
+            (child as any).parentElement = null;
+          }
+          if ((child as any).parentNode === element) {
+            (child as any).parentNode = null;
+          }
+        }
+      }
       children.length = 0;
       element.innerHTML = '';
       textContent = '';
@@ -320,6 +343,10 @@ export function createMockEl(tag = 'div'): any {
     getAttribute(name: string) {
       if (name === 'class') return element.className;
       return attributes.get(name) ?? null;
+    },
+    hasAttribute(name: string) {
+      if (name === 'class') return classes.size > 0;
+      return attributes.has(name);
     },
     removeAttribute(name: string) {
       if (name === 'class') {
@@ -403,7 +430,21 @@ export function createMockEl(tag = 'div'): any {
       updateClass(cls, force);
     },
     value: '',
-    closest() { return { clientHeight: 600 }; },
+    closest(selector: string) {
+      const tokens = selector.split(',').map(part => part.trim()).filter(Boolean);
+      let current: any = element;
+      while (current) {
+        for (const token of tokens) {
+          if (token.startsWith('.') && current.classList?.contains?.(token.slice(1))) {
+            return current;
+          }
+        }
+        current = current.parentElement ?? current.parentNode ?? null;
+      }
+      return null;
+    },
+    parentElement: null as any,
+    parentNode: null as any,
     getEventListeners() { return eventListeners; },
     ownerDocument,
 

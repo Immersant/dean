@@ -10,9 +10,11 @@ declare const providerExecutionTransitionScopeBrand: unique symbol;
 
 export type ProviderExecutionOwnerKind =
   | 'chat'
+  | 'workflow'
   | 'title'
   | 'instruction'
   | 'inline-edit'
+  | 'workflow-promotion'
   | 'warmup';
 
 export type ProviderExecutionInvalidationReason =

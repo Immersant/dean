@@ -1734,14 +1734,14 @@ describe('InlineEditModal - openAndWait', () => {
 
       expect(MarkdownRenderer.renderMarkdown).toHaveBeenNthCalledWith(
         1,
-        oldMarkdown,
+        oldMarkdown.replace('```ts', '```dean-display-only-fence-0'),
         expect.anything(),
         'math/note.md',
         plugin
       );
       expect(MarkdownRenderer.renderMarkdown).toHaveBeenNthCalledWith(
         2,
-        newMarkdown,
+        newMarkdown.replace('```ts', '```dean-display-only-fence-0'),
         expect.anything(),
         'math/note.md',
         plugin

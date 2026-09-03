@@ -24,17 +24,15 @@ import {
 } from '../../../core/prompt/mainAgent';
 import { getRuntimeEnvironmentText } from '../../../core/providers/providerEnvironment';
 import type { ProviderHost } from '../../../core/providers/ProviderHost';
+import { buildDeanSystemPromptAppendices } from '../../../core/session-sections/sessionSectionPrompt';
 import type {
   ChatMessage,
   StreamChunk,
 } from '../../../core/types';
-import { appendBrowserContext } from '../../../utils/browser';
-import { appendCanvasContext } from '../../../utils/canvas';
 import {
   appendContextFiles,
-  appendCurrentNote,
+  appendProviderExecutionContext,
 } from '../../../utils/context';
-import { appendEditorContext } from '../../../utils/editor';
 import { parseEnvironmentVariables } from '../../../utils/env';
 import {
   buildContextFromHistory,
@@ -1474,6 +1472,12 @@ function resolveSystemPrompt(
     vaultPath,
   } satisfies SystemPromptSettings, {
     toolGuidanceProfile: 'provider-native',
+    appendices: buildDeanSystemPromptAppendices(
+      {
+        enableEditorSessionSections: settings.enableEditorSessionSections === true,
+      },
+      request.toolPolicy,
+    ),
   });
 }
 
@@ -1486,18 +1490,7 @@ function encodePrompt(
 } {
   let text = getInputText(request);
   const context = request.context;
-  if (context?.currentNote?.path) {
-    text = appendCurrentNote(text, context.currentNote.path);
-  }
-  if (context?.editorSelection) {
-    text = appendEditorContext(text, context.editorSelection);
-  }
-  if (context?.browserSelection) {
-    text = appendBrowserContext(text, context.browserSelection);
-  }
-  if (context?.canvasSelection) {
-    text = appendCanvasContext(text, context.canvasSelection);
-  }
+  text = appendProviderExecutionContext(text, context);
   if (context?.externalContextPaths?.length) {
     text = appendContextFiles(text, [...context.externalContextPaths]);
   }

@@ -56,6 +56,20 @@ describe('ProviderRegistry', () => {
     expect(ProviderRegistry.createSubagentHistoryService(host, 'pi')).toBeNull();
   });
 
+  it('routes typed workflow-promotion decisions only to a provider that owns one', () => {
+    const host = {
+      app: { vault: { adapter: { basePath: 'C:/vault' } } },
+    } as any;
+
+    expect(ProviderRegistry.createWorkflowPromotionService(host, 'claude'))
+      .toMatchObject({ decide: expect.any(Function) });
+    expect(ProviderRegistry.createWorkflowPromotionService(host, 'codex'))
+      .toMatchObject({ decide: expect.any(Function) });
+    expect(ProviderRegistry.createWorkflowPromotionService(host, 'grok')).toBeNull();
+    expect(ProviderRegistry.createWorkflowPromotionService(host, 'opencode')).toBeNull();
+    expect(ProviderRegistry.createWorkflowPromotionService(host, 'pi')).toBeNull();
+  });
+
   it('returns a settings reconciler for the default provider', () => {
     const reconciler = ProviderRegistry.getSettingsReconciler();
     expect(reconciler).toHaveProperty('reconcileModelWithEnvironment');

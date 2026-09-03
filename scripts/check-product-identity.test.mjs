@@ -41,7 +41,6 @@ function listProductTextFiles(directory) {
     if (ignoredDirectoryNames.has(entry.name)) return [];
 
     const entryPath = path.join(directory, entry.name);
-    if (path.relative(root, entryPath) === path.join('docs', 'superpowers')) return [];
     if (entry.isDirectory()) return listProductTextFiles(entryPath);
     if (!entry.isFile()) return [];
 

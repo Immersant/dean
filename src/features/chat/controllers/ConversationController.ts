@@ -5,6 +5,7 @@ import type {
   ChatRewindMode,
 } from '../../../core/execution';
 import type { ProviderIconSvg, TitleGenerationService } from '../../../core/providers/types';
+import { decodeSectionEpoch } from '../../../core/session-sections/decodeSectionEpoch';
 import type {
   ChatMessage,
   Conversation,
@@ -95,6 +96,7 @@ export interface ConversationControllerDeps {
 type SaveOptions = {
   resumeAtMessageId?: string;
   resetProviderSession?: boolean;
+  sectionEpoch?: number;
 };
 
 export type HistoryConversationOpenState = 'closed' | 'open' | 'current';
@@ -564,14 +566,23 @@ export class ConversationController {
       const filesChanged = result.filesChanged?.length ?? 0;
       let saveError: string | null = null;
       try {
+        // Bump sectionEpoch on every successful rewind persist so Act fences fail closed.
+        const currentEpoch = decodeSectionEpoch(
+          conversationId
+            ? plugin.getConversationSync(conversationId)?.sectionEpoch
+            : undefined,
+        );
         await this.save(
           true,
-          result.sessionStrategy === 'preserve-provider-session'
-            ? { resumeAtMessageId: undefined }
-            : {
-              resumeAtMessageId: prevAssistantUuid,
-              resetProviderSession: !prevAssistantUuid,
-            },
+          {
+            sectionEpoch: currentEpoch + 1,
+            ...(result.sessionStrategy === 'preserve-provider-session'
+              ? { resumeAtMessageId: undefined }
+              : {
+                resumeAtMessageId: prevAssistantUuid,
+                resetProviderSession: !prevAssistantUuid,
+              }),
+          },
         );
       } catch (e) {
         saveError = e instanceof Error ? e.message : 'Failed to save';
@@ -647,6 +658,9 @@ export class ConversationController {
     if (options?.resetProviderSession) {
       updates.sessionId = null;
       updates.providerState = undefined;
+    }
+    if (options && 'sectionEpoch' in options && options.sectionEpoch !== undefined) {
+      updates.sectionEpoch = decodeSectionEpoch(options.sectionEpoch);
     }
 
     await plugin.updateConversation(state.currentConversationId!, updates);

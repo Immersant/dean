@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import * as fs from 'node:fs';
 
 import { getGrokProviderSettings } from '@/providers/grok/settings';
@@ -401,7 +402,7 @@ describe('GrokSettingsTab', () => {
     expect(context.notifyProviderModelOptionsChanged).not.toHaveBeenCalled();
   });
 
-  it('validates an executable CLI file before persisting it', async () => {
+  (process.platform === 'win32' ? it.skip : it)('validates an executable CLI file before persisting it', async () => {
     const plugin = createPlugin();
     grokSettingsTabRenderer.render(createContainer(), createContext(plugin));
 

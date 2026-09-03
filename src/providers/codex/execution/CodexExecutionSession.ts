@@ -23,14 +23,9 @@ import {
   type SystemPromptSettings,
 } from '../../../core/prompt/mainAgent';
 import type { ProviderHost } from '../../../core/providers/ProviderHost';
+import { buildDeanSystemPromptAppendices } from '../../../core/session-sections/sessionSectionPrompt';
 import type { ChatMessage, ImageAttachment, StreamChunk } from '../../../core/types';
-import { appendBrowserContext } from '../../../utils/browser';
-import { appendCanvasContext } from '../../../utils/canvas';
-import {
-  appendCurrentNote,
-  appendCurrentNoteContent,
-} from '../../../utils/context';
-import { appendEditorContext } from '../../../utils/editor';
+import { appendProviderExecutionContext } from '../../../utils/context';
 import {
   buildContextFromHistory,
   buildPromptWithHistoryContext,
@@ -1776,9 +1771,13 @@ export class CodexExecutionSession
   }
 
   private resolveBaseInstructions(request: ProviderExecutionRequest): string {
+    const appendices = buildDeanSystemPromptAppendices(
+      this.plugin.settings,
+      request.toolPolicy,
+    );
     const base = request.configuration.systemInstructions.kind === 'explicit'
       ? request.configuration.systemInstructions.instructions
-      : buildSystemPrompt(this.getSystemPromptSettings());
+      : buildSystemPrompt(this.getSystemPromptSettings(), { appendices });
     return request.toolPolicy.kind === 'passive'
       ? `${base}\n\n${PASSIVE_INSTRUCTIONS}`
       : base;
@@ -1888,25 +1887,7 @@ export class CodexExecutionSession
       .filter(block => block.type === 'text')
       .map(block => block.text)
       .join('\n\n');
-    const context = request.context;
-    if (context?.currentNote) {
-      prompt = context.currentNote.content === undefined
-        ? appendCurrentNote(prompt, context.currentNote.path)
-        : appendCurrentNoteContent(
-          prompt,
-          context.currentNote.path,
-          context.currentNote.content,
-        );
-    }
-    if (context?.editorSelection) {
-      prompt = appendEditorContext(prompt, context.editorSelection);
-    }
-    if (context?.browserSelection) {
-      prompt = appendBrowserContext(prompt, context.browserSelection);
-    }
-    if (context?.canvasSelection) {
-      prompt = appendCanvasContext(prompt, context.canvasSelection);
-    }
+    prompt = appendProviderExecutionContext(prompt, request.context);
 
     const history = request.conversationHistory;
     if (!history?.length) return prompt;

@@ -28,6 +28,10 @@ Open the chat sidebar from the ribbon icon or command palette. Select text and u
 
 **Tabs & Session Management** — Use multiple tabs in single-panel mode or a persistent session manager beside the chat in dual-pane mode.
 
+**Canvas Context** — Select Canvas nodes to send their file, text, link, and other node metadata with your next message.
+
+**Editor Session Sections** — Durable in-note Act buttons and Collect forms that agents can author as `dean-session` fences. Enabled by default.
+
 ## Requirements
 
 - At least one of the following harnesses:
@@ -148,46 +152,6 @@ src/
 ```
 
 Project documentation lives in [`docs/`](docs/README.md): [architecture](docs/architecture.md), [concepts](docs/concepts.md), [features](docs/features.md), [providers](docs/providers.md), [source map](docs/source-map.md), and [development](docs/development.md). Agent execution rules stay in [`AGENTS.md`](AGENTS.md).
-
-## Contributing
-
-Issues and focused pull requests are welcome. Issues are the preferred starting point: describe the problem, reproduction steps, and environment clearly so it can be investigated.
-
-Before opening a pull request, please read the [contribution guide](CONTRIBUTING.md). Pull requests must explain the problem, the proposed solution, why the approach is appropriate, and how the change was validated. Pull requests that add a new provider are not accepted; the guide explains this maintenance and product-quality boundary in detail.
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=Immersant%2Fdean&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Immersant/dean&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Immersant/dean&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Immersant/dean&type=date&legend=top-left" />
- </picture>
-</a>
-
-## Sponsorship
-
-### Kimi (Moonshot AI)
-
-<img src="https://gcdn.moonshot.cn/growth-cdn/sponsor/kimi-en.png" alt="Kimi (Moonshot AI)" width="90%">
-
-Thanks to Kimi (Moonshot AI), our Open Source Friend, for supporting Dean! With 2.8T parameters, native vision, and a
-1-million-token context window, Kimi K3 delivers frontier performance across long-horizon coding, knowledge work, and
-reasoning.
-
-New users receive bonus API credits equal to 10% of their first successful top-up. Use the discount link for the
-[CN](https://platform.kimi.com) or
-[Global](https://platform.kimi.ai) platform. This offer
-ends September 30, 2026. Dean receives no affiliate commission from these links.
-
-### Ke Holdings Inc. (BEIKE)
-
-<img src="assets/sponsors/MOMA.png" alt="MOMA" width="90%">
-
-Dean is proudly sponsored by Ke Holdings Inc. (BEIKE) and the MOMA team. Their support helps Dean continue to
-improve through ongoing development and maintenance.
-
-> Want to support Dean or appear here? Contact me: [tysk01213@gmail.com](mailto:tysk01213@gmail.com).
 
 ## License
 

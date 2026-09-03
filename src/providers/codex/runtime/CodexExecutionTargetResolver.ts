@@ -136,8 +136,9 @@ export function resolveCodexExecutionTarget(
   if (codexSettings.installationMethod === 'wsl') {
     const distroName = codexSettings.wslDistroOverride
       || inferWslDistroFromWindowsPath(options.hostVaultPath)
-      || options.resolveDefaultWslDistro?.()
-      || resolveDefaultWslDistroName();
+      || (options.resolveDefaultWslDistro
+        ? options.resolveDefaultWslDistro()
+        : resolveDefaultWslDistroName());
 
     return {
       method: 'wsl',

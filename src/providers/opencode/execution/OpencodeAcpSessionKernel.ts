@@ -774,9 +774,10 @@ function selectDeniedPermission(
 function getSystemPromptSettings(
   plugin: ProviderHost,
   vaultPath: string,
-): SystemPromptSettings {
+): SystemPromptSettings & { enableEditorSessionSections: boolean } {
   return {
     customPrompt: plugin.settings.systemPrompt,
+    enableEditorSessionSections: plugin.settings.enableEditorSessionSections === true,
     mediaFolder: plugin.settings.mediaFolder,
     userName: plugin.settings.userName,
     vaultPath,

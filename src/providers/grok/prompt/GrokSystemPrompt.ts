@@ -1,8 +1,12 @@
+import type { ProviderToolPolicy } from '../../../core/execution/ProviderExecutionRequest';
 import {
   buildSystemPrompt,
   computeSystemPromptKey,
+  type SystemPromptBuildOptions,
   type SystemPromptSettings,
 } from '../../../core/prompt/mainAgent';
+import { buildDeanSystemPromptAppendices } from '../../../core/session-sections/sessionSectionPrompt';
+import type { DeanSettings } from '../../../core/types/settings';
 
 const GROK_PROMPT_OPTIONS = Object.freeze({
   toolGuidanceProfile: 'provider-native' as const,
@@ -10,10 +14,51 @@ const GROK_PROMPT_OPTIONS = Object.freeze({
 
 export type GrokSystemPromptSettings = SystemPromptSettings;
 
-export function buildGrokSystemPrompt(settings: GrokSystemPromptSettings): string {
-  return buildSystemPrompt(settings, GROK_PROMPT_OPTIONS);
+function mergeGrokPromptOptions(
+  settings: Pick<DeanSettings, 'enableEditorSessionSections'> | GrokSystemPromptSettings,
+  toolPolicy?: ProviderToolPolicy,
+  extra?: SystemPromptBuildOptions,
+): SystemPromptBuildOptions {
+  const appendices = [
+    ...buildDeanSystemPromptAppendices(
+      settings as Pick<DeanSettings, 'enableEditorSessionSections'>,
+      toolPolicy,
+    ),
+    ...(extra?.appendices ?? []),
+  ];
+  return {
+    ...GROK_PROMPT_OPTIONS,
+    ...extra,
+    ...(appendices.length > 0 ? { appendices } : {}),
+  };
 }
 
-export function computeGrokSystemPromptKey(settings: GrokSystemPromptSettings): string {
-  return computeSystemPromptKey(settings, GROK_PROMPT_OPTIONS);
+export function buildGrokSystemPrompt(
+  settings: GrokSystemPromptSettings,
+  options?: {
+    toolPolicy?: ProviderToolPolicy;
+    appendices?: string[];
+  },
+): string {
+  return buildSystemPrompt(
+    settings,
+    mergeGrokPromptOptions(settings, options?.toolPolicy, {
+      appendices: options?.appendices,
+    }),
+  );
+}
+
+export function computeGrokSystemPromptKey(
+  settings: GrokSystemPromptSettings,
+  options?: {
+    toolPolicy?: ProviderToolPolicy;
+    appendices?: string[];
+  },
+): string {
+  return computeSystemPromptKey(
+    settings,
+    mergeGrokPromptOptions(settings, options?.toolPolicy, {
+      appendices: options?.appendices,
+    }),
+  );
 }

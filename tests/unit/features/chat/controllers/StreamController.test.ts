@@ -45,6 +45,10 @@ jest.mock('@/features/chat/rendering/SubagentRenderer', () => ({
 
 jest.mock('@/features/chat/rendering/ThinkingBlockRenderer', () => ({
   appendThinkingContent: jest.fn(),
+  appendThinkingText: jest.fn().mockImplementation((state, content) => {
+    state.content += content;
+    return state.content;
+  }),
   createThinkingBlock: jest.fn().mockImplementation((_parentEl, options) => ({
     wrapperEl: {},
     contentEl: {},
@@ -142,6 +146,7 @@ function createMockDeps(): MockStreamControllerDeps {
     state,
     renderer: {
       renderContent: jest.fn(),
+      renderThinkingPreview: jest.fn(),
       addTextCopyButton: jest.fn(),
       renderCitationGroup: jest.fn(),
     } as any,
@@ -4187,7 +4192,43 @@ describe('StreamController - Text Content', () => {
     });
   });
 
-  describe('appendThinking - no currentContentEl', () => {
+  describe('appendThinking', () => {
+    it('updates the compact preview with each streamed chunk', async () => {
+      const { appendThinkingText } = jest.requireMock('@/features/chat/rendering/ThinkingBlockRenderer');
+      const msg = createTestMessage();
+      deps.state.currentContentEl = createMockEl();
+
+      await controller.handleStreamChunk({ type: 'thinking', content: 'Inspecting ' }, msg);
+      await controller.handleStreamChunk({ type: 'thinking', content: 'the renderer.' }, msg);
+
+      expect(appendThinkingText).toHaveBeenNthCalledWith(
+        1,
+        deps.state.currentThinkingState,
+        'Inspecting '
+      );
+      expect(appendThinkingText).toHaveBeenNthCalledWith(
+        2,
+        deps.state.currentThinkingState,
+        'the renderer.'
+      );
+      expect(deps.state.currentThinkingState?.content).toBe('Inspecting the renderer.');
+    });
+
+    it('renders Markdown in the streamed thinking description', async () => {
+      const msg = createTestMessage();
+      deps.state.currentContentEl = createMockEl();
+
+      await controller.handleStreamChunk({
+        type: 'thinking',
+        content: '**Inspecting** the renderer.',
+      }, msg);
+
+      expect(deps.renderer.renderThinkingPreview).toHaveBeenCalledWith(
+        deps.state.currentThinkingState?.labelEl,
+        '**Inspecting** the renderer.'
+      );
+    });
+
     it('should not create thinking state when currentContentEl is null', async () => {
       const msg = createTestMessage();
       deps.state.currentContentEl = null;

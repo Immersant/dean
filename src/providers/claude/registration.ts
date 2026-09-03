@@ -16,6 +16,7 @@ import { ClaudeTaskResultInterpreter } from './runtime/ClaudeTaskResultInterpret
 import { getClaudeProviderSettings, updateClaudeProviderSettings } from './settings';
 import { claudeSubagentAdapter } from './subagentAdapter';
 import { claudeChatUIConfig } from './ui/ClaudeChatUIConfig';
+import { ClaudeWorkflowPromotionService } from './workflows/ClaudeWorkflowPromotionService';
 
 const LEGACY_CLAUDE_1M_SETTINGS = ['enableOpus1M', 'enableSonnet1M'] as const;
 
@@ -57,6 +58,7 @@ export const claudeProviderRegistration: ProviderModule = {
     const workspace = getClaudeWorkspaceServices();
     return new ClaudeExecutionBackend(plugin, workspace);
   },
+  createWorkflowPromotionService: context => new ClaudeWorkflowPromotionService(context),
   createSubagentHistoryService: plugin => new ClaudeSubagentHistoryService(plugin),
   resolveTitleGenerationModel: (plugin) => {
     const titleModel = plugin.settings.titleGenerationModel;

@@ -4,6 +4,7 @@ import { MarkdownRenderer } from 'obsidian';
 import { processFileLinks } from '../../../utils/fileLink';
 import { replaceImageEmbedsWithHtml } from '../../../utils/imageEmbed';
 import { normalizeLatexMathDelimiters } from '../../../utils/markdownMath';
+import { prepareDisplayOnlyCodeFences } from '../../chat/rendering/DisplayOnlyCodeFences';
 
 interface RenderInlineEditMarkdownPreviewOptions {
   app: App;
@@ -38,7 +39,10 @@ export async function renderInlineEditMarkdownPreview({
 
   try {
     const normalizedMarkdown = normalizeLatexMathDelimiters(markdown);
-    const processedMarkdown = replaceImageEmbedsWithHtml(normalizedMarkdown, app, {
+    // Remap fences so registered processors (e.g. dean-session) cannot instantiate
+    // live widgets inside the inline-edit preview.
+    const displayOnly = prepareDisplayOnlyCodeFences(normalizedMarkdown);
+    const processedMarkdown = replaceImageEmbedsWithHtml(displayOnly.markdown, app, {
       mediaFolder,
       sourcePath,
     });
