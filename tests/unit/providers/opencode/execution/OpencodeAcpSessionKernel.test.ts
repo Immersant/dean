@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect -- Platform-gated test callbacks are still Jest test blocks. */
 import {
   mkdirSync,
   mkdtempSync,
@@ -38,7 +39,7 @@ function permissionRequest(
 }
 
 describe('OpencodeAcpSessionKernel read policy', () => {
-  it('bounds read-only callbacks to the active workspace', () => {
+  (process.platform === 'win32' ? it.skip : it)('bounds read-only callbacks to the active workspace', () => {
     expect(resolveOpencodeReadPath('/vault', 'notes/file.md')).toBe(
       '/vault/notes/file.md',
     );

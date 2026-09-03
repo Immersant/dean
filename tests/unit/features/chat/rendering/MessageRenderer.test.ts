@@ -94,6 +94,7 @@ function createRenderer(
 describe('MessageRenderer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (renderStoredThinkingBlock as jest.Mock).mockReset();
     (Menu as typeof Menu & { instances: unknown[] }).instances.length = 0;
   });
 
@@ -130,6 +131,68 @@ describe('MessageRenderer', () => {
 
     expect(renderStoredSpy).not.toHaveBeenCalled();
     expect(welcomeEl.hasClass('dean-welcome')).toBe(true);
+  });
+
+  it('keeps thinking descriptions visible for every assistant message in history', () => {
+    const { renderer, messagesEl } = createRenderer();
+    (renderStoredThinkingBlock as jest.Mock).mockImplementation((parentEl: HTMLElement) => (
+      parentEl.createDiv({ cls: 'dean-thinking-block' })
+    ));
+
+    renderer.renderMessages([
+      {
+        id: 'assistant-1',
+        role: 'assistant',
+        content: '',
+        timestamp: 1,
+        contentBlocks: [
+          { type: 'thinking', content: 'earlier reasoning', durationSeconds: 4 },
+          { type: 'text', content: 'Earlier answer' },
+        ],
+      },
+      {
+        id: 'assistant-2',
+        role: 'assistant',
+        content: '',
+        timestamp: 2,
+        contentBlocks: [
+          { type: 'thinking', content: 'current reasoning', durationSeconds: 2 },
+          { type: 'text', content: 'Current answer' },
+        ],
+      },
+    ], () => 'Hello');
+
+    const assistantMessages = messagesEl.querySelectorAll('.dean-message-assistant');
+    const earlierThinking = assistantMessages[0].querySelector('.dean-thinking-block');
+    const currentThinking = assistantMessages[1].querySelector('.dean-thinking-block');
+
+    expect(earlierThinking?.hasClass('dean-hidden')).toBe(false);
+    expect(assistantMessages[0].querySelector('.dean-text-block')?.hasClass('dean-hidden')).toBe(false);
+    expect(currentThinking?.hasClass('dean-hidden')).toBe(false);
+  });
+
+  it('keeps earlier thinking visible when a new live assistant message starts', () => {
+    const { renderer, messagesEl } = createRenderer();
+    const earlierMessage = renderer.addMessage({
+      id: 'assistant-1',
+      role: 'assistant',
+      content: '',
+      timestamp: 1,
+    });
+    const earlierContent = earlierMessage.querySelector('.dean-message-content');
+    const earlierThinking = earlierContent?.createDiv({ cls: 'dean-thinking-block' });
+    earlierContent?.createDiv({ cls: 'dean-text-block', text: 'Earlier answer' });
+
+    renderer.addMessage({
+      id: 'assistant-2',
+      role: 'assistant',
+      content: '',
+      timestamp: 2,
+    });
+
+    expect(earlierThinking?.hasClass('dean-hidden')).toBe(false);
+    expect(messagesEl.querySelectorAll('.dean-message-assistant')).toHaveLength(2);
+    expect(earlierContent?.querySelector('.dean-text-block')?.hasClass('dean-hidden')).toBe(false);
   });
 
   // ============================================
@@ -322,6 +385,73 @@ describe('MessageRenderer', () => {
     renderer.renderStoredMessage(msg);
 
     expect(renderContentSpy).toHaveBeenCalledWith(expect.anything(), 'user input only');
+  });
+
+  it('renders a session-section origin chip from executionInput context', () => {
+    const messagesEl = createMockEl();
+    const openLinkText = jest.fn();
+    const { renderer } = createRenderer(messagesEl);
+    (renderer as any).app = { workspace: { openLinkText } };
+    jest.spyOn(renderer, 'renderContent').mockResolvedValue(undefined);
+
+    const msg: ChatMessage = {
+      id: 'u-section',
+      role: 'user',
+      content: 'Continue from the questionnaire answers in this note.',
+      displayContent: 'Section: Review',
+      timestamp: Date.now(),
+      executionInput: {
+        schemaVersion: 1,
+        canonicalText: 'Continue from the questionnaire answers in this note.',
+        context: {
+          sessionSection: {
+            sectionId: 'sec_collect',
+            notePath: 'Notes/Spec.md',
+            conversationId: 'conv-1',
+            kind: 'collect',
+            actionId: 'done',
+            actionLabel: 'Review',
+            title: 'Design feedback',
+            prompt: 'Continue from the questionnaire answers in this note.',
+          },
+        },
+      },
+    };
+
+    renderer.renderStoredMessage(msg);
+
+    const msgEl = messagesEl.children[0];
+    const contentEl = msgEl.children[0];
+    const chip = contentEl.children.find(
+      (child: any) => child.hasClass?.('dean-session-section-message-chip'),
+    );
+    expect(chip).toBeTruthy();
+    expect(chip.getAttribute('data-section-id')).toBe('sec_collect');
+    expect(chip.getAttribute('data-note-path')).toBe('Notes/Spec.md');
+
+    const main = chip.querySelector('.dean-session-section-message-chip-main');
+    main.dispatchEvent('click', { preventDefault: () => {}, stopPropagation: () => {} });
+    expect(openLinkText).toHaveBeenCalledWith('Notes/Spec.md', '', false);
+  });
+
+  it('does not render a session-section chip for ordinary user turns', () => {
+    const messagesEl = createMockEl();
+    const { renderer } = createRenderer(messagesEl);
+    jest.spyOn(renderer, 'renderContent').mockResolvedValue(undefined);
+
+    renderer.renderStoredMessage({
+      id: 'u1',
+      role: 'user',
+      content: 'hello',
+      displayContent: 'hello',
+      timestamp: Date.now(),
+    });
+
+    const contentEl = messagesEl.children[0].children[0];
+    const chip = contentEl.children.find(
+      (child: any) => child.hasClass?.('dean-session-section-message-chip'),
+    );
+    expect(chip).toBeUndefined();
   });
 
   it('renders extracted user display content when stored message has hidden XML context', () => {

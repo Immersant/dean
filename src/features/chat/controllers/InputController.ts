@@ -15,6 +15,11 @@ import {
   type ProviderId,
   type TitleGenerationService,
 } from '../../../core/providers/types';
+import { decodeSectionEpoch } from '../../../core/session-sections/decodeSectionEpoch';
+import type {
+  SessionSectionTurnRequest,
+  SessionSectionTurnResult,
+} from '../../../core/session-sections/SessionSectionTurn';
 import { TOOL_EXIT_PLAN_MODE } from '../../../core/tools/toolNames';
 import {
   type ApprovalDecision,
@@ -248,9 +253,74 @@ export class InputController {
     await this.turnCoordinator.run(options);
   }
 
+  /**
+   * Send an Act / session-section turn without reading the composer.
+   * Does not wrap `sendMessage` — streaming, queue merge, and live context
+   * capture on that path are incompatible with fence payloads.
+   */
+  async submitProgrammaticTurn(
+    request: SessionSectionTurnRequest,
+  ): Promise<SessionSectionTurnResult> {
+    const { state } = this.deps;
+
+    if (
+      !request
+      || typeof request.canonicalText !== 'string'
+      || !request.canonicalText.trim()
+      || typeof request.displayContent !== 'string'
+      || !request.displayContent.trim()
+      || !request.sessionSection
+      || typeof request.hostNotePath !== 'string'
+    ) {
+      new Notice(t('settings.sessionSections.blocked.invalidRequest'));
+      return { status: 'blocked', reason: 'invalid-request' };
+    }
+
+    if (state.isRewinding) {
+      new Notice(t('settings.sessionSections.blocked.rewindInProgress'));
+      return { status: 'blocked', reason: 'rewind-in-progress' };
+    }
+
+    if (
+      state.isCreatingConversation
+      || state.isSwitchingConversation
+      || this.deps.canStartTurn?.() === false
+    ) {
+      new Notice(t('settings.sessionSections.blocked.tabNotReady'));
+      return { status: 'blocked', reason: 'tab-not-ready' };
+    }
+
+    const turnRequest: ChatTurnRequest = {
+      text: request.canonicalText,
+      currentNotePath: request.hostNotePath || undefined,
+      sessionSection: request.sessionSection,
+    };
+
+    if (state.isStreaming) {
+      if (state.queuedProgrammaticTurn) {
+        new Notice(t('settings.sessionSections.queuedReplaced'));
+      }
+      state.queuedProgrammaticTurn = {
+        displayContent: request.displayContent,
+        canonicalText: request.canonicalText,
+        sessionSection: request.sessionSection,
+        hostNotePath: request.hostNotePath,
+        epoch: request.epoch,
+      };
+      this.updateQueueIndicator();
+      return { status: 'queued' };
+    }
+
+    await this.executePreparedTurn(request.displayContent, turnRequest, {
+      touchFileContext: false,
+    });
+    return { status: 'sent' };
+  }
+
   resumeQueuedTurnAfterIntentAdmission(): void {
     if (this.deps.canStartTurn?.() === false) return;
-    if (this.deps.state.isStreaming || !this.deps.state.queuedMessage) return;
+    if (this.deps.state.isStreaming) return;
+    if (!this.deps.state.queuedProgrammaticTurn && !this.deps.state.queuedMessage) return;
     this.processQueuedMessage();
   }
 
@@ -283,14 +353,10 @@ export class InputController {
 
   private async executeSendMessage(options?: SendMessageOptions): Promise<void> {
     const {
-      plugin,
       state,
-      renderer,
-      streamController,
       selectionController,
       browserSelectionController,
       canvasSelectionController,
-      conversationController
     } = this.deps;
     this.discardDeferredReviewForDifferentConversation();
 
@@ -302,7 +368,6 @@ export class InputController {
 
     const inputEl = this.deps.getInputEl();
     const imageContextManager = this.deps.getImageContextManager();
-    const fileContextManager = this.deps.getFileContextManager();
 
     const contentOverride = options?.content;
     const shouldUseInput = contentOverride === undefined;
@@ -369,35 +434,15 @@ export class InputController {
       return;
     }
 
-    state.acknowledgeReview();
-
-    let turnConversationId = state.currentConversationId;
-    this.delegatePendingSteerCorrelationToHistory(turnConversationId);
-
     if (shouldUseInput) {
       inputEl.value = '';
       this.deps.resetInputHeight();
     }
-    state.isStreaming = true;
-    state.cancelRequested = false;
-    state.ignoreUsageUpdates = false; // Allow usage updates for new query
-    this.deps.getSubagentManager().resetSpawnedCount();
-    state.autoScrollEnabled = plugin.settings.enableAutoScroll ?? true; // Reset auto-scroll based on setting
-    const streamGeneration = state.bumpStreamGeneration();
-
-    // Hide welcome message when sending first message
-    const welcomeEl = this.deps.getWelcomeEl();
-    if (welcomeEl) {
-      welcomeEl.addClass('dean-hidden');
-    }
-
-    fileContextManager?.startSession();
 
     // Slash commands are passed directly to SDK for handling
     // SDK handles expansion, $ARGUMENTS, @file references, and frontmatter options
     const images = imageOverride ?? imageContextManager?.getAttachedImages() ?? [];
     const imagesForMessage = images.length > 0 ? [...images] : undefined;
-    const isCompact = /^\/compact(\s|$)/i.test(content);
 
     // Only clear images if we consumed user input (not for programmatic content override)
     if (shouldUseInput) {
@@ -417,18 +462,91 @@ export class InputController {
         canvasContextOverride: options?.canvasContextOverride,
       });
     const { displayContent, turnRequest } = turnSubmission;
+    await this.executePreparedTurn(displayContent, turnRequest, {
+      images: imagesForMessage,
+      touchFileContext: true,
+    });
+  }
+
+  /**
+   * Idle-path turn execution shared by composer sends and programmatic Act turns.
+   * When `touchFileContext` is false, does not start a file-context session or mark
+   * the linked note sent — Act clicks must not rewrite durable currentNote.
+   */
+  private async executePreparedTurn(
+    displayContent: string,
+    turnRequest: ChatTurnRequest,
+    options: {
+      touchFileContext: boolean;
+      images?: ChatMessage['images'];
+    },
+  ): Promise<void> {
+    const {
+      plugin,
+      state,
+      renderer,
+      streamController,
+      conversationController,
+    } = this.deps;
+    const fileContextManager = this.deps.getFileContextManager();
+    const imagesForMessage = options.images && options.images.length > 0
+      ? [...options.images]
+      : undefined;
+    const isCompact = /^\/compact(\s|$)/i.test(turnRequest.text);
+
+    state.acknowledgeReview();
+
+    let turnConversationId = state.currentConversationId;
+    this.delegatePendingSteerCorrelationToHistory(turnConversationId);
+
+    state.isStreaming = true;
+    state.cancelRequested = false;
+    state.ignoreUsageUpdates = false; // Allow usage updates for new query
+    this.deps.getSubagentManager().resetSpawnedCount();
+    state.autoScrollEnabled = plugin.settings.enableAutoScroll ?? true; // Reset auto-scroll based on setting
+    const streamGeneration = state.bumpStreamGeneration();
+
+    // Hide welcome message when sending first message
+    const welcomeEl = this.deps.getWelcomeEl();
+    if (welcomeEl) {
+      welcomeEl.addClass('dean-hidden');
+    }
+
+    if (options.touchFileContext) {
+      fileContextManager?.startSession();
+    }
+
     const messagesBeforeTurn = state.messages;
     const hadPendingConversationSave = state.hasPendingConversationSave;
 
-    fileContextManager?.markCurrentNoteSent();
+    if (options.touchFileContext) {
+      fileContextManager?.markCurrentNoteSent();
+    }
 
     const userMsg: ChatMessage = {
       id: this.deps.generateId(),
       role: 'user',
-      content: displayContent,
-      displayContent,                // Original user input (for UI display)
+      content: turnRequest.text,
+      displayContent,
       timestamp: Date.now(),
       images: imagesForMessage,
+      // Project session-section origin on live turns so MessageRenderer chips
+      // appear before ledger correlation rewrites executionInput on hydrate.
+      ...(turnRequest.sessionSection
+        ? {
+          executionInput: {
+            schemaVersion: 1 as const,
+            canonicalText: turnRequest.text,
+            context: {
+              ...(turnRequest.currentNotePath
+                ? { currentNote: { path: turnRequest.currentNotePath } }
+                : {}),
+              ...this.buildConversationBindingContext(),
+              sessionSection: turnRequest.sessionSection,
+            },
+          },
+        }
+        : {}),
     };
     state.addMessage(userMsg);
     state.hasPendingConversationSave = true;
@@ -822,6 +940,26 @@ export class InputController {
       return;
     }
 
+    if (state.queuedProgrammaticTurn) {
+      indicatorEl.createSpan({
+        cls: 'dean-queue-indicator-text',
+        text: `⌙ Queued: ${state.queuedProgrammaticTurn.displayContent}`,
+      });
+      const actionsEl = indicatorEl.createDiv({ cls: 'dean-queue-indicator-actions' });
+      const discardButton = this.createQueueIconButton(
+        actionsEl,
+        'trash-2',
+        'Discard queued section action',
+      );
+      discardButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        this.clearQueuedMessage();
+      });
+      indicatorEl.addClass('dean-visible-flex');
+      indicatorEl.removeClass('dean-hidden');
+      return;
+    }
+
     indicatorEl.removeClass('dean-visible-flex');
     indicatorEl.addClass('dean-hidden');
   }
@@ -829,6 +967,7 @@ export class InputController {
   clearQueuedMessage(): void {
     const { state } = this.deps;
     state.queuedMessage = null;
+    state.queuedProgrammaticTurn = null;
     this.updateQueueIndicator();
   }
 
@@ -907,6 +1046,31 @@ export class InputController {
 
   private processQueuedMessage(): boolean {
     const { state } = this.deps;
+
+    // Programmatic Act turns always drain before composer-queued messages.
+    if (state.queuedProgrammaticTurn) {
+      const programmatic = state.queuedProgrammaticTurn;
+      state.queuedProgrammaticTurn = null;
+      this.updateQueueIndicator();
+      window.setTimeout(() => {
+        if (
+          state.isSwitchingConversation
+          || state.isCreatingConversation
+          || this.deps.canStartTurn?.() === false
+        ) {
+          if (!state.queuedProgrammaticTurn) {
+            state.queuedProgrammaticTurn = programmatic;
+            this.updateQueueIndicator();
+          }
+          return;
+        }
+        void this.submitProgrammaticTurn(programmatic).catch(() => {
+          this.reportDeferredReviewableSettlement();
+        });
+      }, 0);
+      return true;
+    }
+
     if (!state.queuedMessage) return false;
 
     const queuedMessage = this.cloneQueuedMessage(state.queuedMessage);
@@ -1031,6 +1195,30 @@ export class InputController {
     };
   }
 
+  private buildConversationBindingContext(): {
+    conversationBinding?: {
+      conversationId: string;
+      sectionEpoch: number;
+    };
+  } {
+    if (!this.deps.plugin.settings.enableEditorSessionSections) {
+      return {};
+    }
+    const conversationId = this.deps.state.currentConversationId;
+    if (!conversationId) {
+      return {};
+    }
+    const sectionEpoch = decodeSectionEpoch(
+      this.deps.plugin.getConversationSync(conversationId)?.sectionEpoch,
+    );
+    return {
+      conversationBinding: {
+        conversationId,
+        sectionEpoch,
+      },
+    };
+  }
+
   private createExecutionSubmission(
     displayContent: string,
     request: ChatTurnRequest,
@@ -1089,6 +1277,10 @@ export class InputController {
           : {}),
         ...(request.externalContextPaths
           ? { externalContextPaths: [...request.externalContextPaths] }
+          : {}),
+        ...this.buildConversationBindingContext(),
+        ...(request.sessionSection
+          ? { sessionSection: request.sessionSection }
           : {}),
       },
       conversationHistory: user && assistant

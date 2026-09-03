@@ -2,6 +2,7 @@ import {
   appendContextFiles,
   appendCurrentNote,
   appendCurrentNoteContent,
+  appendProviderExecutionContext,
   extractContentBeforeXmlContext,
   extractUserDisplayContent,
   extractUserQuery,
@@ -139,6 +140,16 @@ describe('XML_CONTEXT_PATTERN', () => {
 
   it('matches browser_selection tag', () => {
     const text = 'Query\n\n<browser_selection source="surfing-view">\nselected web content\n</browser_selection>';
+    expect(XML_CONTEXT_PATTERN.test(text)).toBe(true);
+  });
+
+  it('matches dean_conversation tag', () => {
+    const text = 'Query\n\n<dean_conversation id="conv-1" section_epoch="0" />';
+    expect(XML_CONTEXT_PATTERN.test(text)).toBe(true);
+  });
+
+  it('matches session_section tag', () => {
+    const text = 'Query\n\n<session_section id="sec_1" kind="act" path="note.md">\nbody\n</session_section>';
     expect(XML_CONTEXT_PATTERN.test(text)).toBe(true);
   });
 
@@ -295,8 +306,32 @@ describe('extractUserQuery', () => {
       expect(extractUserQuery(prompt)).toBe('Query end');
     });
 
+    it('strips nested canvas_node summaries inside canvas_selection', () => {
+      const prompt = [
+        'Query',
+        '<canvas_selection path="Board.canvas">',
+        '<canvas_node id="form-1" type="file" file="Form.md" />',
+        '<canvas_node id="label" type="text">',
+        '<![CDATA[Review notes]]>',
+        '</canvas_node>',
+        '</canvas_selection>',
+        'end',
+      ].join(' ');
+      expect(extractUserQuery(prompt)).toBe('Query end');
+    });
+
     it('strips browser_selection tags', () => {
       const prompt = 'Query <browser_selection source="surfing-view">selection</browser_selection> end';
+      expect(extractUserQuery(prompt)).toBe('Query end');
+    });
+
+    it('strips dean_conversation and session_section tags', () => {
+      const prompt = (
+        'Query <dean_conversation id="conv-1" section_epoch="2" /> '
+        + '<session_section id="sec_1" kind="act" path="n.md"><![CDATA[do it]]>'
+        + '<question id="q1" type="text"><prompt><![CDATA[Q]]></prompt>'
+        + '<answer><![CDATA[A]]></answer></question></session_section> end'
+      );
       expect(extractUserQuery(prompt)).toBe('Query end');
     });
 
@@ -305,6 +340,43 @@ describe('extractUserQuery', () => {
       expect(extractUserQuery(prompt)).toBe('Query');
     });
   });
+
+describe('appendProviderExecutionContext', () => {
+  it('appends note then conversation binding then session section in order', () => {
+    const result = appendProviderExecutionContext('Hello', {
+      currentNote: { path: 'notes/spec.md' },
+      conversationBinding: {
+        conversationId: 'conv-1',
+        sectionEpoch: 3,
+      },
+      sessionSection: {
+        sectionId: 'sec_1',
+        notePath: 'notes/spec.md',
+        conversationId: 'conv-1',
+        kind: 'collect',
+        actionId: 'done',
+        title: 'Follow-ups',
+        prompt: 'Continue from the merged answers.',
+        questions: [
+          {
+            id: 'approach',
+            prompt: 'Which navigation model?',
+            type: 'single',
+            options: [{ id: 'tabs', label: 'Tabs' }],
+          },
+        ],
+        answers: { approach: 'tabs' },
+      },
+    });
+    expect(result.indexOf('<linked_note')).toBeLessThan(result.indexOf('<dean_conversation'));
+    expect(result.indexOf('<dean_conversation')).toBeLessThan(result.indexOf('<session_section'));
+    expect(result).toContain('section_epoch="3"');
+    expect(result).toContain('action="done"');
+    expect(result).toContain('Continue from the merged answers.');
+    expect(result).toContain('<question id="approach" type="single">');
+    expect(result).toContain('<answer id="tabs"><![CDATA[Tabs]]></answer>');
+  });
+});
 
   describe('edge cases', () => {
     it('returns empty string for empty input', () => {

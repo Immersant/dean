@@ -10,6 +10,7 @@ import {
 import { ProviderRegistry } from '../../core/providers/ProviderRegistry';
 import { ProviderSettingsCoordinator } from '../../core/providers/ProviderSettingsCoordinator';
 import { type AppTabManagerState, DEFAULT_CHAT_PROVIDER_ID, type ProviderId } from '../../core/providers/types';
+import type { SessionSectionDraftResult } from '../../core/session-sections';
 import { type ConversationMeta, VIEW_TYPE_DEAN } from '../../core/types';
 import {
   cancelScheduledAnimationFrame,
@@ -750,6 +751,43 @@ export class DeanView extends ItemView {
     this.updateTabBarVisibility();
     tab.dom.inputEl.focus();
     return tab;
+  }
+
+  async openNewChatDraft(content: string): Promise<SessionSectionDraftResult> {
+    const manager = this.tabManager;
+    if (!manager || !content.trim()) {
+      return { status: 'blocked', reason: 'tab-not-ready' };
+    }
+
+    let tab: AssembledTabRuntime | null = null;
+    try {
+      tab = await manager.createTab();
+      if (!tab) return { status: 'blocked', reason: 'tab-not-ready' };
+      this.updateTabBarVisibility();
+
+      const inputEl = tab.dom.inputEl;
+      if (
+        tab.conversationId !== null
+        || inputEl.value !== ''
+        || tab.session.userOwnershipRevision !== 0
+      ) {
+        await manager.discardTab(tab.id);
+        return { status: 'blocked', reason: 'composer-unavailable' };
+      }
+
+      inputEl.value = content;
+      const EventConstructor = inputEl.ownerDocument.defaultView?.Event ?? Event;
+      inputEl.dispatchEvent(new EventConstructor('input', { bubbles: true }));
+      inputEl.selectionStart = content.length;
+      inputEl.selectionEnd = content.length;
+      inputEl.focus();
+      return { status: 'opened' };
+    } catch {
+      if (tab && tab.conversationId === null && tab.session.userOwnershipRevision === 0) {
+        await manager.discardTab(tab.id).catch(() => false);
+      }
+      return { status: 'blocked', reason: 'composer-unavailable' };
+    }
   }
 
   private updateTabBar(): void {

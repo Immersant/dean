@@ -31,6 +31,7 @@ import {
   escapeMathDelimitersForStreaming,
   normalizeLatexMathDelimiters,
 } from '../../../utils/markdownMath';
+import { openWorkspaceLink } from '../../../utils/obsidianCompat';
 import type { FeatureHost } from '../../FeatureHost';
 import { findRewindContext } from '../rewind';
 import { formatConversationDirectoryTitle } from '../utils/conversationDirectoryTitle';
@@ -39,6 +40,7 @@ import {
   prepareDisplayOnlyCodeFences,
   restoreDisplayOnlyCodeFences,
 } from './DisplayOnlyCodeFences';
+import { renderSessionSectionMessageChip } from './sessionSectionMessageChip';
 import { resolveSubagentAdapter } from './subagentAdapterResolution';
 import {
   renderStoredAsyncSubagent,
@@ -183,6 +185,7 @@ export class MessageRenderer {
     const contentEl = msgEl.createDiv({ cls: 'dean-message-content', attr: { dir: 'auto' } });
 
     if (msg.role === 'user') {
+      this.renderSessionSectionOriginChip(contentEl, msg);
       const textToShow = this.getUserMessageTextToShow(msg);
       if (textToShow) {
         const textEl = contentEl.createDiv({ cls: 'dean-text-block' });
@@ -216,6 +219,8 @@ export class MessageRenderer {
     }
 
     contentEl.empty();
+
+    this.renderSessionSectionOriginChip(contentEl, msg);
 
     const textToShow = this.getUserMessageTextToShow(msg);
     if (textToShow) {
@@ -317,6 +322,7 @@ export class MessageRenderer {
     const contentEl = msgEl.createDiv({ cls: 'dean-message-content', attr: { dir: 'auto' } });
 
     if (msg.role === 'user') {
+      this.renderSessionSectionOriginChip(contentEl, msg);
       const textToShow = this.getUserMessageTextToShow(msg);
       if (textToShow) {
         const textEl = contentEl.createDiv({ cls: 'dean-text-block' });
@@ -387,6 +393,10 @@ export class MessageRenderer {
     });
   }
 
+  async renderThinkingPreview(el: HTMLElement, markdown: string): Promise<void> {
+    await this.renderContent(el, markdown);
+  }
+
   /**
    * Renders assistant message content (content blocks or fallback).
    */
@@ -401,7 +411,7 @@ export class MessageRenderer {
             contentEl,
             block.content,
             block.durationSeconds,
-            (el, md) => this.renderContent(el, md)
+            (el, md) => this.renderContent(el, md),
           );
         } else if (block.type === 'text') {
           const normalized = stripLegacyInterruptIndicator(block.content);
@@ -926,6 +936,25 @@ export class MessageRenderer {
     const existing = msgEl.querySelector<HTMLElement>('.dean-user-msg-actions');
     if (existing) return existing;
     return msgEl.createDiv({ cls: 'dean-user-msg-actions' });
+  }
+
+  /**
+   * Origin chip for Act turns that left a sessionSection snapshot on the ledger.
+   * Click opens the host note; does not rewrite conversation.currentNote.
+   */
+  private renderSessionSectionOriginChip(
+    contentEl: HTMLElement,
+    msg: ChatMessage,
+  ): void {
+    const section = msg.executionInput?.context?.sessionSection;
+    if (!section) {
+      return;
+    }
+    renderSessionSectionMessageChip(contentEl, section, {
+      onOpenNote: (notePath, event) => {
+        void openWorkspaceLink(this.app, notePath, '', event);
+      },
+    });
   }
 
   private addUserCopyButton(msgEl: HTMLElement, content: string): void {

@@ -7,6 +7,7 @@ import type {
   ProviderInteractionPort,
 } from '../execution';
 import { resolveTitleGenerationLocale } from '../prompt/titleGeneration';
+import type { ProviderWorkflowPromotionService } from '../workflows';
 import { decodeProviderModelSelectionId } from './modelSelection';
 import type { ProviderHost } from './ProviderHost';
 import { ProviderWorkspaceRegistry } from './ProviderWorkspaceRegistry';
@@ -59,6 +60,15 @@ export class ProviderRegistry {
     providerId: ProviderId = DEFAULT_CHAT_PROVIDER_ID,
   ): ProviderExecutionBackend {
     return this.getProviderRegistration(providerId).createExecutionBackend(plugin);
+  }
+
+  static createWorkflowPromotionService(
+    plugin: ProviderHost,
+    providerId: ProviderId = DEFAULT_CHAT_PROVIDER_ID,
+  ): ProviderWorkflowPromotionService | null {
+    const registration = this.getProviderRegistration(providerId);
+    const factory = registration.createWorkflowPromotionService;
+    return factory?.(this.createAuxiliaryExecutionContext(plugin, providerId)) ?? null;
   }
 
   static createSubagentHistoryService(

@@ -7,7 +7,7 @@
 
 import type { App } from 'obsidian';
 
-import { getVaultFileByPath } from './obsidianCompat';
+import { getVaultFileByPath, openWorkspaceLink } from './obsidianCompat';
 
 /**
  * Regex pattern to match Obsidian wikilinks in text content.
@@ -158,7 +158,7 @@ export function registerFileLinkHandler(
       event.preventDefault();
       const linkTarget = link.dataset.href || link.getAttribute('href');
       if (linkTarget) {
-        void app.workspace.openLinkText(linkTarget, '', 'tab');
+        void openWorkspaceLink(app, linkTarget, '', event);
       }
     }
   };

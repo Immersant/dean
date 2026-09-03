@@ -181,6 +181,8 @@ export interface DeanSettings {
   enableDualPane: boolean;
   enableFilePane: boolean;
   dualPaneSide: DualPaneSide;
+  /** When true, agents may author dean-session and dean-artifact fences. Default true. */
+  enableEditorSessionSections: boolean;
   sessionManagerOrganization?: SessionManagerOrganization;
   sessionManagerSort?: SessionManagerSort;
   pinnedLinkedNotePaths?: string[];

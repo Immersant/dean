@@ -861,10 +861,12 @@ function buildPromptBlocks(
   return buildOpencodePromptBlocks({
     browserSelection: request.context?.browserSelection,
     canvasSelection: request.context?.canvasSelection,
+    conversationBinding: request.context?.conversationBinding,
     currentNoteContent: currentNote?.content,
     currentNotePath: currentNote?.path,
     editorSelection: request.context?.editorSelection,
     images,
+    sessionSection: request.context?.sessionSection,
     text,
   }, bootstrapHistory
     ? [...(request.conversationHistory ?? [])] as ChatMessage[]

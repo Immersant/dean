@@ -3136,6 +3136,52 @@ describe('DeanPlugin', () => {
     });
   });
 
+  describe('openSessionSectionDraft', () => {
+    it('opens a fresh view draft without resolving a conversation', async () => {
+      plugin.settings = { enableEditorSessionSections: true } as any;
+      const openNewChatDraft = jest.fn().mockResolvedValue({ status: 'opened' });
+      (plugin as unknown as { ensureViewOpen: jest.Mock }).ensureViewOpen = jest.fn()
+        .mockResolvedValue({ openNewChatDraft });
+      const getConversationById = jest.spyOn(plugin, 'getConversationById');
+      const createConversation = jest.spyOn(plugin, 'createConversation');
+
+      await expect(plugin.openSessionSectionDraft({
+        content: '# Discovery',
+        sourceNotePath: 'Notes/Discovery.md',
+      })).resolves.toEqual({ status: 'opened' });
+
+      expect(openNewChatDraft).toHaveBeenCalledWith('# Discovery');
+      expect(getConversationById).not.toHaveBeenCalled();
+      expect(createConversation).not.toHaveBeenCalled();
+    });
+
+    it('fails closed for disabled sections and invalid empty drafts', async () => {
+      plugin.settings = { enableEditorSessionSections: false } as any;
+      await expect(plugin.openSessionSectionDraft({
+        content: '# Discovery',
+        sourceNotePath: 'Notes/Discovery.md',
+      })).resolves.toEqual({ status: 'blocked', reason: 'flag-off' });
+
+      plugin.settings = { enableEditorSessionSections: true } as any;
+      await expect(plugin.openSessionSectionDraft({
+        content: '   ',
+        sourceNotePath: 'Notes/Discovery.md',
+      })).resolves.toEqual({ status: 'blocked', reason: 'invalid-request' });
+    });
+
+    it('fails closed when opening the chat view rejects', async () => {
+      plugin.settings = { enableEditorSessionSections: true } as any;
+      (plugin as unknown as { ensureViewOpen: jest.Mock }).ensureViewOpen = jest.fn()
+        .mockRejectedValue(new Error('view activation failed'));
+
+      await expect(plugin.openSessionSectionDraft({
+        content: '# Discovery',
+        sourceNotePath: 'Notes/Discovery.md',
+      })).resolves.toEqual({ status: 'blocked', reason: 'view-unavailable' });
+      expect(Notice).toHaveBeenCalledWith(expect.any(String));
+    });
+  });
+
   describe('updateConversation', () => {
     it('creates linked-note metadata atomically and publishes later note changes', async () => {
       await plugin.onload();

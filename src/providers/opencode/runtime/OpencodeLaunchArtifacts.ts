@@ -7,6 +7,8 @@ import {
   computeSystemPromptKey,
   type SystemPromptSettings,
 } from '../../../core/prompt/mainAgent';
+import { buildDeanSystemPromptAppendices } from '../../../core/session-sections/sessionSectionPrompt';
+import type { DeanSettings } from '../../../core/types/settings';
 import { expandHomePath } from '../../../utils/path';
 import {
   OPENCODE_BUILD_MODE_ID,
@@ -61,11 +63,18 @@ export interface PrepareOpencodeLaunchArtifactsParams {
   defaultAgentId?: string;
   managedAgents?: readonly OpencodeManagedAgentConfig[];
   runtimeEnv: NodeJS.ProcessEnv;
-  settings?: SystemPromptSettings;
+  settings?: SystemPromptSettings & Partial<Pick<DeanSettings, 'enableEditorSessionSections'>>;
   systemPromptKey?: string;
   systemPromptText?: string;
   userName?: string;
   workspaceRoot: string;
+}
+
+function resolveOpencodeSystemPromptOptions(
+  settings: PrepareOpencodeLaunchArtifactsParams['settings'],
+): { appendices?: string[] } {
+  const appendices = buildDeanSystemPromptAppendices(settings);
+  return appendices.length > 0 ? { appendices } : {};
 }
 
 export async function prepareOpencodeLaunchArtifacts(
@@ -78,13 +87,15 @@ export async function prepareOpencodeLaunchArtifacts(
   );
   const systemPromptPath = path.join(artifactsDir, 'system.md');
   const configPath = path.join(artifactsDir, 'config.json');
+  const promptOptions = resolveOpencodeSystemPromptOptions(params.settings);
   const systemPrompt = normalizeSystemPrompt(
-    params.systemPromptText ?? buildSystemPrompt(requireSettings(params)),
+    params.systemPromptText
+      ?? buildSystemPrompt(requireSettings(params), promptOptions),
   );
   const promptKey = params.systemPromptKey
     ?? (params.systemPromptText !== undefined
       ? params.systemPromptText
-      : computeSystemPromptKey(requireSettings(params)));
+      : computeSystemPromptKey(requireSettings(params), promptOptions));
   const baseConfig = await loadOpencodeBaseConfig(
     params.runtimeEnv.OPENCODE_CONFIG,
     params.workspaceRoot,

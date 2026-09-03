@@ -42,9 +42,11 @@ Tab IDs are reserved before asynchronous assembly. Admission and activation are 
 | `NavigationController` | Keyboard and history navigation |
 | `SelectionController` | Editor selection context |
 | `BrowserSelectionController` | Browser selection context |
-| `CanvasSelectionController` | Canvas selection context |
+| `CanvasSelectionController` | Canvas selection context and safe node summaries |
 
 Renderers and UI components may render state and emit user intent. They must not mutate tab membership, conversation persistence, or provider-session lifecycle.
+
+Canvas selection context contains the Canvas path and selected node summaries copied from Obsidian's live Canvas objects. Summaries may include node type, file and subpath, text, label, URL, and color; text is capped at 200 characters. Polling does not read linked vault files or parse `dean-session` fences. The agent can read a selected file node's path later when the task requires its contents.
 
 ### Renderers
 
@@ -93,6 +95,47 @@ The **Inline edit** command runs against the active Markdown view.
 `InlineEditModal` is a CodeMirror overlay: an input widget, then a word-level diff or insertion preview. Accept / reject apply or discard the change.
 
 The edit itself is an auxiliary provider execution (`InlineEditService` in `src/core/auxiliary/`). It uses the same backends as chat but a separate session, a dedicated prompt (`src/core/prompt/inlineEdit.ts`), a **read-only** tool policy, and `PASSIVE_AUXILIARY_INTERACTION_PORT` (no approval or ask-user UI). The composer can mention vault files and attach the same external-context directories as the active tab.
+
+## Editor session sections
+
+Editor session sections are enabled by default and can be turned off with **Enable editor session sections** in settings. They are fenced `dean-session` YAML blocks that agents can leave in vault notes for durable actions or forms.
+
+Bound Act sections show a confirmation with **Send** to continue the bound conversation and **New chat** to open the prepared prompt as an editable, unsent draft. Bound Collect sections save answers back into the note and offer the same two choices; **Open chat** only focuses the existing conversation.
+
+Standalone Collect sections set `startNewChat` to a required submit-button label, omit `conversationId`, `epoch`, and actions, then show a confirmation before opening an unsent editable draft in a fresh Dean chat using the current default provider and model. The confirmation action is **New chat**. The source note path appears in the draft text only; Dean does not automatically attach the note as execution context.
+
+Several fences in the same note may share an optional `formId` so a form can be split around normal editor prose. Bound members must share `conversationId` and `epoch`; Act confirmation previews every member's merged questions and current answers with the prepared prompt before either destination is chosen. Standalone members all set `startNewChat` to a button label; that control composes the full form for confirmation. Dean shows Act / the authored standalone submit only on the last `formId` member. Bound and standalone fences cannot share a `formId`. **Open chat** still only focuses the bound conversation.
+
+```dean-session
+schemaVersion: 1
+id: discovery
+kind: collect
+title: Discovery questions
+status: open
+createdAt: 1786992000000
+startNewChat: Start new chat
+questions:
+  - id: goal
+    prompt: What should we build?
+    type: markdown
+answers: {}
+```
+
+## Editor artifacts
+
+The same **Enable editor session sections** setting also turns on `dean-artifact` fences. These are display-only HTML element widgets in vault notes: a YAML header, then a blank line, then an allowlisted HTML fragment. Dean rebuilds the fragment with native elements (`createEl`). Scripts, iframes, forms, media, and `href`/`src` fail closed. Use `dean-session` for questions and Act buttons.
+
+```dean-artifact
+schemaVersion: 1
+id: sprint-health
+title: Sprint health
+createdAt: 1786992000000
+
+<div>
+  <div><strong>Open</strong> 12</div>
+  <div><strong>Blocked</strong> 3</div>
+</div>
+```
 
 ## Settings
 
