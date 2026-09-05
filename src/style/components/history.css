@@ -750,6 +750,15 @@ body.theme-dark .dean-session-metadata-popover {
   text-overflow: ellipsis;
 }
 
+.dean-history-item-session-state {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dean-history-item-date {
   font-size: 11px;
   color: var(--text-faint);

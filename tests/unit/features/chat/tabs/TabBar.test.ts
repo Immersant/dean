@@ -22,6 +22,8 @@ function createTabBarItem(overrides: Partial<TabBarItem> = {}): TabBarItem {
     isActive: false,
     isStreaming: false,
     attention: null,
+    lifecycleState: 'cold',
+    isDraft: false,
     canClose: true,
     ...overrides,
   };
@@ -97,7 +99,8 @@ describe('TabBar', () => {
 
       tabBar.update([createTabBarItem({ title: 'My Conversation' })]);
 
-      expect(containerEl._children[0].getAttribute('aria-label')).toBe('My Conversation');
+      expect(containerEl._children[0].getAttribute('aria-label'))
+        .toBe('My Conversation (Bound session, Ready)');
       expect(containerEl._children[0].getAttribute('title')).toBeNull();
     });
 

@@ -95,7 +95,7 @@ export class TabBar {
     });
 
     // Obsidian uses aria-label for hover tooltips here; adding title causes duplicate tooltip text.
-    badgeEl.setAttribute('aria-label', item.title);
+    badgeEl.setAttribute('aria-label', this.getBadgeAriaLabel(item));
     badgeEl.setAttribute('data-provider', item.providerId);
     badgeEl.setAttribute('data-title-expanded', isTitleExpanded ? 'true' : 'false');
 
@@ -180,6 +180,25 @@ export class TabBar {
     }
 
     return this.truncateExpandedTitle(item.title);
+  }
+
+  private getBadgeAriaLabel(item: TabBarItem): string {
+    const lifecycleLabel = this.getLifecycleLabel(item.lifecycleState);
+    const sessionTypeLabel = item.isDraft ? 'Draft session' : 'Bound session';
+    return `${item.title} (${sessionTypeLabel}, ${lifecycleLabel})`;
+  }
+
+  private getLifecycleLabel(lifecycleState: TabBarItem['lifecycleState']): string {
+    switch (lifecycleState) {
+      case 'provisional':
+        return 'Preview';
+      case 'cold':
+        return 'Ready';
+      case 'warm':
+        return 'Active';
+      case 'closing':
+        return 'Closing';
+    }
   }
 
   private truncateExpandedTitle(title: string): string {

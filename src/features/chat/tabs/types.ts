@@ -309,5 +309,7 @@ export interface TabBarItem {
   isActive: boolean;
   isStreaming: boolean;
   attention: TabAttention;
+  lifecycleState: TabLifecycleState;
+  isDraft: boolean;
   canClose: boolean;
 }

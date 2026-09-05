@@ -1157,6 +1157,8 @@ export class TabManager implements TabManagerInterface {
         isActive: tab.id === this.activeTabId,
         isStreaming: tab.state.isStreaming,
         attention: tab.state.attention,
+        lifecycleState: tab.lifecycleState,
+        isDraft: tab.conversationId === null,
         canClose: !tab.state.isRewinding && (this.tabs.size > 1 || !tab.state.isStreaming),
       });
     }

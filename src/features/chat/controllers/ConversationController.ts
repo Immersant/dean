@@ -46,6 +46,7 @@ function runConversationAction(action: () => Promise<void>, failureMessage: stri
 
 const DEFAULT_HISTORY_PAGE_SIZE = 100;
 const MAX_REWIND_CONFLICT_PATHS = 5;
+type SessionLifecycleState = 'provisional' | 'cold' | 'warm' | 'closing';
 
 function buildRewindConflictConfirmation(conflicts: readonly ChatRewindConflict[]): string {
   const visiblePaths = conflicts
@@ -107,6 +108,8 @@ export type HistoryConversationStatus = {
   attention?: TabAttention;
   location?: 'current-view' | 'other-view';
   tabIndex?: number;
+  lifecycleState?: SessionLifecycleState;
+  isDraft?: boolean;
 };
 
 type HistoryRenderOptions = {
@@ -1377,6 +1380,13 @@ export class ConversationController {
       text: conversation.title,
     });
     titleEl.setAttribute('title', conversation.title);
+    const stateBadgeLabel = this.getSessionStateBadgeLabel(conversationStatus);
+    if (stateBadgeLabel) {
+      content.createDiv({
+        cls: 'dean-history-item-session-state',
+        text: stateBadgeLabel,
+      });
+    }
     if (options.showMetadataPopover) {
       const focusTarget = isSelectable ? content : item;
       focusTarget.setAttribute('tabindex', '0');
@@ -1519,6 +1529,14 @@ export class ConversationController {
 
     if (options.sessionActionMode === 'active') {
       if (!showAttentionState) {
+        const renameBtn = actions.createEl('button', { cls: 'dean-action-btn' });
+        setIcon(renameBtn, 'pencil');
+        renameBtn.setAttribute('aria-label', 'Rename');
+        renameBtn.addEventListener('click', (event) => {
+          event.stopPropagation();
+          this.showRenameEditor(item, conversation.id, conversation.title, options);
+        });
+
         const isPinned = conversation.isPinned === true;
         if (options.showInlinePinAction !== false) {
           const pinBtn = actions.createEl('button', {
@@ -1669,6 +1687,7 @@ export class ConversationController {
     descriptionTarget.setAttribute('aria-describedby', popoverId);
 
     const language = options.language ?? 'en';
+    const status = this.getHistoryConversationStatusForMetadata(conversation, options);
     const linkedNotePath = conversation.currentNote;
     const hasLinkedNote = !!linkedNotePath
       && !isProvisionalNotePath(linkedNotePath, language);
@@ -1690,6 +1709,15 @@ export class ConversationController {
       options.getProviderIcon?.(conversation),
       options.getModelLabel?.(conversation) ?? conversation.selectedModel ?? '',
     );
+    const sessionStateLabel = this.getSessionMetadataLabel(status);
+    if (sessionStateLabel) {
+      this.renderSessionMetadataRow(
+        hoverEl,
+        'panel-top',
+        'Session',
+        sessionStateLabel,
+      );
+    }
     this.renderSessionMetadataRow(
       hoverEl,
       'calendar-days',
@@ -1893,18 +1921,56 @@ export class ConversationController {
 
     if (isRunning) {
       if (openState === 'closed') return 'Running';
-      return `Running in ${this.getHistoryTabLabel(status)}`;
+      const locationLabel = `Running in ${this.getHistoryTabLabel(status)}`;
+      const lifecycleLabel = this.getLifecycleLabel(status.lifecycleState);
+      return lifecycleLabel ? `${locationLabel} · ${lifecycleLabel}` : locationLabel;
     }
 
     switch (openState) {
       case 'current':
-        return typeof status.tabIndex === 'number'
+        {
+          const baseLabel = typeof status.tabIndex === 'number'
           ? `Current tab ${status.tabIndex}`
           : 'Current session';
+          const lifecycleLabel = this.getLifecycleLabel(status.lifecycleState);
+          return lifecycleLabel ? `${baseLabel} · ${lifecycleLabel}` : baseLabel;
+        }
       case 'open':
-        return `Open in ${this.getHistoryTabLabel(status)}`;
+        {
+          const baseLabel = `Open in ${this.getHistoryTabLabel(status)}`;
+          const lifecycleLabel = this.getLifecycleLabel(status.lifecycleState);
+          return lifecycleLabel ? `${baseLabel} · ${lifecycleLabel}` : baseLabel;
+        }
       case 'closed':
         return this.formatDate(timestamp);
+    }
+  }
+
+  private getSessionStateBadgeLabel(status: HistoryConversationStatus): string | null {
+    if (status.openState === 'closed') return null;
+    const lifecycleLabel = this.getLifecycleLabel(status.lifecycleState);
+    const sessionType = status.isDraft === true ? 'Draft' : 'Bound';
+    return lifecycleLabel ? `${sessionType} · ${lifecycleLabel}` : sessionType;
+  }
+
+  private getSessionMetadataLabel(status: HistoryConversationStatus): string | null {
+    if (status.openState === 'closed') return null;
+    const lifecycleLabel = this.getLifecycleLabel(status.lifecycleState);
+    const sessionType = status.isDraft === true ? 'Draft session' : 'Bound session';
+    return lifecycleLabel ? `${sessionType} · ${lifecycleLabel}` : sessionType;
+  }
+
+  private getLifecycleLabel(lifecycleState: SessionLifecycleState | undefined): string | null {
+    if (!lifecycleState) return null;
+    switch (lifecycleState) {
+      case 'provisional':
+        return 'Preview';
+      case 'cold':
+        return 'Ready';
+      case 'warm':
+        return 'Active';
+      case 'closing':
+        return 'Closing';
     }
   }
 

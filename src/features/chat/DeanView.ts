@@ -2073,6 +2073,8 @@ export class DeanView extends ItemView {
         attention: activeTab.state.attention,
         openState: 'current',
         isRunning: activeTab.state.isStreaming,
+        lifecycleState: activeTab.lifecycleState,
+        isDraft: activeTab.conversationId === null,
         location: 'current-view',
         tabIndex: this.getHistoryTabIndex(activeTab),
       };
@@ -2084,6 +2086,8 @@ export class DeanView extends ItemView {
         attention: localTab.state.attention,
         openState: 'open',
         isRunning: localTab.state.isStreaming,
+        lifecycleState: localTab.lifecycleState,
+        isDraft: localTab.conversationId === null,
         location: 'current-view',
         tabIndex: this.getHistoryTabIndex(localTab),
       };
@@ -2096,6 +2100,8 @@ export class DeanView extends ItemView {
         attention: crossViewTab?.state.attention,
         openState: 'open',
         isRunning: crossViewTab?.state.isStreaming ?? false,
+        lifecycleState: crossViewTab?.lifecycleState,
+        isDraft: crossViewTab?.conversationId === null,
         location: 'other-view',
       };
     }
