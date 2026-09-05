@@ -1398,7 +1398,7 @@ describe('ConversationController', () => {
           (button: { getAttribute(name: string): string | null | undefined }) => (
             button.getAttribute('aria-label') === 'Rename'
           ),
-        )).toBe(false);
+        )).toBe(true);
       });
 
       it('filters the current session scope by title and linked-note path', () => {
