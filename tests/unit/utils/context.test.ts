@@ -100,6 +100,21 @@ describe('stripCurrentNoteContext', () => {
     expect(stripCurrentNoteContext(prompt)).toBe('Just a regular prompt');
   });
 
+  it('strips Dean host context from display text', () => {
+    const prompt = 'Hello\n\n<dean_host context_mode="dean-plugin" version="1" />';
+    expect(stripCurrentNoteContext(prompt)).toBe('Hello');
+  });
+
+  it('strips note and Dean host context from composed prompts', () => {
+    const prompt = 'Hello\n\n<linked_note path="note.md" />\n\n<dean_host context_mode="dean-plugin" version="1" />';
+    expect(stripCurrentNoteContext(prompt)).toBe('Hello');
+  });
+
+  it('strips Dean host context after a legacy note prefix', () => {
+    const prompt = '<linked_note path="note.md" />\n\nHello\n\n<dean_host context_mode="dean-plugin" version="1" />';
+    expect(stripCurrentNoteContext(prompt)).toBe('Hello');
+  });
+
   it('prefers prefix format when both could match', () => {
     // This tests the function order: it tries prefix first
     const prefixPrompt = '<linked_note>\ntest.md\n</linked_note>\n\nQuery';
@@ -145,6 +160,11 @@ describe('XML_CONTEXT_PATTERN', () => {
 
   it('matches dean_conversation tag', () => {
     const text = 'Query\n\n<dean_conversation id="conv-1" section_epoch="0" />';
+    expect(XML_CONTEXT_PATTERN.test(text)).toBe(true);
+  });
+
+  it('matches dean_host tag', () => {
+    const text = 'Query\n\n<dean_host context_mode="dean-plugin" version="1" />';
     expect(XML_CONTEXT_PATTERN.test(text)).toBe(true);
   });
 
@@ -342,6 +362,12 @@ describe('extractUserQuery', () => {
   });
 
 describe('appendProviderExecutionContext', () => {
+  it('always appends Dean host context without optional execution context', () => {
+    expect(appendProviderExecutionContext('Hello', undefined)).toBe(
+      'Hello\n\n<dean_host context_mode="dean-plugin" version="1" />',
+    );
+  });
+
   it('appends note then conversation binding then session section in order', () => {
     const result = appendProviderExecutionContext('Hello', {
       currentNote: { path: 'notes/spec.md' },
@@ -368,7 +394,8 @@ describe('appendProviderExecutionContext', () => {
         answers: { approach: 'tabs' },
       },
     });
-    expect(result.indexOf('<linked_note')).toBeLessThan(result.indexOf('<dean_conversation'));
+    expect(result.indexOf('<linked_note')).toBeLessThan(result.indexOf('<dean_host'));
+    expect(result.indexOf('<dean_host')).toBeLessThan(result.indexOf('<dean_conversation'));
     expect(result.indexOf('<dean_conversation')).toBeLessThan(result.indexOf('<session_section'));
     expect(result).toContain('section_epoch="3"');
     expect(result).toContain('action="done"');

@@ -32,6 +32,7 @@ import type {
 import {
   appendContextFiles,
   appendProviderExecutionContext,
+  stripDeanHostContext,
 } from '../../../utils/context';
 import { parseEnvironmentVariables } from '../../../utils/env';
 import {
@@ -1503,10 +1504,14 @@ function encodePrompt(
       text,
       history,
     );
-    text = encodePiRecoveryPrompt(
-      historyContext,
-      recoveredPrompt === historyContext ? null : text,
-    );
+    const promptWasDeduplicated = stripDeanHostContext(recoveredPrompt)
+      === stripDeanHostContext(historyContext);
+    text = promptWasDeduplicated
+      ? encodePiRecoveryPrompt(
+        appendProviderExecutionContext(stripDeanHostContext(historyContext), undefined),
+        null,
+      )
+      : encodePiRecoveryPrompt(historyContext, text);
   }
   return {
     images: request.input.flatMap((block): PiPromptImage[] => {

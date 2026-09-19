@@ -384,7 +384,10 @@ describe('GrokExecutionBackend', () => {
     });
     expect(native.modeRequests[0]).toEqual({ modeId: 'plan', sessionId: 'session-existing' });
     expect(native.promptRequests[0]).toMatchObject({
-      prompt: [{ text: 'hello', type: 'text' }],
+      prompt: [{
+        text: 'hello\n\n<dean_host context_mode="dean-plugin" version="1" />',
+        type: 'text',
+      }],
       sessionId: 'session-existing',
     });
     expect(events.map(event => event.type)).toEqual([

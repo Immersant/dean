@@ -4,8 +4,13 @@
  * Session recovery and history reconstruction.
  */
 
+import { appendDeanHostContext } from '../core/context/DeanHostContext';
 import type { ChatMessage, ToolCallInfo } from '../core/types';
-import { extractUserQuery, formatCurrentNote } from './context';
+import {
+  extractUserQuery,
+  formatCurrentNote,
+  stripDeanHostContext,
+} from './context';
 
 // ============================================
 // Session Recovery
@@ -247,7 +252,11 @@ export function buildPromptWithHistoryContext(
   const shouldAppendPrompt = !lastUserMessage ||
     lastUserQuery.trim() !== currentUserQuery.trim();
 
-  return shouldAppendPrompt
-    ? `${historyContext}\n\nUser: ${prompt}`
+  if (shouldAppendPrompt) {
+    return `${historyContext}\n\nUser: ${prompt}`;
+  }
+
+  return prompt.includes('<dean_host')
+    ? appendDeanHostContext(stripDeanHostContext(historyContext))
     : historyContext;
 }
