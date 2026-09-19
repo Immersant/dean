@@ -6,7 +6,7 @@ import * as path from 'node:path';
 
 import { isWriteEditTool } from '../../../core/tools/toolNames';
 import type { ChatMessage, ContentBlock, ImageAttachment, ToolCallInfo } from '../../../core/types';
-import { extractUserQuery } from '../../../utils/context';
+import { extractUserQuery, stripDeanHostContext } from '../../../utils/context';
 import { extractDiffData } from '../../../utils/diff';
 import { buildImageAttachmentFromBase64 } from '../../../utils/imageAttachment';
 import { encodePiModelId } from '../models';
@@ -505,7 +505,9 @@ function mapPiSessionEntry(
   if (role === 'user') {
     const rawContent = extractTextContent(message.content ?? message.text ?? message.message);
     const recoveryPrompt = decodePiRecoveryPrompt(rawContent);
-    const content = recoveryPrompt?.currentInput ?? (recoveryPrompt ? '' : rawContent);
+    const content = stripDeanHostContext(
+      recoveryPrompt?.currentInput ?? (recoveryPrompt ? '' : rawContent),
+    );
     const displayContent = extractPiSkillDisplayContent(content);
     const messageId = entry.id ?? createSyntheticPiMessageId(
       'user',

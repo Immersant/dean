@@ -439,6 +439,9 @@ describe('ClaudeExecutionBackend', () => {
 
     const prompt = getEncodedPrompts()[0] ?? '';
     expect(prompt).toContain(
+      '<dean_host context_mode="dean-plugin" version="1" />',
+    );
+    expect(prompt).toContain(
       '<current_note path="notes/&quot;draft&quot; &amp; review.md">\n<![CDATA[Before\n</current_note>\nAfter]]>\n</current_note>',
     );
     expect(prompt).toContain(
@@ -985,7 +988,9 @@ describe('ClaudeExecutionBackend', () => {
     const prompts = getEncodedPrompts();
     expect(prompts[0]).toContain('prior question');
     expect(prompts[0]).toContain('prior answer');
-    expect(prompts[1]).toBe('Follow up');
+    expect(prompts[1]).toBe(
+      'Follow up\n\n<dean_host context_mode="dean-plugin" version="1" />',
+    );
   });
 
   it('replays canonical history once after confirmed SDK session amnesia', async () => {
@@ -1019,9 +1024,13 @@ describe('ClaudeExecutionBackend', () => {
     })).events);
 
     const prompts = getEncodedPrompts();
-    expect(prompts[0]).toBe('Hello');
+    expect(prompts[0]).toBe(
+      'Hello\n\n<dean_host context_mode="dean-plugin" version="1" />',
+    );
     expect(prompts[1]).toContain('recover this question');
-    expect(prompts[2]).toBe('After recovery');
+    expect(prompts[2]).toBe(
+      'After recovery\n\n<dean_host context_mode="dean-plugin" version="1" />',
+    );
   });
 
   it('retains amnesia recovery history when cancellation wins before native handoff', async () => {
@@ -1270,7 +1279,9 @@ describe('ClaudeExecutionBackend', () => {
         resumeSessionAt: 'assistant-checkpoint',
       }),
     }));
-    expect(getEncodedPrompts().at(-1)).toBe('Retry the fork');
+    expect(getEncodedPrompts().at(-1)).toBe(
+      'Retry the fork\n\n<dean_host context_mode="dean-plugin" version="1" />',
+    );
   });
 
   it('persists amnesia recovery intent across execution-session recreation', async () => {
@@ -1316,7 +1327,9 @@ describe('ClaudeExecutionBackend', () => {
 
     const prompts = getEncodedPrompts();
     expect(prompts.at(-2)).toContain('durable recovery question');
-    expect(prompts.at(-1)).toBe('Continue after recovery');
+    expect(prompts.at(-1)).toBe(
+      'Continue after recovery\n\n<dean_host context_mode="dean-plugin" version="1" />',
+    );
     expect(replacement.getSnapshot().providerState).not.toHaveProperty(
       'historyReplayPending',
     );

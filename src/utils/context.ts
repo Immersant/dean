@@ -25,7 +25,7 @@ const NOTE_CONTEXT_BLOCK_PATTERN = `(?:${SELF_CLOSING_NOTE_CONTEXT_PATTERN}|${PA
 const NOTE_CONTEXT_PREFIX_REGEX = new RegExp(`^${NOTE_CONTEXT_BLOCK_PATTERN}\\n\\n`);
 // Matches note context at the END of prompt (current placement)
 const NOTE_CONTEXT_SUFFIX_REGEX = new RegExp(`\\n\\n${NOTE_CONTEXT_BLOCK_PATTERN}$`);
-const DEAN_HOST_CONTEXT_SUFFIX_REGEX = /\n\n<dean_host(?:\s[^>]*)?\s*\/>$/;
+const DEAN_HOST_CONTEXT_REGEX = /(?:\n\n)?<dean_host(?:\s[^>]*)?\s*\/>\s*/g;
 
 /**
  * Pattern to match XML context tags appended to prompts.
@@ -69,7 +69,12 @@ export function stripCurrentNoteContext(prompt: string): string {
   }
   return prompt
     .replace(NOTE_CONTEXT_SUFFIX_REGEX, '')
-    .replace(DEAN_HOST_CONTEXT_SUFFIX_REGEX, '');
+    .replace(DEAN_HOST_CONTEXT_REGEX, '')
+    .trimEnd();
+}
+
+export function stripDeanHostContext(prompt: string): string {
+  return prompt.replace(DEAN_HOST_CONTEXT_REGEX, '').trimEnd();
 }
 
 /**

@@ -1005,6 +1005,9 @@ describe('CodexExecutionBackend', () => {
       };
     const prompt = turnParams.input.find(block => block.type === 'text')?.text;
     expect(prompt).toContain(
+      '<dean_host context_mode="dean-plugin" version="1" />',
+    );
+    expect(prompt).toContain(
       '<current_note path="notes/&quot;draft&quot; &amp; review.md">\n<![CDATA[Before\n</current_note>\nAfter]]>\n</current_note>',
     );
     expect(prompt).toContain(

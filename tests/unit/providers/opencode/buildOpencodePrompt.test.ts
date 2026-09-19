@@ -21,6 +21,9 @@ describe('buildOpencodePromptText', () => {
     });
 
     expect(prompt).toContain('Summarize this');
+    expect(prompt).toContain(
+      '<dean_host context_mode="dean-plugin" version="1" />',
+    );
     expect(prompt).toContain('<linked_note path="notes/&quot;today&quot; &amp; draft.md" />');
     expect(prompt).toContain('<editor_selection path="notes/&quot;today&quot; &amp; draft.md" lines="4-5">');
     expect(prompt).toContain('<browser_selection source="browser:https://example.com" title="Example" url="https://example.com">');
@@ -92,7 +95,10 @@ describe('buildOpencodePromptBlocks', () => {
     });
 
     expect(blocks).toEqual([
-      { type: 'text', text: 'Inspect this image' },
+      {
+        type: 'text',
+        text: 'Inspect this image\n\n<dean_host context_mode="dean-plugin" version="1" />',
+      },
       { type: 'image', mimeType: 'image/png', data: 'base64-image' },
     ]);
   });
