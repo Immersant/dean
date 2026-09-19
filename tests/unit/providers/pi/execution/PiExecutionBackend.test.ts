@@ -24,6 +24,7 @@ import {
   type PiExecutionKernelCallbacks,
 } from '@/providers/pi/execution';
 import { PiConversationHistoryService } from '@/providers/pi/history/PiConversationHistoryService';
+import { decodePiRecoveryPrompt } from '@/providers/pi/history/PiRecoveryPromptCodec';
 import type { PiLaunchSpec } from '@/providers/pi/runtime/PiLaunchSpec';
 
 class FakeKernel implements PiExecutionKernel {
@@ -974,6 +975,23 @@ describe('PiExecutionBackend', () => {
     expect(prompts[1]).toBe(
       'Second follow up\n\n<dean_host context_mode="dean-plugin" version="1" />',
     );
+  });
+
+  it('deduplicates a recovered current query while retaining one host marker', async () => {
+    const harness = createHarness();
+    const conversationHistory = createConversationHistory('prior');
+    const run = harness.session.execute(createRequest({
+      conversationHistory,
+      input: [{ text: 'prior question', type: 'text' }],
+    }));
+    const eventsPromise = collect(run.events);
+    await waitFor(() => harness.kernels.flatMap(getPromptMessages).length === 1);
+    completeTurn(harness.kernels[0]);
+    await eventsPromise;
+
+    const prompt = getPromptMessages(harness.kernels[0])[0];
+    expect(decodePiRecoveryPrompt(prompt)?.currentInput).toBeNull();
+    expect(prompt.match(/<dean_host\b/g)).toHaveLength(1);
   });
 
   it.each([
