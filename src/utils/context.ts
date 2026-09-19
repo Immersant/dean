@@ -4,6 +4,7 @@
  * Note and context file formatting for prompts.
  */
 
+import { appendDeanHostContext } from '../core/context/DeanHostContext';
 import type { ProviderExecutionContext } from '../core/execution/ProviderExecutionRequest';
 import {
   appendDeanConversationBinding,
@@ -24,14 +25,15 @@ const NOTE_CONTEXT_BLOCK_PATTERN = `(?:${SELF_CLOSING_NOTE_CONTEXT_PATTERN}|${PA
 const NOTE_CONTEXT_PREFIX_REGEX = new RegExp(`^${NOTE_CONTEXT_BLOCK_PATTERN}\\n\\n`);
 // Matches note context at the END of prompt (current placement)
 const NOTE_CONTEXT_SUFFIX_REGEX = new RegExp(`\\n\\n${NOTE_CONTEXT_BLOCK_PATTERN}$`);
+const DEAN_HOST_CONTEXT_SUFFIX_REGEX = /\n\n<dean_host(?:\s[^>]*)?\s*\/>$/;
 
 /**
  * Pattern to match XML context tags appended to prompts.
  * These tags are always preceded by \n\n separator.
  * Matches: linked_note/current_note, editor_selection (with attributes), editor_cursor (with attributes),
- * context_files, canvas_selection, browser_selection, dean_conversation, session_section
+ * context_files, canvas_selection, browser_selection, dean_host, dean_conversation, session_section
  */
-export const XML_CONTEXT_PATTERN = /\n\n<(?:linked_note|current_note|editor_selection|editor_cursor|context_files|canvas_selection|browser_selection|dean_conversation|session_section)[\s>]/;
+export const XML_CONTEXT_PATTERN = /\n\n<(?:linked_note|current_note|editor_selection|editor_cursor|context_files|canvas_selection|browser_selection|dean_host|dean_conversation|session_section)[\s>]/;
 const BRACKET_CONTEXT_PATTERN = /\n\[(?:Current note|Editor selection from|Browser selection from|Canvas selection from)\b/;
 
 export function formatCurrentNote(notePath: string): string {
@@ -65,7 +67,9 @@ export function stripCurrentNoteContext(prompt: string): string {
   if (strippedPrefix !== prompt) {
     return strippedPrefix;
   }
-  return prompt.replace(NOTE_CONTEXT_SUFFIX_REGEX, '');
+  return prompt
+    .replace(NOTE_CONTEXT_SUFFIX_REGEX, '')
+    .replace(DEAN_HOST_CONTEXT_SUFFIX_REGEX, '');
 }
 
 /**
@@ -134,6 +138,7 @@ export function extractUserQuery(prompt: string): string {
     .replace(/<context_files>[\s\S]*?<\/context_files>\s*/g, '')
     .replace(/<canvas_selection[\s\S]*?<\/canvas_selection>\s*/g, '')
     .replace(/<browser_selection[\s\S]*?<\/browser_selection>\s*/g, '')
+    .replace(/<dean_host(?:\s[^>]*)?\s*\/>\s*/g, '')
     .replace(/<dean_conversation(?:\s[^>]*)?\s*\/>\s*/g, '')
     .replace(/<session_section[\s\S]*?<\/session_section>\s*/g, '')
     .trim();
@@ -165,7 +170,7 @@ export function appendProviderExecutionContext(
   },
 ): string {
   if (!context) {
-    return prompt;
+    return appendDeanHostContext(prompt);
   }
 
   let next = prompt;
@@ -189,6 +194,7 @@ export function appendProviderExecutionContext(
   if (context.canvasSelection) {
     next = appendCanvasContext(next, context.canvasSelection);
   }
+  next = appendDeanHostContext(next);
   if (context.conversationBinding) {
     next = appendDeanConversationBinding(next, context.conversationBinding);
   }
