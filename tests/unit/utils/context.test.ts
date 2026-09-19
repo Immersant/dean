@@ -105,6 +105,16 @@ describe('stripCurrentNoteContext', () => {
     expect(stripCurrentNoteContext(prompt)).toBe('Hello');
   });
 
+  it('strips note and Dean host context from composed prompts', () => {
+    const prompt = 'Hello\n\n<linked_note path="note.md" />\n\n<dean_host context_mode="dean-plugin" version="1" />';
+    expect(stripCurrentNoteContext(prompt)).toBe('Hello');
+  });
+
+  it('strips Dean host context after a legacy note prefix', () => {
+    const prompt = '<linked_note path="note.md" />\n\nHello\n\n<dean_host context_mode="dean-plugin" version="1" />';
+    expect(stripCurrentNoteContext(prompt)).toBe('Hello');
+  });
+
   it('prefers prefix format when both could match', () => {
     // This tests the function order: it tries prefix first
     const prefixPrompt = '<linked_note>\ntest.md\n</linked_note>\n\nQuery';

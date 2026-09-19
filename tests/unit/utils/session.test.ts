@@ -644,6 +644,24 @@ describe('session utilities', () => {
       expect(result).toBe(historyContext);
     });
 
+    it('preserves exactly one Dean host marker when a recovered prompt is deduplicated', () => {
+      const messages: ChatMessage[] = [
+        { id: 'msg-1', role: 'user', content: 'Retry this', timestamp: 1000 },
+      ];
+      const historyContext = 'User: Retry this';
+      const prompt = 'Retry this\n\n<dean_host context_mode="dean-plugin" version="1" />';
+
+      const result = buildPromptWithHistoryContext(
+        historyContext,
+        prompt,
+        prompt,
+        messages,
+      );
+
+      expect(result.match(/<dean_host\b/g)).toHaveLength(1);
+      expect(result).toContain('context_mode="dean-plugin"');
+    });
+
     it('appends prompt when actualPrompt differs from last user message', () => {
       const messages: ChatMessage[] = [
         { id: 'msg-1', role: 'user', content: 'first message', timestamp: 1000 },

@@ -63,13 +63,13 @@ export function appendCurrentNoteContent(
  * Handles legacy <current_note> tags and canonical <linked_note> tags.
  */
 export function stripCurrentNoteContext(prompt: string): string {
-  const strippedPrefix = prompt.replace(NOTE_CONTEXT_PREFIX_REGEX, '');
-  if (strippedPrefix !== prompt) {
+  const withoutHost = stripDeanHostContext(prompt);
+  const strippedPrefix = withoutHost.replace(NOTE_CONTEXT_PREFIX_REGEX, '');
+  if (strippedPrefix !== withoutHost) {
     return strippedPrefix;
   }
-  return prompt
+  return withoutHost
     .replace(NOTE_CONTEXT_SUFFIX_REGEX, '')
-    .replace(DEAN_HOST_CONTEXT_REGEX, '')
     .trimEnd();
 }
 
