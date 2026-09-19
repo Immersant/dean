@@ -184,7 +184,7 @@ html: <div>no</div>
 
   it('parses the vault artifact-board example', () => {
     const note = readFileSync(join(process.cwd(), 'artifact-board.md'), 'utf8');
-    const match = note.match(/```dean-artifact\n([\s\S]*?)\n```/);
+    const match = note.match(/```dean-artifact\r?\n([\s\S]*?)\r?\n```/);
     if (!match?.[1]) {
       throw new Error('expected artifact example fence');
     }
@@ -196,7 +196,7 @@ html: <div>no</div>
 
   it('parses the vault mobile-layout-drafts example', () => {
     const note = readFileSync(join(process.cwd(), 'mobile-layout-drafts.md'), 'utf8');
-    const match = note.match(/```dean-artifact\n([\s\S]*?)\n```/);
+    const match = note.match(/```dean-artifact\r?\n([\s\S]*?)\r?\n```/);
     if (!match?.[1]) {
       throw new Error('expected artifact example fence');
     }

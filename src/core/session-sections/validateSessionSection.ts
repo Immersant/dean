@@ -1,4 +1,3 @@
-import { isValidSessionMetadataId } from '../bootstrap/SessionStorage';
 import { decodeSectionEpoch } from './decodeSectionEpoch';
 import {
   type BoundSessionSection,
@@ -317,10 +316,12 @@ export function validateSessionSection(raw: unknown): SessionSection {
     };
   }
 
-  const conversationId = typeof raw.conversationId === 'string' ? raw.conversationId : '';
-  if (!isValidSessionMetadataId(conversationId)) {
-    throw new SessionSectionValidationError('conversationId is not a valid session metadata id');
-  }
+  // Missing or invalid conversationId is not a hard validation error.
+  // The fence still renders as a degraded bound section so the user can
+  // start a new chat with the same content. Persistence remains guarded
+  // by isValidSessionMetadataId / assertValidSessionMetadataId; resolution
+  // treats empty/invalid as missing and falls back to a new-chat draft.
+  const conversationId = typeof raw.conversationId === 'string' ? raw.conversationId.trim() : '';
 
   const section: BoundSessionSection = {
     schemaVersion: SESSION_SECTION_SCHEMA_VERSION,

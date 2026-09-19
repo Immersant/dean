@@ -1523,7 +1523,8 @@ export default class DeanPlugin extends Plugin {
 
     const conversation = await this.resolveConversationForSessionSection(conversationId);
     if (!conversation) {
-      new Notice(t('settings.sessionSections.blocked.conversationMissing'));
+      // Invalid or deleted conversationId is not a hard error; session-section
+      // Act flows fallback to a new chat draft (handled in SessionSectionService).
       return { status: 'blocked', reason: 'conversation-missing' };
     }
 
@@ -1618,15 +1619,49 @@ export default class DeanPlugin extends Plugin {
       return { status: 'blocked', reason: 'flag-off' };
     }
 
-    if (typeof conversationId !== 'string' || !conversationId.trim()) {
+    if (typeof conversationId !== 'string') {
       new Notice(t('settings.sessionSections.blocked.invalidRequest'));
       return { status: 'blocked', reason: 'invalid-request' };
+    }
+    // Empty/invalid conversationId is not a hard error; treat as missing
+    // and fall back to a fresh draft below.
+    if (!conversationId.trim()) {
+      const view = await this.ensureViewOpen();
+      if (!view) {
+        new Notice(t('settings.sessionSections.blocked.viewUnavailable'));
+        return { status: 'blocked', reason: 'view-unavailable' };
+      }
+      try {
+        const result = await view.openNewChatDraft('');
+        if (result.status === 'opened') {
+          return { status: 'focused' };
+        }
+      } catch {
+        // Fall through
+      }
+      new Notice(t('settings.sessionSections.blocked.tabNotReady'));
+      return { status: 'blocked', reason: 'tab-not-ready' };
     }
 
     const conversation = await this.resolveConversationForSessionSection(conversationId);
     if (!conversation) {
-      new Notice(t('settings.sessionSections.blocked.conversationMissing'));
-      return { status: 'blocked', reason: 'conversation-missing' };
+      // Conversation missing/invalid is not a hard error for session sections.
+      // Fallback to opening a fresh draft instead of blocking Open chat.
+      const view = await this.ensureViewOpen();
+      if (!view) {
+        new Notice(t('settings.sessionSections.blocked.viewUnavailable'));
+        return { status: 'blocked', reason: 'view-unavailable' };
+      }
+      try {
+        const result = await view.openNewChatDraft('');
+        if (result.status === 'opened') {
+          return { status: 'focused' };
+        }
+      } catch {
+        // Fall through to tab-not-ready
+      }
+      new Notice(t('settings.sessionSections.blocked.tabNotReady'));
+      return { status: 'blocked', reason: 'tab-not-ready' };
     }
 
     await this.activateView();
