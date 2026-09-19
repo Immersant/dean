@@ -130,6 +130,30 @@ export async function activateSessionSectionAction(
         : undefined,
     );
     const result = await host.submitSessionSectionTurn(section.conversationId, request);
+    // Scope to new chat when bound conversation is missing/invalid instead of hard blocking.
+    if (result.status === 'blocked' && result.reason === 'conversation-missing') {
+      recordSessionSectionDiagnostic({
+        level: 'info',
+        code: 'submit-conversation-missing-fallback-new-chat',
+        message: 'Bound conversation missing; opening new chat draft',
+        conversationId: section.conversationId,
+        sectionId: section.id,
+        actionId,
+      });
+      const fallback = await host.openSessionSectionDraft({
+        content: draft,
+        sourceNotePath: notePath,
+      });
+      recordSessionSectionDiagnostic({
+        level: fallback.status === 'opened' ? 'info' : 'warn',
+        code: fallback.status === 'opened' ? 'new-chat-draft-opened' : 'new-chat-draft-blocked',
+        message: fallback.status === 'opened' ? 'Opened Act fallback new-chat draft' : fallback.reason,
+        conversationId: section.conversationId,
+        sectionId: section.id,
+        actionId,
+      });
+      return fallback;
+    }
     recordSessionSectionDiagnostic({
       level: result.status === 'blocked' ? 'warn' : 'info',
       code: `submit-${result.status}`,

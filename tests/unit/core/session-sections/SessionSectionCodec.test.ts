@@ -243,10 +243,13 @@ describe('SessionSectionCodec', () => {
     expect(() => parseSessionSectionYaml(yaml)).toThrow(/action/);
   });
 
-  it('rejects invalid conversationId paths', () => {
-    expect(() => parseSessionSectionYaml(
+  it('accepts invalid conversationId paths as degraded bound sections (new-chat fallback)', () => {
+    const section = parseSessionSectionYaml(
       ACT_YAML.replace('conv-1710000000000-ab12cd34e', '../escape'),
-    )).toThrow(/conversationId/);
+    );
+    expect(section.conversationId).toBe('../escape');
+    // Still round-trips; runtime treats the conversation as missing and opens a new chat.
+    expect(parseSessionSectionYaml(serializeSessionSectionYaml(section)).conversationId).toBe('../escape');
   });
 
   it('round-trips open cssClass and style maps without a named layout allowlist', () => {
@@ -290,7 +293,7 @@ describe('SessionSectionCodec', () => {
 
   it('parses the theme-branding collect fence in mobile-layout-drafts', () => {
     const note = readFileSync(join(process.cwd(), 'mobile-layout-drafts.md'), 'utf8');
-    const match = note.match(/```dean-session\n([\s\S]*?)\n```/);
+    const match = note.match(/```dean-session\r?\n([\s\S]*?)\r?\n```/);
     if (!match?.[1]) {
       throw new Error('expected session-section example fence');
     }
